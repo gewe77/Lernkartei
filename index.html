@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#c96442">
+<title>Lernkartei</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23c96442'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E▣%3C/text%3E%3C/svg%3E">
+<style>
+:root {
+  --bg: #faf9f7; --surface: #ffffff; --surface-2: #f1efe8;
+  --text: #1a1a19; --text-2: #5f5e5a; --text-3: #888780;
+  --border: rgba(0,0,0,0.12); --border-strong: rgba(0,0,0,0.2);
+  --accent: #c96442; --accent-hover: #b15637;
+  --r1: #e24b4a; --r2: #ef9f27; --r3: #639922; --r4: #378add;
+  --radius: 8px; --radius-lg: 12px; --shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1f1e1c; --surface: #2a2927; --surface-2: #353330;
+    --text: #f0eee6; --text-2: #b4b2a9; --text-3: #888780;
+    --border: rgba(255,255,255,0.12); --border-strong: rgba(255,255,255,0.2);
+    --shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  background: var(--bg); color: var(--text);
+  font-size: 15px; line-height: 1.5; min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+button { font-family: inherit; font-size: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; font-size: inherit; }
+.app { max-width: 920px; margin: 0 auto; padding: 0 16px 80px; }
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 0; border-bottom: 1px solid var(--border); margin-bottom: 20px;
+  position: sticky; top: 0; background: var(--bg); z-index: 10;
+  flex-wrap: wrap; gap: 12px;
+}
+.logo { font-weight: 600; font-size: 18px; color: var(--accent); }
+.logo::before { content: "▣ "; }
+.nav { display: flex; gap: 4px; flex-wrap: wrap; }
+.nav button {
+  padding: 8px 14px; border: none; background: transparent;
+  border-radius: var(--radius); color: var(--text-2);
+  font-weight: 500; transition: all 0.15s;
+}
+.nav button:hover { background: var(--surface-2); color: var(--text); }
+.nav button.active { background: var(--accent); color: white; }
+.sync-status {
+  display: flex; align-items: center; gap: 6px; font-size: 12px;
+  color: var(--text-2); padding: 4px 10px; border-radius: 20px;
+  background: var(--surface-2);
+}
+.sync-status .dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--text-3);
+}
+.sync-status.ok .dot { background: var(--r3); }
+.sync-status.busy .dot { background: var(--r2); animation: pulse 1s infinite; }
+.sync-status.err .dot { background: var(--r1); }
+@keyframes pulse { 50% { opacity: 0.3; } }
+
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.card h2 { margin: 0 0 12px; font-size: 18px; font-weight: 600; }
+.card h3 { margin: 16px 0 8px; font-size: 15px; font-weight: 600; }
+.btn {
+  padding: 8px 14px; border: 1px solid var(--border-strong);
+  background: var(--surface); color: var(--text);
+  border-radius: var(--radius); font-weight: 500; transition: all 0.15s;
+}
+.btn:hover { background: var(--surface-2); }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-danger { color: var(--r1); border-color: var(--r1); }
+.btn-danger:hover { background: var(--r1); color: white; }
+.btn-sm { padding: 4px 10px; font-size: 13px; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.input, .select, .textarea {
+  width: 100%; padding: 8px 12px; border: 1px solid var(--border-strong);
+  border-radius: var(--radius); background: var(--surface); color: var(--text);
+}
+.textarea { resize: vertical; min-height: 70px; font-family: inherit; }
+.field { margin-bottom: 12px; }
+.field label { display: block; margin-bottom: 4px; font-size: 13px; color: var(--text-2); font-weight: 500; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+.row > * { flex: 1; min-width: 180px; }
+.box-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.box-item {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px;
+  border-left: 4px solid var(--accent);
+}
+.box-item h3 { margin: 0 0 6px; font-size: 15px; }
+.box-item .meta { font-size: 13px; color: var(--text-2); margin-bottom: 10px; }
+.box-item .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.muted { color: var(--text-2); font-size: 13px; }
+.empty { text-align: center; padding: 40px 20px; color: var(--text-2); }
+.flash-wrap { perspective: 1200px; margin: 20px auto; max-width: 600px; }
+.flash { position: relative; min-height: 280px; transform-style: preserve-3d; transition: transform 0.5s; }
+.flash.flipped { transform: rotateY(180deg); }
+.flash-side {
+  position: absolute; inset: 0; padding: 30px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow);
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  text-align: center; backface-visibility: hidden;
+  font-size: 18px; line-height: 1.5; cursor: pointer;
+}
+.flash-back { transform: rotateY(180deg); }
+.flash-side .label { position: absolute; top: 12px; left: 16px; font-size: 12px; color: var(--text-3); letter-spacing: 0.5px; }
+.flash-side .fach-badge { position: absolute; top: 12px; right: 16px; font-size: 12px; padding: 3px 10px; border-radius: 20px; background: var(--surface-2); color: var(--text-2); }
+.flash-side .notiz { margin-top: 16px; font-size: 14px; color: var(--text-2); border-top: 1px dashed var(--border); padding-top: 12px; font-style: italic; }
+.rate-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 16px 0; }
+.rate-btn { padding: 14px 8px; border: none; border-radius: var(--radius); color: white; font-weight: 600; font-size: 14px; display: flex; flex-direction: column; gap: 2px; align-items: center; }
+.rate-btn small { font-weight: 400; opacity: 0.85; font-size: 11px; }
+.rate-1 { background: var(--r1); } .rate-2 { background: var(--r2); }
+.rate-3 { background: var(--r3); } .rate-4 { background: var(--r4); }
+.progress-bar { height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; margin: 12px 0; }
+.progress-fill { height: 100%; background: var(--accent); transition: width 0.3s; }
+.kbd-hint { font-size: 12px; color: var(--text-3); text-align: center; margin-top: 8px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+th { font-weight: 600; color: var(--text-2); font-size: 13px; }
+td .actions { display: flex; gap: 4px; }
+.bar-row { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+.bar-label { width: 60px; font-size: 13px; color: var(--text-2); }
+.bar-track { flex: 1; height: 18px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--accent); display: flex; align-items: center; padding-left: 6px; color: white; font-size: 12px; font-weight: 500; }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.stat-card { background: var(--surface-2); border-radius: var(--radius); padding: 14px; }
+.stat-card .v { font-size: 24px; font-weight: 600; }
+.stat-card .l { font-size: 12px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.5px; }
+.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+.modal { background: var(--surface); border-radius: var(--radius-lg); max-width: 540px; width: 100%; padding: 24px; max-height: 90vh; overflow-y: auto; }
+.modal h2 { margin-top: 0; }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: var(--radius); font-size: 14px; z-index: 200; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.loading { text-align: center; padding: 80px 20px; color: var(--text-2); }
+.spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.checkbox-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+.checkbox-row input[type=checkbox] { width: 16px; height: 16px; }
+.mini-progress { display: inline-flex; gap: 2px; vertical-align: middle; margin-left: 8px; }
+.mini-progress span { width: 6px; height: 12px; background: var(--surface-2); border-radius: 1px; }
+.mini-progress span.on { background: var(--accent); }
+.warn { background: rgba(239, 159, 39, 0.15); color: var(--text); padding: 10px 14px; border-radius: var(--radius); font-size: 14px; border: 1px solid var(--r2); margin-bottom: 12px; }
+.info { background: rgba(55, 138, 221, 0.1); color: var(--text); padding: 10px 14px; border-radius: var(--radius); font-size: 14px; border: 1px solid var(--r4); margin-bottom: 12px; }
+@media (max-width: 600px) {
+  .nav button { padding: 6px 10px; font-size: 13px; }
+  .logo { display: none; }
+  .flash-side { padding: 20px; font-size: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="loading"><div class="spinner"></div>Lade Daten…</div>
+</div>
+
+<script>
+'use strict';
+
+// ================================================================
+// KONFIGURATION — HIER deine OAuth-Client-ID eintragen
+// ================================================================
+// Solange leer, läuft die App im Lokal-Modus (nur localStorage).
+// Sobald du eine ID einträgst und die App über https oder http://localhost
+// öffnest, wird der Drive-Sync aktiv.
+const GOOGLE_CLIENT_ID = ''; // z.B. '123456789-abc.apps.googleusercontent.com'
+const DRIVE_FILE_NAME = 'lernkartei-data.json';
+const DRIVE_FOLDER_NAME = 'Lernkartei';
+const SYNC_DEBOUNCE_MS = 2500; // Warte X ms nach letzter Änderung, dann sync
+
+// ================================================================
+// STORAGE LAYER (localStorage als primärer Speicher)
+// ================================================================
+const STORAGE_PREFIX = 'lk:';
+const STORAGE_OK = (() => {
+  try {
+    localStorage.setItem('__lk_test__', '1');
+    localStorage.removeItem('__lk_test__');
+    return true;
+  } catch (e) { return false; }
+})();
+function sGet(key, fallback = null) {
+  if (!STORAGE_OK) return fallback;
+  try {
+    const v = localStorage.getItem(key);
+    return v === null ? fallback : JSON.parse(v);
+  } catch (e) { return fallback; }
+}
+function sSet(key, value) {
+  if (!STORAGE_OK) return false;
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (e) {
+    if (e.name === 'QuotaExceededError') alert('Speicher voll!');
+    return false;
+  }
+}
+function sDelete(key) { if (STORAGE_OK) try { localStorage.removeItem(key); } catch (e) {} }
+
+// ================================================================
+// STATE
+// ================================================================
+const VERSION = 2;
+const DEFAULT_INTERVALS = [1, 3, 7, 14, 21, 30, 45, 60, 90, 120, 180, 365];
+const NUM_FACHER = 12;
+
+let state = {
+  meta: { version: VERSION, lastSeen: null, streak: 0, lastLearnDate: null, intervals: [...DEFAULT_INTERVALS], modifiedAt: 0 },
+  boxes: [],
+  cards: {},
+  view: 'lernen',
+  session: null,
+};
+
+let sync = {
+  enabled: false,
+  configured: false,
+  signedIn: false,
+  token: null,
+  tokenExpiry: 0,
+  fileId: null,
+  folderId: null,
+  status: 'idle', // idle | busy | ok | err
+  statusMsg: '',
+  lastSyncAt: 0,
+  pendingTimer: null,
+  user: null,
+};
+
+// ================================================================
+// HELPERS
+// ================================================================
+const todayISO = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
+const addDaysISO = (days) => {
+  const d = new Date(); d.setDate(d.getDate() + days);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
+const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+const escapeHTML = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const isDue = (card) => card.faellig <= todayISO();
+
+function toast(msg) {
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2200);
+}
+function confirmDialog(msg) { return Promise.resolve(confirm(msg)); }
+
+function bumpModified() {
+  state.meta.modifiedAt = Date.now();
+  sSet(STORAGE_PREFIX + 'meta', state.meta);
+}
+
+// ================================================================
+// DATEN-SERIALISIERUNG (für Sync und Export)
+// ================================================================
+function serializeAll() {
+  return {
+    version: VERSION,
+    exported: new Date().toISOString(),
+    meta: state.meta,
+    boxes: state.boxes,
+    cards: state.cards,
+  };
+}
+async function loadFromObject(data, mode = 'replace') {
+  if (!data || !data.boxes || !data.cards) throw new Error('Ungültiges Format');
+  if (mode === 'replace') {
+    for (const b of state.boxes) sDelete(STORAGE_PREFIX + 'cards:' + b.id);
+    state.boxes = data.boxes;
+    state.cards = data.cards;
+    if (data.meta) state.meta = { ...state.meta, ...data.meta };
+  } else { // merge
+    const byName = {};
+    state.boxes.forEach(b => byName[b.name.toLowerCase()] = b.id);
+    for (const ib of data.boxes) {
+      let targetId = byName[ib.name.toLowerCase()];
+      if (!targetId) {
+        const newId = uid();
+        state.boxes.push({ ...ib, id: newId });
+        state.cards[newId] = [];
+        byName[ib.name.toLowerCase()] = newId;
+        targetId = newId;
+      }
+      const incoming = data.cards[ib.id] || [];
+      const existing = state.cards[targetId] || [];
+      const existingFragen = new Set(existing.map(c => c.frage + '|' + c.antwort));
+      for (const c of incoming) {
+        const key = c.frage + '|' + c.antwort;
+        if (!existingFragen.has(key)) {
+          existing.push({ ...c, id: uid() });
+          existingFragen.add(key);
+        }
+      }
+      state.cards[targetId] = existing;
+    }
+  }
+  sSet(STORAGE_PREFIX + 'boxes', state.boxes);
+  sSet(STORAGE_PREFIX + 'meta', state.meta);
+  for (const b of state.boxes) sSet(STORAGE_PREFIX + 'cards:' + b.id, state.cards[b.id] || []);
+}
+
+// ================================================================
+// GOOGLE DRIVE SYNC
+// ================================================================
+function syncIsConfigurable() {
+  if (!GOOGLE_CLIENT_ID) return false;
+  const proto = location.protocol;
+  const host = location.hostname;
+  if (proto === 'https:') return true;
+  if (proto === 'http:' && (host === 'localhost' || host === '127.0.0.1')) return true;
+  return false;
+}
+
+function setSyncStatus(status, msg = '') {
+  sync.status = status; sync.statusMsg = msg;
+  const el = document.querySelector('.sync-status');
+  if (el) {
+    el.className = 'sync-status ' + status;
+    el.querySelector('span:last-child').textContent = msg ||
+      (status==='ok'?'Synced':status==='busy'?'Sync…':status==='err'?'Fehler':'Drive');
+  }
+}
+
+async function loadGoogleScripts() {
+  if (window.google?.accounts?.oauth2 && window.gapi) return;
+  await new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client';
+    s.onload = res; s.onerror = () => rej(new Error('GSI laden fehlgeschlagen'));
+    document.head.appendChild(s);
+  });
+  await new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://apis.google.com/js/api.js';
+    s.onload = res; s.onerror = () => rej(new Error('GAPI laden fehlgeschlagen'));
+    document.head.appendChild(s);
+  });
+  await new Promise((res) => window.gapi.load('client', res));
+  await window.gapi.client.init({ discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'] });
+}
+
+let tokenClient = null;
+function getTokenClient() {
+  if (tokenClient) return tokenClient;
+  tokenClient = window.google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: 'https://www.googleapis.com/auth/drive.file',
+    callback: () => {}, // wird pro Anfrage überschrieben
+  });
+  return tokenClient;
+}
+
+function requestToken(opts = {}) {
+  return new Promise((resolve, reject) => {
+    const client = getTokenClient();
+    client.callback = (resp) => {
+      if (resp.error) return reject(new Error(resp.error));
+      sync.token = resp.access_token;
+      sync.tokenExpiry = Date.now() + (resp.expires_in || 3600) * 1000 - 60000;
+      window.gapi.client.setToken({ access_token: resp.access_token });
+      sSet(STORAGE_PREFIX + 'sync-was-signed-in', true);
+      resolve(resp);
+    };
+    client.error_callback = (err) => reject(err);
+    client.requestAccessToken({ prompt: opts.prompt ?? '' });
+  });
+}
+
+async function ensureToken() {
+  if (sync.token && Date.now() < sync.tokenExpiry) return sync.token;
+  await requestToken({ prompt: '' });
+  return sync.token;
+}
+
+async function signInDrive() {
+  setSyncStatus('busy', 'Anmelden…');
+  try {
+    await loadGoogleScripts();
+    await requestToken({ prompt: 'consent' });
+    sync.signedIn = true;
+    await initDriveFile();
+    setSyncStatus('ok', 'Verbunden');
+    toast('Mit Google Drive verbunden');
+    render();
+    // Direkt nach Anmeldung ersten Sync ausführen
+    await doSync({ initial: true });
+  } catch (e) {
+    console.error(e);
+    setSyncStatus('err', 'Fehler');
+    toast('Anmeldung fehlgeschlagen: ' + (e.message || e));
+  }
+}
+
+function signOutDrive() {
+  if (sync.token) {
+    try { window.google.accounts.oauth2.revoke(sync.token, () => {}); } catch (e) {}
+  }
+  sync.token = null; sync.tokenExpiry = 0; sync.signedIn = false;
+  sync.fileId = null; sync.folderId = null;
+  sDelete(STORAGE_PREFIX + 'sync-was-signed-in');
+  sDelete(STORAGE_PREFIX + 'sync-file-id');
+  sDelete(STORAGE_PREFIX + 'sync-folder-id');
+  setSyncStatus('idle', 'Abgemeldet');
+  render();
+}
+
+async function initDriveFile() {
+  // Prüfe / lege Ordner an
+  sync.folderId = sGet(STORAGE_PREFIX + 'sync-folder-id');
+  sync.fileId = sGet(STORAGE_PREFIX + 'sync-file-id');
+
+  if (!sync.folderId) {
+    const folderResp = await window.gapi.client.drive.files.list({
+      q: `name='${DRIVE_FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+      fields: 'files(id,name)',
+      spaces: 'drive',
+    });
+    if (folderResp.result.files?.length) {
+      sync.folderId = folderResp.result.files[0].id;
+    } else {
+      const created = await window.gapi.client.drive.files.create({
+        resource: { name: DRIVE_FOLDER_NAME, mimeType: 'application/vnd.google-apps.folder' },
+        fields: 'id',
+      });
+      sync.folderId = created.result.id;
+    }
+    sSet(STORAGE_PREFIX + 'sync-folder-id', sync.folderId);
+  }
+
+  // Prüfe / finde Datei
+  if (!sync.fileId) {
+    const fileResp = await window.gapi.client.drive.files.list({
+      q: `name='${DRIVE_FILE_NAME}' and '${sync.folderId}' in parents and trashed=false`,
+      fields: 'files(id,name,modifiedTime)',
+      spaces: 'drive',
+    });
+    if (fileResp.result.files?.length) {
+      sync.fileId = fileResp.result.files[0].id;
+      sSet(STORAGE_PREFIX + 'sync-file-id', sync.fileId);
+    }
+  }
+}
+
+async function downloadDriveFile() {
+  if (!sync.fileId) return null;
+  await ensureToken();
+  const resp = await window.gapi.client.drive.files.get({ fileId: sync.fileId, alt: 'media' });
+  try {
+    return typeof resp.result === 'string' ? JSON.parse(resp.result) : resp.result;
+  } catch (e) {
+    return JSON.parse(resp.body);
+  }
+}
+
+async function uploadDriveFile(data) {
+  await ensureToken();
+  const content = JSON.stringify(data);
+  const metadata = { name: DRIVE_FILE_NAME, mimeType: 'application/json' };
+  if (!sync.fileId) metadata.parents = [sync.folderId];
+
+  const boundary = '-------lk' + Math.random().toString(36).slice(2);
+  const body =
+    `--${boundary}\r\n` +
+    `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+    JSON.stringify(metadata) + '\r\n' +
+    `--${boundary}\r\n` +
+    `Content-Type: application/json\r\n\r\n` +
+    content + '\r\n' +
+    `--${boundary}--`;
+
+  const url = sync.fileId
+    ? `https://www.googleapis.com/upload/drive/v3/files/${sync.fileId}?uploadType=multipart&fields=id,modifiedTime`
+    : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,modifiedTime`;
+  const method = sync.fileId ? 'PATCH' : 'POST';
+
+  const resp = await fetch(url, {
+    method,
+    headers: {
+      'Authorization': 'Bearer ' + sync.token,
+      'Content-Type': `multipart/related; boundary=${boundary}`,
+    },
+    body,
+  });
+  if (!resp.ok) throw new Error('Upload-Fehler ' + resp.status);
+  const result = await resp.json();
+  if (!sync.fileId) {
+    sync.fileId = result.id;
+    sSet(STORAGE_PREFIX + 'sync-file-id', sync.fileId);
+  }
+  return result;
+}
+
+// Konflikt-Behandlung: Beim Sync vergleichen wir modifiedAt-Zeitstempel
+async function doSync({ initial = false, force = false } = {}) {
+  if (!sync.enabled || !sync.signedIn) return;
+  setSyncStatus('busy', 'Sync…');
+  try {
+    await ensureToken();
+    if (!sync.fileId && !sync.folderId) await initDriveFile();
+
+    const remote = await downloadDriveFile();
+    const localMod = state.meta.modifiedAt || 0;
+    const remoteMod = remote?.meta?.modifiedAt || 0;
+
+    if (!remote) {
+      // Erste Drive-Datei anlegen
+      await uploadDriveFile(serializeAll());
+      sync.lastSyncAt = Date.now();
+      sSet(STORAGE_PREFIX + 'sync-last', sync.lastSyncAt);
+      setSyncStatus('ok', 'Hochgeladen');
+      return;
+    }
+
+    if (initial && remoteMod > localMod && localMod > 0) {
+      // Möglicher Konflikt: beide Seiten haben Daten
+      await showConflictDialog(remote, remoteMod, localMod);
+      return;
+    }
+
+    if (initial && remoteMod > localMod) {
+      // Drive ist neuer, lokal noch unverändert → übernehmen
+      await loadFromObject(remote, 'replace');
+      sync.lastSyncAt = Date.now();
+      sSet(STORAGE_PREFIX + 'sync-last', sync.lastSyncAt);
+      setSyncStatus('ok', 'Geladen');
+      render();
+      toast('Daten von Drive geladen');
+      return;
+    }
+
+    if (force || localMod > remoteMod) {
+      await uploadDriveFile(serializeAll());
+      sync.lastSyncAt = Date.now();
+      sSet(STORAGE_PREFIX + 'sync-last', sync.lastSyncAt);
+      setSyncStatus('ok', 'Hochgeladen');
+      return;
+    }
+
+    // Gleichstand
+    sync.lastSyncAt = Date.now();
+    sSet(STORAGE_PREFIX + 'sync-last', sync.lastSyncAt);
+    setSyncStatus('ok', 'Aktuell');
+  } catch (e) {
+    console.error('Sync error', e);
+    setSyncStatus('err', 'Fehler');
+    toast('Sync fehlgeschlagen: ' + (e.message || e));
+  }
+}
+
+async function showConflictDialog(remote, remoteMod, localMod) {
+  return new Promise((resolve) => {
+    const localCount = state.boxes.reduce((a, b) => a + (state.cards[b.id]?.length || 0), 0);
+    const remoteCount = (remote.boxes || []).reduce((a, b) => a + (remote.cards?.[b.id]?.length || 0), 0);
+    const fmtDate = (ts) => ts ? new Date(ts).toLocaleString('de-DE') : 'unbekannt';
+
+    const bg = document.createElement('div');
+    bg.className = 'modal-bg';
+    bg.innerHTML = `
+      <div class="modal">
+        <h2>⚠ Sync-Konflikt</h2>
+        <p>Lokale Daten und Drive-Daten unterscheiden sich. Was möchtest du tun?</p>
+        <div class="row" style="margin: 16px 0">
+          <div class="card" style="margin:0">
+            <h3>Lokal</h3>
+            <p class="muted">${state.boxes.length} Kästen · ${localCount} Karten</p>
+            <p class="muted">Geändert: ${fmtDate(localMod)}</p>
+          </div>
+          <div class="card" style="margin:0">
+            <h3>Drive</h3>
+            <p class="muted">${(remote.boxes||[]).length} Kästen · ${remoteCount} Karten</p>
+            <p class="muted">Geändert: ${fmtDate(remoteMod)}</p>
+          </div>
+        </div>
+        <div class="btn-row" style="flex-direction:column">
+          <button class="btn btn-primary" data-action="merge">Beide zusammenführen (empfohlen)</button>
+          <button class="btn" data-action="local">Lokale Version verwenden (Drive überschreiben)</button>
+          <button class="btn" data-action="remote">Drive-Version verwenden (Lokal überschreiben)</button>
+          <button class="btn" data-action="cancel">Später entscheiden</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(bg);
+    bg.addEventListener('click', async (e) => {
+      const action = e.target.dataset.action;
+      if (!action) return;
+      bg.remove();
+      try {
+        if (action === 'cancel') {
+          setSyncStatus('idle', 'Pausiert');
+          resolve(); return;
+        }
+        if (action === 'merge') {
+          await loadFromObject(remote, 'merge');
+          state.meta.modifiedAt = Date.now();
+          sSet(STORAGE_PREFIX + 'meta', state.meta);
+          await uploadDriveFile(serializeAll());
+          setSyncStatus('ok', 'Zusammengeführt');
+          render(); toast('Daten zusammengeführt');
+        } else if (action === 'local') {
+          state.meta.modifiedAt = Date.now();
+          sSet(STORAGE_PREFIX + 'meta', state.meta);
+          await uploadDriveFile(serializeAll());
+          setSyncStatus('ok', 'Drive überschrieben');
+          toast('Drive aktualisiert');
+        } else if (action === 'remote') {
+          await loadFromObject(remote, 'replace');
+          setSyncStatus('ok', 'Drive übernommen');
+          render(); toast('Lokale Daten ersetzt');
+        }
+        sync.lastSyncAt = Date.now();
+        sSet(STORAGE_PREFIX + 'sync-last', sync.lastSyncAt);
+      } catch (err) {
+        console.error(err);
+        setSyncStatus('err', 'Fehler');
+        toast('Aktion fehlgeschlagen');
+      }
+      resolve();
+    });
+  });
+}
+
+function scheduleSyncSoon() {
+  if (!sync.enabled || !sync.signedIn) return;
+  clearTimeout(sync.pendingTimer);
+  sync.pendingTimer = setTimeout(() => doSync({ force: false }), SYNC_DEBOUNCE_MS);
+}
+
+// Wrapper, der nach jeder Datenänderung Sync triggert
+async function persistAndSync(boxId) {
+  bumpModified();
+  if (boxId) sSet(STORAGE_PREFIX + 'cards:' + boxId, state.cards[boxId]);
+  scheduleSyncSoon();
+}
+
+// ================================================================
+// INIT
+// ================================================================
+async function loadAll() {
+  if (!STORAGE_OK) {
+    document.getElementById('app').innerHTML =
+      '<div class="card"><h2>⚠ Speicher nicht verfügbar</h2><p>Bitte aktiviere localStorage in deinem Browser (kein privater Modus).</p></div>';
+    return;
+  }
+  state.meta = sGet(STORAGE_PREFIX + 'meta', state.meta);
+  if (!state.meta.intervals || state.meta.intervals.length !== NUM_FACHER) state.meta.intervals = [...DEFAULT_INTERVALS];
+  if (!state.meta.modifiedAt) state.meta.modifiedAt = 0;
+
+  state.boxes = sGet(STORAGE_PREFIX + 'boxes', []);
+  state.cards = {};
+  for (const b of state.boxes) state.cards[b.id] = sGet(STORAGE_PREFIX + 'cards:' + b.id, []);
+
+  if (state.boxes.length === 0) {
+    const demoId = uid();
+    state.boxes = [{ id: demoId, name: 'Beispiel', color: '#c96442', createdAt: todayISO() }];
+    state.cards[demoId] = [
+      makeCard('Was ist die Hauptstadt von Frankreich?', 'Paris'),
+      makeCard('Was bedeutet "ephemer"?', 'Kurzlebig, vergänglich'),
+      makeCard('Wer schrieb "Faust"?', 'Johann Wolfgang von Goethe', 'Erschienen 1808 (Teil 1)'),
+    ];
+    sSet(STORAGE_PREFIX + 'boxes', state.boxes);
+    sSet(STORAGE_PREFIX + 'cards:' + demoId, state.cards[demoId]);
+    bumpModified();
+  }
+
+  updateStreak();
+  sSet(STORAGE_PREFIX + 'meta', state.meta);
+
+  // Sync vorbereiten
+  sync.configured = !!GOOGLE_CLIENT_ID;
+  sync.enabled = syncIsConfigurable();
+  sync.lastSyncAt = sGet(STORAGE_PREFIX + 'sync-last', 0);
+  sync.fileId = sGet(STORAGE_PREFIX + 'sync-file-id', null);
+  sync.folderId = sGet(STORAGE_PREFIX + 'sync-folder-id', null);
+
+  render();
+
+  // Auto-Login wenn früher schon angemeldet
+  if (sync.enabled && sGet(STORAGE_PREFIX + 'sync-was-signed-in', false)) {
+    try {
+      await loadGoogleScripts();
+      await requestToken({ prompt: '' });
+      sync.signedIn = true;
+      setSyncStatus('busy', 'Sync…');
+      await doSync({ initial: true });
+      render();
+    } catch (e) {
+      // Stille Anmeldung fehlgeschlagen — Nutzer muss neu klicken
+      console.warn('Auto-Login nicht möglich', e);
+    }
+  }
+}
+
+function makeCard(frage, antwort, notiz = '') {
+  return { id: uid(), frage, antwort, notiz, fach: 1, faellig: todayISO(), history: [] };
+}
+
+function updateStreak() {
+  const today = todayISO();
+  if (state.meta.lastLearnDate === today) return;
+  if (state.meta.lastLearnDate) {
+    const yesterday = addDaysISO(-1);
+    if (state.meta.lastLearnDate < yesterday) state.meta.streak = 0;
+  }
+  state.meta.lastSeen = today;
+}
+
+async function recordLearned() {
+  const today = todayISO();
+  if (state.meta.lastLearnDate !== today) {
+    if (state.meta.lastLearnDate === addDaysISO(-1)) state.meta.streak += 1;
+    else state.meta.streak = 1;
+    state.meta.lastLearnDate = today;
+    bumpModified();
+  }
+}
+
+// ================================================================
+// INTERVAL LOGIC
+// ================================================================
+function applyRating(card, rating) {
+  const intervals = state.meta.intervals;
+  let newFach = card.fach;
+  if (rating === 1) newFach = 1;
+  else if (rating === 2) newFach = card.fach;
+  else if (rating === 3) newFach = Math.min(NUM_FACHER, card.fach + 1);
+  else if (rating === 4) newFach = Math.min(NUM_FACHER, card.fach + 2);
+  let interval = intervals[newFach - 1];
+  if (rating === 2) interval = Math.max(1, Math.round(interval * 1.1));
+  card.fach = newFach;
+  card.faellig = addDaysISO(interval);
+  card.history = card.history || [];
+  card.history.push({ d: todayISO(), r: rating, f: newFach });
+  if (card.history.length > 50) card.history = card.history.slice(-50);
+  return card;
+}
+
+// ================================================================
+// RENDER / NAV
+// ================================================================
+function render() {
+  const app = document.getElementById('app');
+  const syncBadge = sync.configured && sync.enabled ? `
+    <div class="sync-status ${sync.status}" onclick="go('einstellungen')" style="cursor:pointer">
+      <div class="dot"></div>
+      <span>${sync.statusMsg || (sync.signedIn?'Drive':'Drive aus')}</span>
+    </div>
+  ` : '';
+
+  app.innerHTML = `
+    <div class="topbar">
+      <div class="logo">Lernkartei</div>
+      <div class="nav">
+        <button class="${state.view==='lernen'?'active':''}" onclick="go('lernen')">Lernen</button>
+        <button class="${state.view==='kaesten'?'active':''}" onclick="go('kaesten')">Kästen</button>
+        <button class="${state.view==='karten'?'active':''}" onclick="go('karten')">Karten</button>
+        <button class="${state.view==='statistik'?'active':''}" onclick="go('statistik')">Statistik</button>
+        <button class="${state.view==='einstellungen'?'active':''}" onclick="go('einstellungen')">⚙</button>
+      </div>
+      ${syncBadge}
+    </div>
+    <div id="view"></div>
+  `;
+  renderView();
+}
+function go(v) { state.view = v; state.session = null; render(); }
+function renderView() {
+  const el = document.getElementById('view');
+  if (state.view === 'lernen') return renderLernen(el);
+  if (state.view === 'kaesten') return renderKaesten(el);
+  if (state.view === 'karten') return renderKarten(el);
+  if (state.view === 'statistik') return renderStatistik(el);
+  if (state.view === 'einstellungen') return renderEinstellungen(el);
+}
+
+// ================================================================
+// VIEW: LERNEN
+// ================================================================
+let lernenSelectedBoxes = new Set();
+let lernenMode = 'today';
+
+function renderLernen(el) {
+  if (state.session) return renderSession(el);
+  if (state.boxes.length === 0) {
+    el.innerHTML = `<div class="card empty">Noch keine Kästen vorhanden. Lege zuerst einen an.</div>`;
+    return;
+  }
+  if (lernenSelectedBoxes.size === 0) state.boxes.forEach(b => lernenSelectedBoxes.add(b.id));
+
+  const today = todayISO();
+  const stats = state.boxes.map(b => {
+    const cards = state.cards[b.id] || [];
+    return { ...b, total: cards.length, due: cards.filter(c => c.faellig <= today).length };
+  });
+  const totalDue = stats.filter(s => lernenSelectedBoxes.has(s.id)).reduce((a, s) => a + s.due, 0);
+
+  el.innerHTML = `
+    <div class="card">
+      <h2>Sitzung starten</h2>
+      <p class="muted">Streak: ${state.meta.streak} Tag${state.meta.streak===1?'':'e'} 🔥 — Heute fällig: ${totalDue}</p>
+      <h3>Kästen auswählen</h3>
+      <div>
+        ${stats.map(s => `
+          <div class="checkbox-row">
+            <input type="checkbox" id="box-${s.id}" ${lernenSelectedBoxes.has(s.id)?'checked':''} onchange="toggleBoxSelect('${s.id}')">
+            <label for="box-${s.id}" style="flex:1;cursor:pointer">
+              <strong>${escapeHTML(s.name)}</strong>
+              <span class="muted"> — ${s.total} Karten, ${s.due} fällig</span>
+            </label>
+          </div>
+        `).join('')}
+      </div>
+      <h3>Modus</h3>
+      <div class="btn-row">
+        <button class="btn ${lernenMode==='today'?'btn-primary':''}" onclick="setLernenMode('today')">Nur heute fällig</button>
+        <button class="btn ${lernenMode==='all'?'btn-primary':''}" onclick="setLernenMode('all')">Alle Karten</button>
+      </div>
+      <div style="margin-top:20px">
+        <button class="btn btn-primary" onclick="startSession()">Sitzung starten ${lernenMode==='today'?`(${totalDue} Karten)`:''}</button>
+      </div>
+    </div>
+  `;
+}
+window.toggleBoxSelect = (id) => { if (lernenSelectedBoxes.has(id)) lernenSelectedBoxes.delete(id); else lernenSelectedBoxes.add(id); };
+window.setLernenMode = (m) => { lernenMode = m; render(); };
+
+window.startSession = () => {
+  const today = todayISO();
+  let cards = [];
+  for (const bId of lernenSelectedBoxes) {
+    for (const c of (state.cards[bId] || [])) {
+      if (lernenMode === 'all' || c.faellig <= today) cards.push({ boxId: bId, card: c });
+    }
+  }
+  if (cards.length === 0) { toast('Keine Karten zum Lernen'); return; }
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+  state.session = { queue: cards, total: cards.length, done: 0, current: cards[0], flipped: false, ratings: {1:0,2:0,3:0,4:0} };
+  render();
+};
+
+function renderSession(el) {
+  const s = state.session;
+  if (!s.current) {
+    el.innerHTML = `
+      <div class="card" style="text-align:center">
+        <h2>Sitzung beendet 🎉</h2>
+        <p>${s.done} Karten gelernt</p>
+        <p class="muted">😖 ${s.ratings[1]} · 😬 ${s.ratings[2]} · 🙂 ${s.ratings[3]} · 😎 ${s.ratings[4]}</p>
+        <div class="btn-row" style="justify-content:center">
+          <button class="btn btn-primary" onclick="endSession()">Zur Übersicht</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+  const c = s.current.card;
+  const pct = (s.done / s.total) * 100;
+  const fachDots = Array.from({length: NUM_FACHER}, (_, i) => `<span class="${i < c.fach ? 'on' : ''}"></span>`).join('');
+
+  el.innerHTML = `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span class="muted">Karte ${s.done + 1} / ${s.total}</span>
+        <button class="btn btn-sm" onclick="abortSession()">Abbrechen</button>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="flash-wrap">
+        <div class="flash ${s.flipped?'flipped':''}" onclick="toggleFlip()">
+          <div class="flash-side flash-front">
+            <div class="label">FRAGE</div>
+            <div class="fach-badge">Fach ${c.fach}</div>
+            <div>${escapeHTML(c.frage)}</div>
+            ${!s.flipped ? '<div style="margin-top:20px" class="muted">Klick oder Leertaste zum Aufdecken</div>' : ''}
+          </div>
+          <div class="flash-side flash-back">
+            <div class="label">ANTWORT</div>
+            <div class="fach-badge">Fach ${c.fach}</div>
+            <div>${escapeHTML(c.antwort)}</div>
+            ${c.notiz ? `<div class="notiz">${escapeHTML(c.notiz)}</div>` : ''}
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;margin:8px 0">
+        <span class="muted">Fortschritt: </span>
+        <span class="mini-progress">${fachDots}</span>
+      </div>
+      ${s.flipped ? `
+        <div class="rate-row">
+          <button class="rate-btn rate-1" onclick="rate(1)">1<small>Nicht gewusst</small></button>
+          <button class="rate-btn rate-2" onclick="rate(2)">2<small>Schwer</small></button>
+          <button class="rate-btn rate-3" onclick="rate(3)">3<small>Gewusst</small></button>
+          <button class="rate-btn rate-4" onclick="rate(4)">4<small>Sehr leicht</small></button>
+        </div>
+        <div class="kbd-hint">Tasten 1–4 zum Bewerten · Leertaste zum Umdrehen</div>
+      ` : `
+        <div style="text-align:center;margin-top:16px">
+          <button class="btn btn-primary" onclick="toggleFlip()">Antwort zeigen (Leertaste)</button>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+window.toggleFlip = () => { if (state.session?.current) { state.session.flipped = !state.session.flipped; render(); } };
+window.rate = async (r) => {
+  const s = state.session;
+  if (!s?.current || !s.flipped) return;
+  const { boxId, card } = s.current;
+  applyRating(card, r);
+  s.ratings[r] += 1;
+  s.done += 1;
+  await persistAndSync(boxId);
+  await recordLearned();
+  s.queue.shift();
+  s.current = s.queue[0] || null;
+  s.flipped = false;
+  render();
+};
+window.abortSession = async () => { if (await confirmDialog('Sitzung abbrechen?')) endSession(); };
+window.endSession = () => { state.session = null; render(); };
+
+// ================================================================
+// VIEW: KÄSTEN
+// ================================================================
+function renderKaesten(el) {
+  el.innerHTML = `
+    <div class="card">
+      <h2>Neuen Kasten anlegen</h2>
+      <div class="row">
+        <input class="input" id="new-box-name" placeholder="z.B. Englisch Vokabeln" maxlength="50">
+        <button class="btn btn-primary" onclick="createBox()">Anlegen</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Vorhandene Kästen (${state.boxes.length})</h2>
+      ${state.boxes.length === 0 ? '<div class="empty">Noch keine Kästen.</div>' : `
+        <div class="box-list">
+          ${state.boxes.map(b => {
+            const cards = state.cards[b.id] || [];
+            const due = cards.filter(isDue).length;
+            return `
+              <div class="box-item" style="border-left-color:${b.color}">
+                <h3>${escapeHTML(b.name)}</h3>
+                <div class="meta">${cards.length} Karten · ${due} fällig</div>
+                <div class="actions">
+                  <button class="btn btn-sm" onclick="renameBox('${b.id}')">Umbenennen</button>
+                  <button class="btn btn-sm" onclick="exportBoxCSV('${b.id}')">CSV</button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteBox('${b.id}')">Löschen</button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `}
+    </div>
+  `;
+  const ni = document.getElementById('new-box-name');
+  if (ni) ni.addEventListener('keydown', e => { if (e.key === 'Enter') createBox(); });
+}
+
+window.createBox = async () => {
+  const name = document.getElementById('new-box-name').value.trim();
+  if (!name) return toast('Name fehlt');
+  const id = uid();
+  const colors = ['#c96442','#378add','#639922','#7f77dd','#d4537e','#1d9e75','#ba7517'];
+  state.boxes.push({ id, name, color: colors[state.boxes.length % colors.length], createdAt: todayISO() });
+  state.cards[id] = [];
+  sSet(STORAGE_PREFIX + 'boxes', state.boxes);
+  sSet(STORAGE_PREFIX + 'cards:' + id, []);
+  bumpModified(); scheduleSyncSoon();
+  toast('Kasten angelegt');
+  render();
+};
+window.renameBox = async (id) => {
+  const b = state.boxes.find(x => x.id === id);
+  if (!b) return;
+  const name = prompt('Neuer Name:', b.name);
+  if (name == null || !name.trim()) return;
+  b.name = name.trim();
+  sSet(STORAGE_PREFIX + 'boxes', state.boxes);
+  bumpModified(); scheduleSyncSoon();
+  render();
+};
+window.deleteBox = async (id) => {
+  const b = state.boxes.find(x => x.id === id);
+  if (!b) return;
+  const cards = state.cards[id] || [];
+  if (!await confirmDialog(`Kasten "${b.name}" mit ${cards.length} Karten unwiderruflich löschen?`)) return;
+  state.boxes = state.boxes.filter(x => x.id !== id);
+  delete state.cards[id];
+  sSet(STORAGE_PREFIX + 'boxes', state.boxes);
+  sDelete(STORAGE_PREFIX + 'cards:' + id);
+  lernenSelectedBoxes.delete(id);
+  bumpModified(); scheduleSyncSoon();
+  toast('Gelöscht'); render();
+};
+
+// ================================================================
+// VIEW: KARTEN
+// ================================================================
+let kartenFilterBox = 'all';
+let kartenSearch = '';
+
+function renderKarten(el) {
+  const allCards = [];
+  for (const b of state.boxes) for (const c of (state.cards[b.id] || [])) allCards.push({ ...c, boxId: b.id, boxName: b.name });
+  let filtered = allCards;
+  if (kartenFilterBox !== 'all') filtered = filtered.filter(c => c.boxId === kartenFilterBox);
+  if (kartenSearch) {
+    const q = kartenSearch.toLowerCase();
+    filtered = filtered.filter(c => c.frage.toLowerCase().includes(q) || c.antwort.toLowerCase().includes(q) || (c.notiz||'').toLowerCase().includes(q));
+  }
+
+  el.innerHTML = `
+    <div class="card">
+      <h2>Neue Karte anlegen</h2>
+      <div class="field"><label>Kasten</label>
+        <select class="select" id="new-card-box">${state.boxes.map(b => `<option value="${b.id}">${escapeHTML(b.name)}</option>`).join('')}</select>
+      </div>
+      <div class="field"><label>Frage</label><textarea class="textarea" id="new-card-frage"></textarea></div>
+      <div class="field"><label>Antwort</label><textarea class="textarea" id="new-card-antwort"></textarea></div>
+      <div class="field"><label>Notiz (optional)</label><textarea class="textarea" id="new-card-notiz"></textarea></div>
+      <button class="btn btn-primary" onclick="createCard()">Karte anlegen</button>
+    </div>
+    <div class="card">
+      <h2>Karten durchsuchen</h2>
+      <div class="row">
+        <select class="select" onchange="kartenFilterBox=this.value;render()">
+          <option value="all" ${kartenFilterBox==='all'?'selected':''}>Alle Kästen</option>
+          ${state.boxes.map(b => `<option value="${b.id}" ${kartenFilterBox===b.id?'selected':''}>${escapeHTML(b.name)}</option>`).join('')}
+        </select>
+        <input class="input" id="search-input" placeholder="Suchen…" value="${escapeHTML(kartenSearch)}" oninput="kartenSearch=this.value;debouncedRender()">
+      </div>
+      <p class="muted" style="margin:12px 0 0">${filtered.length} Karten</p>
+    </div>
+    <div class="card">
+      <h2>CSV-Import</h2>
+      <p class="muted">Format: <code>Frage;Antwort;Kasten</code></p>
+      <textarea class="textarea" id="csv-input" placeholder="Frage;Antwort;Kasten"></textarea>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn" onclick="importCSV(false)">Hinzufügen</button>
+        <button class="btn btn-danger" onclick="importCSV(true)">Ersetzen</button>
+        <input type="file" id="csv-file" accept=".csv,.txt" style="display:none" onchange="loadCSVFile(event)">
+        <button class="btn" onclick="document.getElementById('csv-file').click()">Datei wählen…</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Karten</h2>
+      ${filtered.length === 0 ? '<div class="empty">Keine Karten.</div>' : `
+        <div style="overflow-x:auto"><table>
+          <thead><tr><th>Frage</th><th>Antwort</th><th>Kasten</th><th>Fach</th><th>Fällig</th><th></th></tr></thead>
+          <tbody>${filtered.slice(0, 200).map(c => `
+            <tr>
+              <td>${escapeHTML(c.frage.slice(0,60))}${c.frage.length>60?'…':''}</td>
+              <td>${escapeHTML(c.antwort.slice(0,60))}${c.antwort.length>60?'…':''}</td>
+              <td>${escapeHTML(c.boxName)}</td>
+              <td>${c.fach}</td>
+              <td>${c.faellig}</td>
+              <td class="actions">
+                <button class="btn btn-sm" onclick="editCard('${c.boxId}','${c.id}')">✎</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteCard('${c.boxId}','${c.id}')">×</button>
+              </td>
+            </tr>
+          `).join('')}</tbody>
+        </table>${filtered.length > 200 ? `<p class="muted">Zeige 200 von ${filtered.length}</p>` : ''}</div>
+      `}
+    </div>
+  `;
+  if (kartenSearch) {
+    const si = document.getElementById('search-input');
+    if (si) { si.focus(); si.setSelectionRange(si.value.length, si.value.length); }
+  }
+}
+
+let renderTimer;
+window.debouncedRender = () => { clearTimeout(renderTimer); renderTimer = setTimeout(render, 250); };
+
+window.createCard = async () => {
+  const boxId = document.getElementById('new-card-box').value;
+  const frage = document.getElementById('new-card-frage').value.trim();
+  const antwort = document.getElementById('new-card-antwort').value.trim();
+  const notiz = document.getElementById('new-card-notiz').value.trim();
+  if (!frage || !antwort) return toast('Frage und Antwort erforderlich');
+  state.cards[boxId].push(makeCard(frage, antwort, notiz));
+  await persistAndSync(boxId);
+  toast('Karte angelegt'); render();
+};
+
+window.editCard = (boxId, cardId) => {
+  const card = state.cards[boxId].find(c => c.id === cardId);
+  if (!card) return;
+  showEditModal(boxId, card);
+};
+
+function showEditModal(boxId, card) {
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `
+    <div class="modal">
+      <h2>Karte bearbeiten</h2>
+      <div class="field"><label>Frage</label><textarea class="textarea" id="ed-frage">${escapeHTML(card.frage)}</textarea></div>
+      <div class="field"><label>Antwort</label><textarea class="textarea" id="ed-antwort">${escapeHTML(card.antwort)}</textarea></div>
+      <div class="field"><label>Notiz</label><textarea class="textarea" id="ed-notiz">${escapeHTML(card.notiz||'')}</textarea></div>
+      <div class="field"><label>Kasten</label>
+        <select class="select" id="ed-box">${state.boxes.map(b => `<option value="${b.id}" ${b.id===boxId?'selected':''}>${escapeHTML(b.name)}</option>`).join('')}</select>
+      </div>
+      <div class="row">
+        <div class="field"><label>Fach (1-${NUM_FACHER})</label><input class="input" type="number" min="1" max="${NUM_FACHER}" id="ed-fach" value="${card.fach}"></div>
+        <div class="field"><label>Fällig</label><input class="input" type="date" id="ed-faellig" value="${card.faellig}"></div>
+      </div>
+      <div class="btn-row" style="justify-content:flex-end">
+        <button class="btn" onclick="this.closest('.modal-bg').remove()">Abbrechen</button>
+        <button class="btn btn-primary" id="ed-save">Speichern</button>
+      </div>
+    </div>`;
+  bg.addEventListener('click', e => { if (e.target === bg) bg.remove(); });
+  document.body.appendChild(bg);
+  document.getElementById('ed-save').onclick = async () => {
+    const newBox = document.getElementById('ed-box').value;
+    card.frage = document.getElementById('ed-frage').value.trim();
+    card.antwort = document.getElementById('ed-antwort').value.trim();
+    card.notiz = document.getElementById('ed-notiz').value.trim();
+    card.fach = Math.max(1, Math.min(NUM_FACHER, parseInt(document.getElementById('ed-fach').value)||1));
+    card.faellig = document.getElementById('ed-faellig').value || todayISO();
+    if (newBox !== boxId) {
+      state.cards[boxId] = state.cards[boxId].filter(c => c.id !== card.id);
+      state.cards[newBox].push(card);
+      sSet(STORAGE_PREFIX + 'cards:' + boxId, state.cards[boxId]);
+      sSet(STORAGE_PREFIX + 'cards:' + newBox, state.cards[newBox]);
+    } else {
+      sSet(STORAGE_PREFIX + 'cards:' + boxId, state.cards[boxId]);
+    }
+    bumpModified(); scheduleSyncSoon();
+    bg.remove(); toast('Gespeichert'); render();
+  };
+}
+
+window.deleteCard = async (boxId, cardId) => {
+  if (!await confirmDialog('Karte löschen?')) return;
+  state.cards[boxId] = state.cards[boxId].filter(c => c.id !== cardId);
+  await persistAndSync(boxId);
+  toast('Gelöscht'); render();
+};
+
+window.loadCSVFile = (event) => {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => { document.getElementById('csv-input').value = e.target.result; };
+  reader.readAsText(file, 'UTF-8');
+};
+
+window.importCSV = async (replace) => {
+  const text = document.getElementById('csv-input').value.trim();
+  if (!text) return toast('Kein Text');
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  let added = 0, skipped = 0;
+  const byBoxName = {};
+  state.boxes.forEach(b => byBoxName[b.name.toLowerCase()] = b.id);
+  if (replace && !await confirmDialog('Alle Karten in betroffenen Kästen ersetzen?')) return;
+  const newCardsByBox = {};
+  for (const line of lines) {
+    const parts = line.split(';').map(s => s.trim());
+    if (parts.length < 2 || !parts[0] || !parts[1]) { skipped++; continue; }
+    const [frage, antwort, kasten] = parts;
+    let boxId;
+    if (kasten) {
+      boxId = byBoxName[kasten.toLowerCase()];
+      if (!boxId) {
+        boxId = uid();
+        const colors = ['#c96442','#378add','#639922','#7f77dd','#d4537e'];
+        state.boxes.push({ id: boxId, name: kasten, color: colors[state.boxes.length % colors.length], createdAt: todayISO() });
+        byBoxName[kasten.toLowerCase()] = boxId;
+        state.cards[boxId] = [];
+      }
+    } else { boxId = state.boxes[0]?.id; if (!boxId) { skipped++; continue; } }
+    if (!newCardsByBox[boxId]) newCardsByBox[boxId] = [];
+    newCardsByBox[boxId].push(makeCard(frage, antwort));
+    added++;
+  }
+  if (replace) for (const id of Object.keys(newCardsByBox)) state.cards[id] = newCardsByBox[id];
+  else for (const id of Object.keys(newCardsByBox)) state.cards[id] = (state.cards[id] || []).concat(newCardsByBox[id]);
+  sSet(STORAGE_PREFIX + 'boxes', state.boxes);
+  for (const id of Object.keys(newCardsByBox)) sSet(STORAGE_PREFIX + 'cards:' + id, state.cards[id]);
+  bumpModified(); scheduleSyncSoon();
+  document.getElementById('csv-input').value = '';
+  toast(`${added} hinzugefügt, ${skipped} übersprungen`); render();
+};
+
+window.exportBoxCSV = (boxId) => {
+  const b = state.boxes.find(x => x.id === boxId);
+  const cards = state.cards[boxId] || [];
+  const lines = cards.map(c => {
+    const esc = s => String(s).replace(/;/g, ',').replace(/[\r\n]+/g, ' ');
+    return `${esc(c.frage)};${esc(c.antwort)};${esc(b.name)}`;
+  });
+  download(b.name + '.csv', lines.join('\n'), 'text/csv');
+};
+
+function download(filename, content, mime) {
+  const blob = new Blob([content], { type: mime + ';charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+}
+
+// ================================================================
+// VIEW: STATISTIK
+// ================================================================
+let statBox = 'all';
+function renderStatistik(el) {
+  let cards = [];
+  if (statBox === 'all') for (const b of state.boxes) cards = cards.concat(state.cards[b.id] || []);
+  else cards = state.cards[statBox] || [];
+  const today = todayISO();
+  const due = cards.filter(c => c.faellig <= today).length;
+  const fachCounts = Array(NUM_FACHER).fill(0);
+  cards.forEach(c => { if (c.fach >= 1 && c.fach <= NUM_FACHER) fachCounts[c.fach - 1]++; });
+  const max = Math.max(...fachCounts, 1);
+  const weekdayCounts = [0,0,0,0,0,0,0];
+  const weekdayNames = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+  for (const c of cards) for (const h of (c.history||[])) {
+    weekdayCounts[new Date(h.d + 'T12:00:00').getDay()]++;
+  }
+  const wMax = Math.max(...weekdayCounts, 1);
+
+  el.innerHTML = `
+    <div class="card">
+      <h2>Statistik</h2>
+      <div class="field"><label>Kasten</label>
+        <select class="select" onchange="statBox=this.value;render()">
+          <option value="all" ${statBox==='all'?'selected':''}>Alle Kästen</option>
+          ${state.boxes.map(b => `<option value="${b.id}" ${statBox===b.id?'selected':''}>${escapeHTML(b.name)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="l">Gesamt</div><div class="v">${cards.length}</div></div>
+        <div class="stat-card"><div class="l">Heute fällig</div><div class="v">${due}</div></div>
+        <div class="stat-card"><div class="l">Streak</div><div class="v">${state.meta.streak} 🔥</div></div>
+        <div class="stat-card"><div class="l">Fach 12</div><div class="v">${fachCounts[NUM_FACHER-1]}</div></div>
+      </div>
+      <h3>Karten pro Fach</h3>
+      ${fachCounts.map((n, i) => `
+        <div class="bar-row">
+          <div class="bar-label">Fach ${i+1}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(n/max)*100}%">${n>0?n:''}</div></div>
+        </div>
+      `).join('')}
+      <h3>Aktivität nach Wochentag</h3>
+      ${weekdayNames.map((name, i) => `
+        <div class="bar-row">
+          <div class="bar-label">${name}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(weekdayCounts[i]/wMax)*100}%">${weekdayCounts[i]>0?weekdayCounts[i]:''}</div></div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ================================================================
+// VIEW: EINSTELLUNGEN
+// ================================================================
+function renderEinstellungen(el) {
+  const lastSyncStr = sync.lastSyncAt ? new Date(sync.lastSyncAt).toLocaleString('de-DE') : 'nie';
+
+  let syncSection = '';
+  if (!GOOGLE_CLIENT_ID) {
+    syncSection = `
+      <div class="info">
+        <strong>Drive-Sync nicht konfiguriert.</strong><br>
+        Trage in der HTML-Datei (oben im &lt;script&gt;) deine OAuth-Client-ID ein, um Drive-Sync zu aktivieren.
+        Anleitung siehe README.
+      </div>
+    `;
+  } else if (!sync.enabled) {
+    syncSection = `
+      <div class="warn">
+        <strong>Drive-Sync benötigt HTTPS oder localhost.</strong><br>
+        Aktuelle URL: <code>${escapeHTML(location.origin)}</code><br>
+        Bitte über GitHub Pages oder einen lokalen Webserver öffnen.
+      </div>
+    `;
+  } else {
+    syncSection = `
+      <div class="row" style="margin-bottom:12px">
+        <div><strong>Status:</strong> ${sync.signedIn ? '✓ Verbunden' : '○ Nicht verbunden'}</div>
+        <div><strong>Letzter Sync:</strong> ${lastSyncStr}</div>
+      </div>
+      <div class="btn-row">
+        ${sync.signedIn
+          ? `<button class="btn btn-primary" onclick="manualSync()">Jetzt synchronisieren</button>
+             <button class="btn" onclick="forceSyncUpload()">Lokale Daten hochladen</button>
+             <button class="btn" onclick="forceSyncDownload()">Drive-Daten laden</button>
+             <button class="btn btn-danger" onclick="signOutDrive()">Abmelden</button>`
+          : `<button class="btn btn-primary" onclick="signInDrive()">Mit Google Drive verbinden</button>`
+        }
+      </div>
+      <p class="muted" style="margin-top:8px">
+        Die Daten werden im Drive-Ordner <code>${DRIVE_FOLDER_NAME}</code> als <code>${DRIVE_FILE_NAME}</code> gespeichert.
+        Auto-Sync läuft ${SYNC_DEBOUNCE_MS/1000}s nach jeder Änderung.
+      </p>
+    `;
+  }
+
+  el.innerHTML = `
+    <div class="card">
+      <h2>Google Drive Sync</h2>
+      ${syncSection}
+    </div>
+    <div class="card">
+      <h2>Intervalle pro Fach (Tage)</h2>
+      <p class="muted">SuperMemo SM-2 Standard. Anpassbar an dein Lernsystem.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px">
+        ${state.meta.intervals.map((iv, i) => `
+          <div class="field" style="margin:0"><label>Fach ${i+1}</label>
+            <input class="input" type="number" min="1" max="3650" value="${iv}" id="iv-${i}">
+          </div>
+        `).join('')}
+      </div>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn btn-primary" onclick="saveIntervals()">Speichern</button>
+        <button class="btn" onclick="resetIntervals()">Zurücksetzen</button>
+        <button class="btn" onclick="loadHANIntervals()">HAN CROCO Stil</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Lokale Datensicherung</h2>
+      <p class="muted">Zusätzlich zum Drive-Sync kannst du immer ein lokales JSON-Backup ziehen.</p>
+      <div class="btn-row">
+        <button class="btn" onclick="exportJSON()">JSON exportieren</button>
+        <input type="file" id="json-file" accept=".json" style="display:none" onchange="loadJSONFile(event)">
+        <button class="btn" onclick="document.getElementById('json-file').click()">JSON-Datei wählen…</button>
+      </div>
+      <textarea class="textarea" id="json-import" placeholder='Oder JSON hier einfügen…' style="min-height:120px;margin-top:8px"></textarea>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn" onclick="importJSON('merge')">Zusammenführen</button>
+        <button class="btn btn-danger" onclick="importJSON('replace')">Komplett ersetzen</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Reset</h2>
+      <p class="muted">Löscht alle lokalen Daten. Drive-Datei bleibt unangetastet.</p>
+      <button class="btn btn-danger" onclick="factoryReset()">Lokal zurücksetzen</button>
+    </div>
+    <div class="card">
+      <h2>Info</h2>
+      <p class="muted">Lernkartei v${VERSION} · ${state.boxes.length} Kästen · ${state.boxes.reduce((a,b)=>a+(state.cards[b.id]?.length||0),0)} Karten</p>
+    </div>
+  `;
+}
+
+window.manualSync = () => doSync({ initial: true });
+window.forceSyncUpload = async () => {
+  if (!await confirmDialog('Drive mit lokalen Daten überschreiben?')) return;
+  state.meta.modifiedAt = Date.now();
+  sSet(STORAGE_PREFIX + 'meta', state.meta);
+  await doSync({ force: true });
+};
+window.forceSyncDownload = async () => {
+  if (!await confirmDialog('Lokale Daten mit Drive überschreiben?')) return;
+  setSyncStatus('busy', 'Lade…');
+  try {
+    const remote = await downloadDriveFile();
+    if (!remote) { toast('Keine Drive-Datei'); setSyncStatus('idle',''); return; }
+    await loadFromObject(remote, 'replace');
+    setSyncStatus('ok', 'Geladen');
+    render(); toast('Drive-Daten geladen');
+  } catch (e) { setSyncStatus('err', 'Fehler'); toast('Fehler: ' + e.message); }
+};
+
+window.signInDrive = signInDrive;
+window.signOutDrive = signOutDrive;
+
+window.saveIntervals = async () => {
+  const next = [];
+  for (let i = 0; i < NUM_FACHER; i++) {
+    const v = parseInt(document.getElementById('iv-' + i).value);
+    if (!v || v < 1) return toast('Ungültiger Wert in Fach ' + (i+1));
+    next.push(v);
+  }
+  state.meta.intervals = next;
+  sSet(STORAGE_PREFIX + 'meta', state.meta);
+  bumpModified(); scheduleSyncSoon();
+  toast('Gespeichert');
+};
+window.resetIntervals = async () => {
+  state.meta.intervals = [...DEFAULT_INTERVALS];
+  sSet(STORAGE_PREFIX + 'meta', state.meta);
+  bumpModified(); scheduleSyncSoon();
+  render(); toast('Standard wiederhergestellt');
+};
+window.loadHANIntervals = async () => {
+  state.meta.intervals = [1,2,6,12,19,30,50,80,120,180,270,365];
+  sSet(STORAGE_PREFIX + 'meta', state.meta);
+  bumpModified(); scheduleSyncSoon();
+  render(); toast('HAN CROCO Stil geladen');
+};
+
+window.exportJSON = () => {
+  download('lernkartei-' + todayISO() + '.json', JSON.stringify(serializeAll(), null, 2), 'application/json');
+};
+window.loadJSONFile = (event) => {
+  const file = event.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => { document.getElementById('json-import').value = e.target.result; toast('Datei geladen'); };
+  reader.readAsText(file, 'UTF-8');
+};
+window.importJSON = async (mode) => {
+  const text = document.getElementById('json-import').value.trim();
+  if (!text) return toast('Kein JSON');
+  let data; try { data = JSON.parse(text); } catch { return toast('Ungültiges JSON'); }
+  if (mode === 'replace' && !await confirmDialog('Alle Daten ersetzen?')) return;
+  await loadFromObject(data, mode);
+  bumpModified(); scheduleSyncSoon();
+  document.getElementById('json-import').value = '';
+  toast('Import abgeschlossen'); render();
+};
+window.factoryReset = async () => {
+  if (!await confirmDialog('Wirklich ALLE lokalen Daten löschen?')) return;
+  for (const b of state.boxes) sDelete(STORAGE_PREFIX + 'cards:' + b.id);
+  sDelete(STORAGE_PREFIX + 'boxes');
+  sDelete(STORAGE_PREFIX + 'meta');
+  state.meta = { version: VERSION, lastSeen: null, streak: 0, lastLearnDate: null, intervals: [...DEFAULT_INTERVALS], modifiedAt: 0 };
+  state.boxes = []; state.cards = {};
+  toast('Zurückgesetzt'); loadAll();
+};
+
+// ================================================================
+// KEYBOARD
+// ================================================================
+document.addEventListener('keydown', (e) => {
+  if (!state.session?.current) return;
+  if (e.target.matches('input, textarea, select')) return;
+  if (e.code === 'Space') { e.preventDefault(); toggleFlip(); }
+  else if (state.session.flipped && ['1','2','3','4'].includes(e.key)) { e.preventDefault(); rate(parseInt(e.key)); }
+});
+
+// Vor Schließen: Pending Sync ausführen
+window.addEventListener('beforeunload', () => {
+  if (sync.pendingTimer) {
+    clearTimeout(sync.pendingTimer);
+    if (sync.signedIn && navigator.sendBeacon && sync.token) {
+      // Best effort - synchroner Sync ist im beforeunload nicht möglich
+    }
+  }
+});
+
+// ================================================================
+// START
+// ================================================================
+loadAll();
+</script>
+</body>
+</html>
