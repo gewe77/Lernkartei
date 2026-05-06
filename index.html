@@ -269,8 +269,9 @@ label:first-child{margin-top:0}
 
 <script>
 // ══════════════════════════════════════════════
-// KONFIGURATION — Client-ID hier eintragen:
+// KONFIGURATION
 // ══════════════════════════════════════════════
+const GOOGLE_CLIENT_ID = '';  // <-- Zeile 274: Client-ID hier eintragen
 const GDRIVE_FILE_NAME = 'lernkartei-data.json';
 const GDRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
 
@@ -368,6 +369,7 @@ async function saveClientId(){
 }
 
 function getClientId(){
+  if(GOOGLE_CLIENT_ID) return GOOGLE_CLIENT_ID;
   return (document.getElementById('goog-client-id')?.value||'').trim();
 }
 
