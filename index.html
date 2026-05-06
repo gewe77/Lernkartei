@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lernkartei</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -22,10 +23,14 @@
 }}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;color:var(--txt);background:var(--bg);min-height:100vh;line-height:1.6}
 #app{max-width:720px;margin:0 auto;padding:0 0 80px}
-nav{display:flex;gap:2px;padding:12px 16px;border-bottom:0.5px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100;flex-wrap:wrap}
+nav{display:flex;gap:2px;padding:10px 16px;border-bottom:0.5px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100;flex-wrap:wrap;align-items:center}
 nav button{background:none;border:none;padding:6px 12px;border-radius:var(--radius);cursor:pointer;font-size:13px;color:var(--txt2);font-weight:400;transition:background .15s,color .15s}
 nav button.active{background:var(--bg2);color:var(--txt);font-weight:500}
 nav button:hover:not(.active){background:var(--bg2)}
+#gdrive-status{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--txt3)}
+#gdrive-status .dot{width:8px;height:8px;border-radius:50%;background:var(--txt3)}
+#gdrive-status.connected .dot{background:var(--green)}
+#gdrive-status.connected{color:var(--green)}
 .page{padding:16px;display:none}
 .page.active{display:block}
 h2{font-size:18px;font-weight:500;margin-bottom:16px;color:var(--txt)}
@@ -38,6 +43,8 @@ h3{font-size:15px;font-weight:500;margin-bottom:10px;color:var(--txt)}
 .btn-primary:hover{opacity:.85}
 .btn-sm{padding:5px 10px;font-size:13px}
 .btn-danger{color:var(--red)}
+.btn-google{background:#4285f4;color:#fff;border-color:#4285f4}
+.btn-google:hover{opacity:.9;background:#4285f4}
 input,select,textarea{width:100%;padding:8px 12px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg2);color:var(--txt);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
 input:focus,select:focus,textarea:focus{border-color:var(--blue)}
 textarea{resize:vertical;min-height:80px;line-height:1.6;white-space:pre-wrap}
@@ -47,31 +54,29 @@ label:first-child{margin-top:0}
 .row-wrap{display:flex;gap:8px;flex-wrap:wrap}
 .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:12px;font-weight:500}
 .empty{text-align:center;padding:40px 16px;color:var(--txt3);font-size:14px}
-#loading{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;font-size:15px;color:var(--txt2)}
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;font-size:15px;color:var(--txt2);gap:8px}
+#loading-sub{font-size:13px;color:var(--txt3)}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--txt);color:var(--bg);padding:10px 20px;border-radius:var(--radius);font-size:14px;opacity:0;transition:all .3s;z-index:999;pointer-events:none;white-space:nowrap}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .progress-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:12px}
 .progress-fill{height:100%;background:var(--blue);border-radius:3px;transition:width .3s}
 .fach-chip{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;background:var(--blue-bg);color:var(--blue);font-weight:500}
-
 .flip-scene{perspective:1200px;width:100%;min-height:240px;cursor:pointer;margin-bottom:16px}
 .flip-card{position:relative;width:100%;min-height:240px;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1)}
 .flip-card.flipped{transform:rotateY(180deg)}
 .flip-face{position:absolute;inset:0;backface-visibility:hidden;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius2);padding:28px 24px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
 .flip-back{transform:rotateY(180deg)}
 .flip-face .frage{font-size:18px;font-weight:500;color:var(--txt);line-height:1.5}
-.flip-face .antwort{font-size:15px;color:var(--txt);line-height:1.7;text-align:left;width:100%;max-width:560px;white-space:pre-wrap}
-.flip-face .notiz{font-size:13px;color:var(--txt3);margin-top:12px;font-style:italic;white-space:pre-wrap;text-align:left;width:100%;max-width:560px}
+.flip-face .antwort{font-size:15px;color:var(--txt);line-height:1.7;text-align:left;width:100%;max-width:560px}
+.flip-face .notiz{font-size:13px;color:var(--txt3);margin-top:12px;font-style:italic;text-align:left;width:100%;max-width:560px;white-space:pre-wrap}
 .flip-face .hint{font-size:13px;color:var(--txt3)}
-
 .rating-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px}
-.rating-btn{padding:12px 0;border-radius:var(--radius);border:1.5px solid;cursor:pointer;font-size:13px;font-weight:500;transition:transform .1s,opacity .15s;display:flex;flex-direction:column;align-items:center;gap:2px}
+.rating-btn{padding:12px 0;border-radius:var(--radius);border:1.5px solid;cursor:pointer;font-size:13px;font-weight:500;transition:transform .1s;display:flex;flex-direction:column;align-items:center;gap:2px}
 .rating-btn:active{transform:scale(0.96)}
 .r1{background:var(--red-bg);border-color:var(--red);color:var(--red)}
 .r2{background:var(--orange-bg);border-color:var(--orange);color:var(--orange)}
 .r3{background:var(--green-bg);border-color:var(--green);color:var(--green)}
 .r4{background:var(--blue-bg);border-color:var(--blue);color:var(--blue)}
-
 .box-color-dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
 .stat-num{font-size:28px;font-weight:500}
 .stat-label{font-size:13px;color:var(--txt2)}
@@ -80,24 +85,20 @@ label:first-child{margin-top:0}
 .bar-label{font-size:12px;color:var(--txt2);margin-bottom:3px;display:flex;justify-content:space-between}
 .bar{height:12px;background:var(--blue-bg);border-radius:4px;overflow:hidden}
 .bar-fill{height:100%;background:var(--blue);border-radius:4px;transition:width .4s}
-
 .search-row{display:flex;gap:8px;margin-bottom:12px}
 .search-row input{flex:1}
 .card-list-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border:0.5px solid var(--border);border-radius:var(--radius2);margin-bottom:8px;background:var(--bg)}
 .card-list-item .q{font-weight:500;font-size:14px;flex:1;min-width:0;word-break:break-word;white-space:pre-wrap}
-.card-list-item .a{font-size:13px;color:var(--txt2);flex:1;min-width:0;word-break:break-word;white-space:pre-wrap}
+.card-list-item .a{font-size:13px;color:var(--txt2);flex:1;min-width:0;word-break:break-word}
 .card-list-item .actions{display:flex;gap:4px;flex-shrink:0}
-
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
 .modal{background:var(--bg);border-radius:var(--radius2);padding:24px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;border:0.5px solid var(--border)}
 .modal h3{margin-bottom:16px}
-
 .box-item{display:flex;align-items:center;gap:10px;padding:12px 16px;border:0.5px solid var(--border);border-radius:var(--radius2);margin-bottom:8px;background:var(--bg);cursor:pointer;transition:background .15s}
 .box-item:hover{background:var(--bg2)}
 .box-info{flex:1;min-width:0}
 .box-name{font-weight:500;font-size:15px}
 .box-meta{font-size:12px;color:var(--txt3)}
-.session-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .kbd{display:inline-block;padding:2px 6px;background:var(--bg2);border:0.5px solid var(--border2);border-radius:4px;font-size:11px;color:var(--txt2);font-family:monospace}
 .color-picker-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 .color-dot-pick{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s}
@@ -108,19 +109,28 @@ label:first-child{margin-top:0}
 .interval-item input{padding:4px 8px;font-size:13px}
 .antwort ul,.antwort ol{padding-left:1.4em;margin:4px 0}
 .antwort li{margin-bottom:2px}
+.sync-info{font-size:12px;color:var(--txt3);margin-top:6px}
+.gdrive-section{border:0.5px solid var(--border);border-radius:var(--radius2);padding:16px;margin-bottom:16px;background:var(--bg2)}
 @media(max-width:480px){.rating-row{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
-<div id="loading">Lernkartei wird geladen…</div>
+<div id="loading">
+  <div>Lernkartei wird geladen…</div>
+  <div id="loading-sub"></div>
+</div>
 <div id="toast"></div>
 <div id="app" style="display:none">
-<nav id="nav">
+<nav>
   <button onclick="showPage('lernen')" data-page="lernen">📚 Lernen</button>
   <button onclick="showPage('kaesten')" data-page="kaesten">📦 Kästen</button>
   <button onclick="showPage('karten')" data-page="karten">🗂 Karten</button>
   <button onclick="showPage('statistik')" data-page="statistik">📊 Statistik</button>
   <button onclick="showPage('einstellungen')" data-page="einstellungen">⚙ Einstellungen</button>
+  <div id="gdrive-status" title="Google Drive Status">
+    <div class="dot"></div>
+    <span id="gdrive-label">Nicht verbunden</span>
+  </div>
 </nav>
 
 <!-- LERNEN -->
@@ -131,25 +141,25 @@ label:first-child{margin-top:0}
     <div id="due-summary" style="margin-bottom:16px;font-size:14px;color:var(--txt2)"></div>
     <label>Kästen auswählen</label>
     <div id="box-checkboxes" style="margin:8px 0 16px"></div>
-    <div class="row-wrap" style="gap:8px;margin-bottom:8px">
+    <div class="row-wrap" style="gap:16px;margin-bottom:12px">
       <label style="margin:0;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px">
-        <input type="radio" name="lmode" value="heute" checked> Nur heute fällig
+        <input type="radio" name="lmode" value="heute" checked style="width:auto"> Nur heute fällig
       </label>
       <label style="margin:0;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px">
-        <input type="radio" name="lmode" value="alle"> Alle fälligen
+        <input type="radio" name="lmode" value="alle" style="width:auto"> Alle fälligen
       </label>
     </div>
-    <button class="btn btn-primary" onclick="startSession()" style="margin-top:8px">Sitzung starten</button>
+    <button class="btn btn-primary" onclick="startSession()">Sitzung starten</button>
   </div>
   <div id="lernen-session" style="display:none">
-    <div class="session-header">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
       <div style="font-size:13px;color:var(--txt2)" id="session-counter"></div>
       <button class="btn btn-sm" onclick="endSession()">Abbrechen</button>
     </div>
     <div class="progress-bar"><div class="progress-fill" id="session-progress"></div></div>
     <div id="karte-wrap"></div>
-    <div id="flip-hint" style="text-align:center;font-size:13px;color:var(--txt3);margin-bottom:8px">
-      <span class="kbd">Leertaste</span> = umdrehen &nbsp;|&nbsp; <span class="kbd">1-4</span> = bewerten
+    <div style="text-align:center;font-size:13px;color:var(--txt3);margin-bottom:8px">
+      <span class="kbd">Leertaste</span> = umdrehen &nbsp;|&nbsp; <span class="kbd">1–4</span> = bewerten
     </div>
     <div id="rating-area" style="display:none">
       <div class="rating-row">
@@ -160,13 +170,11 @@ label:first-child{margin-top:0}
       </div>
     </div>
   </div>
-  <div id="lernen-done" style="display:none">
-    <div style="text-align:center;padding:40px 16px">
-      <div style="font-size:48px;margin-bottom:12px">🎉</div>
-      <h2 style="margin-bottom:8px">Sitzung abgeschlossen!</h2>
-      <div id="session-result" style="color:var(--txt2);font-size:14px;margin-bottom:24px"></div>
-      <button class="btn btn-primary" onclick="showLernenStart()">Zurück</button>
-    </div>
+  <div id="lernen-done" style="display:none;text-align:center;padding:40px 16px">
+    <div style="font-size:48px;margin-bottom:12px">🎉</div>
+    <h2 style="margin-bottom:8px">Sitzung abgeschlossen!</h2>
+    <div id="session-result" style="color:var(--txt2);font-size:14px;margin-bottom:24px"></div>
+    <button class="btn btn-primary" onclick="showLernenStart()">Zurück</button>
   </div>
 </div>
 
@@ -187,9 +195,7 @@ label:first-child{margin-top:0}
   </div>
   <div class="search-row">
     <input type="text" id="search-input" placeholder="Suchen…" oninput="renderCards()">
-    <select id="filter-box" onchange="renderCards()" style="width:auto">
-      <option value="">Alle Kästen</option>
-    </select>
+    <select id="filter-box" onchange="renderCards()" style="width:auto"><option value="">Alle Kästen</option></select>
   </div>
   <div id="card-list"></div>
   <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
@@ -211,18 +217,44 @@ label:first-child{margin-top:0}
 <!-- EINSTELLUNGEN -->
 <div id="page-einstellungen" class="page">
   <h2>Einstellungen</h2>
+
+  <h3>Google Drive Synchronisation</h3>
+  <div class="gdrive-section">
+    <div id="gdrive-setup-hint" style="font-size:13px;color:var(--txt2);margin-bottom:12px;padding:10px;background:var(--orange-bg);border-radius:var(--radius);border:0.5px solid var(--orange);display:none">
+      ⚠️ Bitte zuerst deine Google Client-ID eintragen (siehe unten).
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="margin-top:0">Google OAuth Client-ID</label>
+      <input type="text" id="goog-client-id" placeholder="123456789-abc...apps.googleusercontent.com" oninput="saveClientId()">
+      <div class="sync-info">Erstelle eine Client-ID unter <a href="https://console.cloud.google.com" target="_blank" style="color:var(--blue)">console.cloud.google.com</a> → APIs &amp; Dienste → Anmeldedaten → OAuth 2.0</div>
+    </div>
+    <div id="gdrive-auth-area">
+      <button class="btn btn-google" onclick="gdriveLogin()" id="btn-gdrive-login">🔑 Mit Google anmelden</button>
+      <button class="btn btn-sm btn-danger" onclick="gdriveLogout()" id="btn-gdrive-logout" style="display:none">Abmelden</button>
+    </div>
+    <div id="gdrive-user-info" style="margin-top:10px;font-size:13px;color:var(--txt2)"></div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap" id="gdrive-sync-btns" style="display:none">
+      <button class="btn btn-sm" onclick="gdrivePush()">☁️ Zu Drive hochladen</button>
+      <button class="btn btn-sm" onclick="gdrivePull()">⬇️ Von Drive laden</button>
+      <button class="btn btn-sm" onclick="gdriveAutoSync()" id="btn-autosync">🔄 Auto-Sync: AUS</button>
+    </div>
+    <div class="sync-info" id="last-sync-info"></div>
+  </div>
+
   <h3>Intervalle pro Fach (Tage)</h3>
-  <p style="font-size:13px;color:var(--txt2);margin-bottom:8px">Passe die Wartezeit je Fach an. Standard: wissenschaftlich optimiert (SM-2 / Ebbinghaus).</p>
+  <p style="font-size:13px;color:var(--txt2);margin-bottom:8px">Standard: SM-2 / Ebbinghaus-optimiert.</p>
   <div class="interval-grid" id="interval-grid"></div>
   <div style="display:flex;gap:8px;margin-top:16px">
     <button class="btn btn-sm" onclick="saveIntervals()">Speichern</button>
     <button class="btn btn-sm" onclick="resetIntervals()">Zurücksetzen</button>
   </div>
+
   <div style="margin-top:24px;border-top:0.5px solid var(--border);padding-top:20px">
     <h3>Referenz-Dump</h3>
-    <p style="font-size:13px;color:var(--txt2);margin-bottom:10px">Exportiert alle gespeicherten Daten als lesbares JSON in die Zwischenablage.</p>
+    <p style="font-size:13px;color:var(--txt2);margin-bottom:10px">Vollständiger JSON-Abzug aller Daten in die Zwischenablage (für Diagnose oder manuelle Sicherung).</p>
     <button class="btn btn-sm" onclick="copyRefDump()">📋 Referenz-Dump kopieren</button>
   </div>
+
   <div style="margin-top:24px;border-top:0.5px solid var(--border);padding-top:20px">
     <h3>Alle Daten löschen</h3>
     <p style="font-size:13px;color:var(--txt2);margin-bottom:10px">Löscht alle Kästen, Karten und Statistiken unwiderruflich.</p>
@@ -231,51 +263,57 @@ label:first-child{margin-top:0}
 </div>
 </div>
 
-<!-- MODAL -->
 <div id="modal-bg" class="modal-bg" style="display:none" onclick="closeModalOnBg(event)">
   <div class="modal" id="modal-content"></div>
 </div>
 
 <script>
-const BOX_COLORS=['#378add','#639922','#e24b4a','#ef9f27','#d4537e','#1d9e75','#7f77dd','#ba7517'];
-const DEFAULT_INTERVALS=[1,3,7,14,21,30,45,60,90,120,180,365];
-let boxes=[],allCards={},meta={},intervals=[...DEFAULT_INTERVALS];
-let session=null,currentFlipped=false;
+// ══════════════════════════════════════════════
+// KONFIGURATION — Client-ID hier eintragen:
+// ══════════════════════════════════════════════
+const GDRIVE_FILE_NAME = 'lernkartei-data.json';
+const GDRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
 
-// ─── STORAGE (localStorage fallback für standalone HTML) ───
-const STORE={
-  async get(key){
-    if(window.storage){try{return await window.storage.get(key)}catch(e){}}
-    const v=localStorage.getItem(key);
-    return v?{value:v}:null;
+const BOX_COLORS = ['#378add','#639922','#e24b4a','#ef9f27','#d4537e','#1d9e75','#7f77dd','#ba7517'];
+const DEFAULT_INTERVALS = [1,3,7,14,21,30,45,60,90,120,180,365];
+
+let boxes=[], allCards={}, meta={}, intervals=[...DEFAULT_INTERVALS];
+let session=null, currentFlipped=false;
+let gAccessToken=null, gUserName='', gAutoSync=false, gFileId=null;
+
+// ─── STORAGE ───
+const STORE = {
+  async get(k){
+    if(window.storage){try{return await window.storage.get(k)}catch(e){}}
+    const v=localStorage.getItem(k); return v?{value:v}:null;
   },
-  async set(key,val){
-    if(window.storage){try{return await window.storage.set(key,val)}catch(e){}}
-    localStorage.setItem(key,val);
+  async set(k,v){
+    if(window.storage){try{return await window.storage.set(k,v)}catch(e){}}
+    localStorage.setItem(k,v);
   },
-  async delete(key){
-    if(window.storage){try{return await window.storage.delete(key)}catch(e){}}
-    localStorage.removeItem(key);
+  async delete(k){
+    if(window.storage){try{return await window.storage.delete(k)}catch(e){}}
+    localStorage.removeItem(k);
   },
   async list(prefix){
     if(window.storage){try{return await window.storage.list(prefix)}catch(e){}}
-    const keys=Object.keys(localStorage).filter(k=>k.startsWith(prefix));
-    return{keys};
+    return {keys: Object.keys(localStorage).filter(k=>k.startsWith(prefix))};
   }
 };
 
 async function loadAll(){
-  const m=await STORE.get('lk:meta');
-  meta=m?JSON.parse(m.value):{version:1,streak:0,lastLearnDate:''};
-  const b=await STORE.get('lk:boxes');
-  boxes=b?JSON.parse(b.value):[];
+  const m=await STORE.get('lk:meta'); meta=m?JSON.parse(m.value):{version:1,streak:0,lastLearnDate:''};
+  const b=await STORE.get('lk:boxes'); boxes=b?JSON.parse(b.value):[];
   allCards={};
-  for(const box of boxes){
-    const c=await STORE.get('lk:cards:'+box.id);
-    allCards[box.id]=c?JSON.parse(c.value):[];
+  for(const box of boxes){const c=await STORE.get('lk:cards:'+box.id); allCards[box.id]=c?JSON.parse(c.value):[];}
+  const iv=await STORE.get('lk:intervals'); if(iv) intervals=JSON.parse(iv.value);
+  const cid=await STORE.get('lk:gdrive-clientid'); if(cid) {
+    const el=document.getElementById('goog-client-id'); if(el) el.value=cid.value;
   }
-  const iv=await STORE.get('lk:intervals');
-  if(iv)intervals=JSON.parse(iv.value);
+  const as=await STORE.get('lk:gdrive-autosync'); gAutoSync=as?JSON.parse(as.value):false;
+  const fi=await STORE.get('lk:gdrive-fileid'); if(fi) gFileId=fi.value;
+  const ls=await STORE.get('lk:gdrive-lastsync'); if(ls) updateLastSyncInfo(ls.value);
+  updateAutoSyncBtn();
 }
 
 async function saveBoxes(){await STORE.set('lk:boxes',JSON.stringify(boxes))}
@@ -295,29 +333,20 @@ function renderAntwort(text){
   for(let line of lines){
     const ulM=line.match(/^[-*•]\s+(.*)/);
     const olM=line.match(/^\d+\.\s+(.*)/);
-    if(ulM){
-      if(!inUl){if(inOl){html+='</ol>';inOl=false;}html+='<ul>';inUl=true;}
-      html+=`<li>${escHtml(ulM[1])}</li>`;
-    } else if(olM){
-      if(!inOl){if(inUl){html+='</ul>';inUl=false;}html+='<ol>';inOl=true;}
-      html+=`<li>${escHtml(olM[1])}</li>`;
-    } else {
-      if(inUl){html+='</ul>';inUl=false;}
-      if(inOl){html+='</ol>';inOl=false;}
-      html+=line?`<p style="margin:0 0 2px">${escHtml(line)}</p>`:'<br>';
-    }
+    if(ulM){if(!inUl){if(inOl){html+='</ol>';inOl=false;}html+='<ul>';inUl=true;}html+=`<li>${escHtml(ulM[1])}</li>`;}
+    else if(olM){if(!inOl){if(inUl){html+='</ul>';inUl=false;}html+='<ol>';inOl=true;}html+=`<li>${escHtml(olM[1])}</li>`;}
+    else{if(inUl){html+='</ul>';inUl=false;}if(inOl){html+='</ol>';inOl=false;}html+=line?`<p style="margin:0 0 2px">${escHtml(line)}</p>`:'<br>';}
   }
-  if(inUl)html+='</ul>';
-  if(inOl)html+='</ol>';
+  if(inUl)html+='</ul>';if(inOl)html+='</ol>';
   return html;
 }
-
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
+// ─── NAVIGATION ───
 function showPage(p){
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
-  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('nav button[data-page]').forEach(b=>b.classList.remove('active'));
   document.querySelector(`nav button[data-page="${p}"]`).classList.add('active');
   if(p==='lernen')renderLernen();
   if(p==='kaesten')renderBoxes();
@@ -332,10 +361,164 @@ function toast(msg,dur=2500){
   setTimeout(()=>t.classList.remove('show'),dur);
 }
 
+// ─── GOOGLE DRIVE AUTH ───
+async function saveClientId(){
+  const val=document.getElementById('goog-client-id')?.value.trim()||'';
+  await STORE.set('lk:gdrive-clientid',val);
+}
+
+function getClientId(){
+  return (document.getElementById('goog-client-id')?.value||'').trim();
+}
+
+function gdriveLogin(){
+  const clientId=getClientId();
+  if(!clientId){
+    document.getElementById('gdrive-setup-hint').style.display='block';
+    toast('Bitte zuerst Client-ID eintragen',3000);return;
+  }
+  document.getElementById('gdrive-setup-hint').style.display='none';
+  const redirectUri=window.location.origin+window.location.pathname;
+  const params=new URLSearchParams({
+    client_id:clientId,
+    redirect_uri:redirectUri,
+    response_type:'token',
+    scope:GDRIVE_SCOPE,
+    include_granted_scopes:'true',
+    prompt:'select_account'
+  });
+  window.location.href='https://accounts.google.com/o/oauth2/v2/auth?'+params.toString();
+}
+
+function gdriveLogout(){
+  gAccessToken=null;gUserName='';gFileId=null;
+  STORE.delete('lk:gdrive-fileid');
+  updateDriveUI();toast('Von Google abgemeldet');
+}
+
+function handleOAuthCallback(){
+  const hash=window.location.hash;
+  if(!hash)return;
+  const params=new URLSearchParams(hash.slice(1));
+  const token=params.get('access_token');
+  if(!token)return;
+  gAccessToken=token;
+  history.replaceState(null,'',window.location.pathname);
+  fetchUserInfo();
+  toast('Mit Google Drive verbunden ✓',3000);
+  if(gAutoSync)gdrivePull();
+}
+
+async function fetchUserInfo(){
+  if(!gAccessToken)return;
+  try{
+    const r=await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+gAccessToken}});
+    const d=await r.json();
+    gUserName=d.name||d.email||'Google-Nutzer';
+    updateDriveUI();
+  }catch(e){updateDriveUI();}
+}
+
+function updateDriveUI(){
+  const connected=!!gAccessToken;
+  const statusEl=document.getElementById('gdrive-status');
+  const labelEl=document.getElementById('gdrive-label');
+  const loginBtn=document.getElementById('btn-gdrive-login');
+  const logoutBtn=document.getElementById('btn-gdrive-logout');
+  const syncBtns=document.getElementById('gdrive-sync-btns');
+  const userInfo=document.getElementById('gdrive-user-info');
+  if(statusEl){statusEl.className='';statusEl.classList.add(connected?'connected':'');}
+  if(labelEl)labelEl.textContent=connected?'Drive verbunden':'Nicht verbunden';
+  if(loginBtn)loginBtn.style.display=connected?'none':'inline-flex';
+  if(logoutBtn)logoutBtn.style.display=connected?'inline-flex':'none';
+  if(syncBtns)syncBtns.style.display=connected?'flex':'none';
+  if(userInfo)userInfo.textContent=connected?'Angemeldet als: '+gUserName:'';
+}
+
+// ─── GOOGLE DRIVE API ───
+async function gdriveFindFile(){
+  if(!gAccessToken)return null;
+  const q=encodeURIComponent(`name='${GDRIVE_FILE_NAME}' and trashed=false`);
+  const r=await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,modifiedTime)`,
+    {headers:{Authorization:'Bearer '+gAccessToken}});
+  const d=await r.json();
+  if(d.files&&d.files.length>0){gFileId=d.files[0].id;await STORE.set('lk:gdrive-fileid',gFileId);return gFileId;}
+  return null;
+}
+
+async function gdrivePush(){
+  if(!gAccessToken){toast('Bitte zuerst mit Google anmelden');return;}
+  toast('Wird hochgeladen…');
+  try{
+    const data=buildExportData();
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    if(!gFileId)gFileId=await gdriveFindFile();
+    let r;
+    if(gFileId){
+      r=await fetch(`https://www.googleapis.com/upload/drive/v3/files/${gFileId}?uploadType=media`,
+        {method:'PATCH',headers:{Authorization:'Bearer '+gAccessToken,'Content-Type':'application/json'},body:blob});
+    } else {
+      const meta=JSON.stringify({name:GDRIVE_FILE_NAME,mimeType:'application/json'});
+      const form=new FormData();
+      form.append('metadata',new Blob([meta],{type:'application/json'}));
+      form.append('file',blob);
+      r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
+        {method:'POST',headers:{Authorization:'Bearer '+gAccessToken},body:form});
+      const d=await r.json();gFileId=d.id;
+      await STORE.set('lk:gdrive-fileid',gFileId);
+    }
+    if(r.ok){
+      const now=new Date().toLocaleString('de-DE');
+      await STORE.set('lk:gdrive-lastsync',now);
+      updateLastSyncInfo(now);
+      toast('✓ Erfolgreich zu Google Drive hochgeladen',3000);
+    } else {toast('Fehler beim Hochladen ('+r.status+')',4000);}
+  }catch(e){toast('Fehler: '+e.message,4000);}
+}
+
+async function gdrivePull(){
+  if(!gAccessToken){toast('Bitte zuerst mit Google anmelden');return;}
+  toast('Wird geladen…');
+  try{
+    if(!gFileId)gFileId=await gdriveFindFile();
+    if(!gFileId){toast('Keine Datei in Drive gefunden. Zuerst hochladen.',4000);return;}
+    const r=await fetch(`https://www.googleapis.com/drive/v3/files/${gFileId}?alt=media`,
+      {headers:{Authorization:'Bearer '+gAccessToken}});
+    if(!r.ok){toast('Fehler beim Laden ('+r.status+')',4000);return;}
+    const data=await r.json();
+    await restoreFromData(data);
+    const now=new Date().toLocaleString('de-DE');
+    await STORE.set('lk:gdrive-lastsync',now);
+    updateLastSyncInfo(now);
+    toast('✓ Daten von Google Drive geladen',3000);
+    renderBoxes();renderCards();renderLernen();
+  }catch(e){toast('Fehler: '+e.message,4000);}
+}
+
+async function gdriveAutoSync(){
+  gAutoSync=!gAutoSync;
+  await STORE.set('lk:gdrive-autosync',JSON.stringify(gAutoSync));
+  updateAutoSyncBtn();
+  toast('Auto-Sync: '+(gAutoSync?'AN':'AUS'));
+}
+
+function updateAutoSyncBtn(){
+  const btn=document.getElementById('btn-autosync');
+  if(btn)btn.textContent='🔄 Auto-Sync: '+(gAutoSync?'AN':'AUS');
+}
+
+function updateLastSyncInfo(ts){
+  const el=document.getElementById('last-sync-info');
+  if(el&&ts)el.textContent='Letzte Synchronisation: '+ts;
+}
+
+async function autoSyncIfEnabled(){
+  if(gAutoSync&&gAccessToken)await gdrivePush();
+}
+
 // ─── LERNEN ───
 function renderLernen(){
-  const el=document.getElementById('box-checkboxes');
-  el.innerHTML='';
+  const el=document.getElementById('box-checkboxes');el.innerHTML='';
   if(!boxes.length){el.innerHTML='<span style="font-size:14px;color:var(--txt3)">Keine Kästen vorhanden.</span>';return;}
   boxes.forEach(box=>{
     const total=(allCards[box.id]||[]).length;
@@ -345,7 +528,7 @@ function renderLernen(){
     label.innerHTML=`<input type="checkbox" value="${box.id}" checked style="width:auto">
       <span class="box-color-dot" style="background:${box.color}"></span>
       <span style="flex:1">${escHtml(box.name)}</span>
-      <span style="font-size:12px;color:var(--txt3)">${due} fällig / ${total} gesamt</span>`;
+      <span style="font-size:12px;color:var(--txt3)">${due} fällig / ${total}</span>`;
     el.appendChild(label);
   });
   const totalDue=Object.values(allCards).flat().filter(isDue).length;
@@ -354,18 +537,14 @@ function renderLernen(){
   document.getElementById('streak-display').innerHTML=streak>0?`<span style="font-size:14px">🔥 Streak: <b>${streak}</b> Tag${streak!==1?'e':''}</span>`:'';
 }
 
-function getSelectedBoxIds(){
-  return[...(document.querySelectorAll('#box-checkboxes input[type=checkbox]:checked'))].map(i=>i.value);
-}
-
 function startSession(){
-  const boxIds=getSelectedBoxIds();
+  const boxIds=[...(document.querySelectorAll('#box-checkboxes input:checked'))].map(i=>i.value);
   if(!boxIds.length){toast('Bitte mindestens einen Kasten wählen');return;}
   let cards=[];
   boxIds.forEach(bid=>{(allCards[bid]||[]).forEach(c=>{if(isDue(c))cards.push({...c,_boxId:bid});});});
   if(!cards.length){toast('Keine fälligen Karten!');return;}
   cards.sort(()=>Math.random()-.5);
-  session={cards,idx:0,results:[],boxIds};
+  session={cards,idx:0,results:[]};
   document.getElementById('lernen-start').style.display='none';
   document.getElementById('lernen-done').style.display='none';
   document.getElementById('lernen-session').style.display='block';
@@ -402,47 +581,41 @@ function showSessionCard(){
 }
 
 function flipCard(){
-  const fc=document.getElementById('flip-card');
-  if(!fc)return;
-  currentFlipped=!currentFlipped;
-  fc.classList.toggle('flipped',currentFlipped);
+  const fc=document.getElementById('flip-card');if(!fc)return;
+  currentFlipped=!currentFlipped;fc.classList.toggle('flipped',currentFlipped);
   if(currentFlipped)document.getElementById('rating-area').style.display='block';
 }
 
 async function bewerten(rating){
   if(!session)return;
   const card=session.cards[session.idx];
-  const boxId=card._boxId;
-  const real=allCards[boxId].find(c=>c.id===card.id);
+  const real=allCards[card._boxId].find(c=>c.id===card.id);
   if(!real)return;
   let fach=real.fach||1;
   if(rating===1)fach=1;
   else if(rating===2)fach=Math.max(1,fach);
   else if(rating===3)fach=Math.min(intervals.length,fach+1);
   else if(rating===4)fach=Math.min(intervals.length,fach+2);
-  const days=intervals[fach-1]||1;
-  real.fach=fach;real.faellig=addDays(today(),days);
-  real.history=real.history||[];
-  real.history.push({date:today(),rating,fach});
-  await saveCards(boxId);
-  session.results.push({rating});
-  session.idx++;
-  updateStreak();
-  showSessionCard();
+  real.fach=fach;real.faellig=addDays(today(),intervals[fach-1]||1);
+  real.history=real.history||[];real.history.push({date:today(),rating,fach});
+  await saveCards(card._boxId);
+  session.results.push({rating});session.idx++;
+  updateStreak();showSessionCard();
 }
 
 async function updateStreak(){
   const t=today();
   if(meta.lastLearnDate!==t){
-    const yesterday=addDays(t,-1);
-    meta.streak=(meta.lastLearnDate===yesterday)?(meta.streak||0)+1:1;
-    meta.lastLearnDate=t;
-    await saveMeta();
+    const y=addDays(t,-1);
+    meta.streak=(meta.lastLearnDate===y)?(meta.streak||0)+1:1;
+    meta.lastLearnDate=t;await saveMeta();
   }
 }
 
 function endSession(){
-  if(confirm('Sitzung abbrechen? Bisheriger Fortschritt wird gespeichert.')){session=null;showLernenStart();}
+  if(confirm('Abbrechen? Bisheriger Fortschritt wird gespeichert.')){
+    session=null;showLernenStart();autoSyncIfEnabled();
+  }
 }
 
 function finishSession(){
@@ -450,8 +623,8 @@ function finishSession(){
   document.getElementById('lernen-done').style.display='block';
   const res=session?.results||[];
   document.getElementById('session-result').innerHTML=
-    `${res.length} Karten bewertet &nbsp;|&nbsp; ✅ ${res.filter(r=>r.rating===4).length} sehr leicht &nbsp;|&nbsp; ❌ ${res.filter(r=>r.rating===1).length} nicht gewusst`;
-  session=null;
+    `${res.length} Karten &nbsp;|&nbsp; ✅ ${res.filter(r=>r.rating===4).length} sehr leicht &nbsp;|&nbsp; ❌ ${res.filter(r=>r.rating===1).length} nicht gewusst`;
+  session=null;autoSyncIfEnabled();
 }
 
 function showLernenStart(){
@@ -463,19 +636,16 @@ function showLernenStart(){
 
 // ─── KÄSTEN ───
 function renderBoxes(){
-  const el=document.getElementById('box-list');
-  el.innerHTML='';
-  if(!boxes.length){el.innerHTML='<div class="empty">Noch keine Kästen. Erstelle deinen ersten!</div>';return;}
+  const el=document.getElementById('box-list');el.innerHTML='';
+  if(!boxes.length){el.innerHTML='<div class="empty">Noch keine Kästen.</div>';return;}
   boxes.forEach(box=>{
-    const cards=allCards[box.id]||[];
-    const due=cards.filter(isDue).length;
-    const div=document.createElement('div');
-    div.className='box-item';
+    const cards=allCards[box.id]||[];const due=cards.filter(isDue).length;
+    const div=document.createElement('div');div.className='box-item';
     div.innerHTML=`
       <span class="box-color-dot" style="background:${box.color};width:14px;height:14px"></span>
       <div class="box-info">
         <div class="box-name">${escHtml(box.name)}</div>
-        <div class="box-meta">${cards.length} Karte${cards.length!==1?'n':''} &nbsp;·&nbsp; ${due} fällig</div>
+        <div class="box-meta">${cards.length} Karte${cards.length!==1?'n':''} · ${due} fällig</div>
       </div>
       <div style="display:flex;gap:4px">
         <button class="btn btn-sm" onclick="event.stopPropagation();openBoxModal('${box.id}')">✏️</button>
@@ -490,10 +660,8 @@ function openBoxModal(boxId){
   const colorOpts=BOX_COLORS.map(c=>`<div class="color-dot-pick${(box?box.color===c:c===BOX_COLORS[0])?' selected':''}" style="background:${c}" data-color="${c}" onclick="selectColor(this)"></div>`).join('');
   showModal(`
     <h3>${box?'Kasten bearbeiten':'Neuer Kasten'}</h3>
-    <label>Name</label>
-    <input type="text" id="box-name" value="${box?escHtml(box.name):''}" placeholder="z.B. Englisch">
-    <label>Farbe</label>
-    <div class="color-picker-row">${colorOpts}</div>
+    <label>Name</label><input type="text" id="box-name" value="${box?escHtml(box.name):''}">
+    <label>Farbe</label><div class="color-picker-row">${colorOpts}</div>
     <div style="display:flex;gap:8px;margin-top:20px">
       <button class="btn btn-primary" onclick="saveBox('${boxId||''}')">Speichern</button>
       <button class="btn" onclick="closeModal()">Abbrechen</button>
@@ -501,25 +669,23 @@ function openBoxModal(boxId){
 }
 
 function selectColor(el){
-  document.querySelectorAll('.color-dot-pick').forEach(d=>d.classList.remove('selected'));
-  el.classList.add('selected');
+  document.querySelectorAll('.color-dot-pick').forEach(d=>d.classList.remove('selected'));el.classList.add('selected');
 }
 
 async function saveBox(boxId){
   const name=document.getElementById('box-name').value.trim();
-  if(!name){toast('Bitte Namen eingeben');return;}
+  if(!name){toast('Name eingeben');return;}
   const color=document.querySelector('.color-dot-pick.selected')?.dataset.color||BOX_COLORS[0];
   if(boxId){const box=boxes.find(b=>b.id===boxId);if(box){box.name=name;box.color=color;}}
   else{const id=uid();boxes.push({id,name,color,createdAt:today()});allCards[id]=[];}
-  await saveBoxes();closeModal();renderBoxes();toast('Kasten gespeichert');
+  await saveBoxes();closeModal();renderBoxes();autoSyncIfEnabled();toast('Kasten gespeichert');
 }
 
 async function deleteBox(boxId){
   if(!confirm('Kasten und alle Karten löschen?'))return;
-  boxes=boxes.filter(b=>b.id!==boxId);
-  delete allCards[boxId];
-  await STORE.delete('lk:cards:'+boxId);
-  await saveBoxes();renderBoxes();toast('Kasten gelöscht');
+  boxes=boxes.filter(b=>b.id!==boxId);delete allCards[boxId];
+  await STORE.delete('lk:cards:'+boxId);await saveBoxes();
+  renderBoxes();autoSyncIfEnabled();toast('Kasten gelöscht');
 }
 
 // ─── KARTEN ───
@@ -527,12 +693,9 @@ function renderCards(){
   const q=(document.getElementById('search-input')?.value||'').toLowerCase();
   const bf=document.getElementById('filter-box')?.value||'';
   const sel=document.getElementById('filter-box');
-  if(sel){
-    const prev=sel.value;sel.innerHTML='<option value="">Alle Kästen</option>';
-    boxes.forEach(b=>{sel.innerHTML+=`<option value="${b.id}"${b.id===prev?' selected':''}>${escHtml(b.name)}</option>`;});
-  }
-  const el=document.getElementById('card-list');el.innerHTML='';
-  let shown=0;
+  if(sel){const prev=sel.value;sel.innerHTML='<option value="">Alle Kästen</option>';
+    boxes.forEach(b=>{sel.innerHTML+=`<option value="${b.id}"${b.id===prev?' selected':''}>${escHtml(b.name)}</option>`;});}
+  const el=document.getElementById('card-list');el.innerHTML='';let shown=0;
   boxes.forEach(box=>{
     if(bf&&box.id!==bf)return;
     (allCards[box.id]||[]).forEach(card=>{
@@ -542,7 +705,7 @@ function renderCards(){
       div.innerHTML=`
         <div style="flex:1;min-width:0">
           <div class="q">${escHtml(card.frage)}</div>
-          <div class="a">${escHtml(card.antwort.length>120?card.antwort.slice(0,120)+'…':card.antwort)}</div>
+          <div class="a">${escHtml(card.antwort.length>100?card.antwort.slice(0,100)+'…':card.antwort)}</div>
           <div style="margin-top:4px;display:flex;gap:6px;align-items:center">
             <span class="badge" style="background:${box.color}22;color:${box.color};font-size:11px">${escHtml(box.name)}</span>
             <span class="fach-chip">Fach ${card.fach||1}</span>
@@ -564,15 +727,12 @@ function openCardModal(boxId,cardId){
   const boxOpts=boxes.map(b=>`<option value="${b.id}"${boxId&&b.id===boxId?' selected':''}>${escHtml(b.name)}</option>`).join('');
   showModal(`
     <h3>${card?'Karte bearbeiten':'Neue Karte'}</h3>
-    <label>Kasten</label>
-    <select id="card-box">${boxOpts}</select>
-    <label>Frage</label>
-    <textarea id="card-frage" rows="3">${card?escHtml(card.frage):''}</textarea>
+    <label>Kasten</label><select id="card-box">${boxOpts}</select>
+    <label>Frage</label><textarea id="card-frage" rows="3">${card?escHtml(card.frage):''}</textarea>
     <label>Antwort <span style="font-size:11px;color:var(--txt3)">(Enter = neue Zeile, - oder 1. = Aufzählung)</span></label>
     <textarea id="card-antwort" rows="5" placeholder="- Punkt 1&#10;- Punkt 2&#10;oder normaler Text">${card?escHtml(card.antwort):''}</textarea>
-    <label>Notiz (optional)</label>
-    <textarea id="card-notiz" rows="2">${card?escHtml(card.notiz||''):''}</textarea>
-    ${card?`<label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="card-reset" style="width:auto"> Auf Fach 1 zurücksetzen</label>`:''}
+    <label>Notiz (optional)</label><textarea id="card-notiz" rows="2">${card?escHtml(card.notiz||''):''}</textarea>
+    ${card?`<label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-top:12px"><input type="checkbox" id="card-reset" style="width:auto"> Auf Fach 1 zurücksetzen</label>`:''}
     <div style="display:flex;gap:8px;margin-top:20px">
       <button class="btn btn-primary" onclick="saveCard('${boxId||''}','${cardId||''}')">Speichern</button>
       <button class="btn" onclick="closeModal()">Abbrechen</button>
@@ -585,7 +745,6 @@ async function saveCard(oldBoxId,cardId){
   const notiz=document.getElementById('card-notiz').value.trim();
   const newBoxId=document.getElementById('card-box').value;
   if(!frage||!antwort){toast('Frage und Antwort ausfüllen');return;}
-  if(!newBoxId){toast('Bitte Kasten wählen');return;}
   if(!allCards[newBoxId])allCards[newBoxId]=[];
   if(cardId&&oldBoxId){
     const resetFach=document.getElementById('card-reset')?.checked;
@@ -602,13 +761,13 @@ async function saveCard(oldBoxId,cardId){
     allCards[newBoxId].push({id:uid(),frage,antwort,notiz,fach:1,faellig:today(),history:[]});
     await saveCards(newBoxId);
   }
-  closeModal();renderCards();toast('Karte gespeichert');
+  closeModal();renderCards();autoSyncIfEnabled();toast('Karte gespeichert');
 }
 
 async function deleteCard(boxId,cardId){
   if(!confirm('Karte löschen?'))return;
   allCards[boxId]=(allCards[boxId]||[]).filter(c=>c.id!==cardId);
-  await saveCards(boxId);renderCards();toast('Karte gelöscht');
+  await saveCards(boxId);renderCards();autoSyncIfEnabled();toast('Karte gelöscht');
 }
 
 // ─── STATISTIK ───
@@ -616,11 +775,10 @@ function renderStats(){
   const el=document.getElementById('stat-content');
   const allC=Object.values(allCards).flat();
   const totalDue=allC.filter(isDue).length;
-  const fachDist={};
-  for(let i=1;i<=intervals.length;i++)fachDist[i]=0;
+  const fachDist={};for(let i=1;i<=intervals.length;i++)fachDist[i]=0;
   allC.forEach(c=>{const f=Math.min(c.fach||1,intervals.length);fachDist[f]=(fachDist[f]||0)+1;});
   const maxFach=Math.max(...Object.values(fachDist),1);
-  const histAll=allC.flatMap(c=>(c.history||[]).map(h=>({...h})));
+  const histAll=allC.flatMap(c=>(c.history||[]));
   const dayMap={};histAll.forEach(h=>{dayMap[h.date]=(dayMap[h.date]||0)+1;});
   const days=Object.entries(dayMap).sort((a,b)=>a[0]<b[0]?-1:1).slice(-14);
   el.innerHTML=`
@@ -628,30 +786,25 @@ function renderStats(){
       <div class="card" style="text-align:center"><div class="stat-num">${allC.length}</div><div class="stat-label">Karten gesamt</div></div>
       <div class="card" style="text-align:center"><div class="stat-num" style="color:var(--blue)">${totalDue}</div><div class="stat-label">Heute fällig</div></div>
     </div>
-    <div class="card" style="margin-bottom:12px">
-      <h3 style="margin-bottom:12px">Karten pro Fach</h3>
-      ${Object.entries(fachDist).map(([f,n])=>`
-        <div class="bar-wrap">
-          <div class="bar-label"><span>Fach ${f}</span><span>${n}</span></div>
-          <div class="bar"><div class="bar-fill" style="width:${Math.round(n/maxFach*100)}%"></div></div>
-        </div>`).join('')}
+    <div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:12px">Karten pro Fach</h3>
+      ${Object.entries(fachDist).map(([f,n])=>`<div class="bar-wrap">
+        <div class="bar-label"><span>Fach ${f}</span><span>${n}</span></div>
+        <div class="bar"><div class="bar-fill" style="width:${Math.round(n/maxFach*100)}%"></div></div>
+      </div>`).join('')}
     </div>
     ${days.length?`<div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:12px">Aktivität (letzte 14 Tage)</h3>
       ${days.map(([d,n])=>`<div class="bar-wrap">
         <div class="bar-label"><span>${d}</span><span>${n}</span></div>
         <div class="bar"><div class="bar-fill" style="width:${Math.round(n/Math.max(...days.map(x=>x[1]))*100)}%;background:var(--green)"></div></div>
       </div>`).join('')}</div>`:''}
-    <div class="card">
-      <h3 style="margin-bottom:12px">Pro Kasten</h3>
-      ${boxes.map(b=>{
-        const bc=allCards[b.id]||[];
-        return`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border)">
+    <div class="card"><h3 style="margin-bottom:12px">Pro Kasten</h3>
+      ${boxes.map(b=>{const bc=allCards[b.id]||[];return`
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border)">
           <span class="box-color-dot" style="background:${b.color}"></span>
           <span style="flex:1">${escHtml(b.name)}</span>
           <span style="font-size:13px;color:var(--txt2)">${bc.length} Karten</span>
           <span class="fach-chip">${bc.filter(isDue).length} fällig</span>
-        </div>`;
-      }).join('')||'<span style="color:var(--txt3);font-size:14px">Keine Kästen</span>'}
+        </div>`}).join('')||'<span style="color:var(--txt3);font-size:14px">Keine Kästen</span>'}
     </div>`;
 }
 
@@ -663,11 +816,11 @@ function renderIntervals(){
     div.innerHTML=`<label>Fach ${i+1}</label><input type="number" min="1" max="3650" value="${intervals[i]}" id="iv-${i}">`;
     grid.appendChild(div);
   }
+  updateDriveUI();
 }
 
 async function saveIntervals(){
-  intervals=[];
-  for(let i=0;i<12;i++)intervals.push(parseInt(document.getElementById('iv-'+i)?.value)||DEFAULT_INTERVALS[i]);
+  intervals=[];for(let i=0;i<12;i++)intervals.push(parseInt(document.getElementById('iv-'+i)?.value)||DEFAULT_INTERVALS[i]);
   await saveIntervalsSt();toast('Intervalle gespeichert');
 }
 
@@ -675,12 +828,83 @@ async function resetIntervals(){
   intervals=[...DEFAULT_INTERVALS];await saveIntervalsSt();renderIntervals();toast('Zurückgesetzt');
 }
 
+// ─── IMPORT / EXPORT ───
+function buildExportData(){
+  const data={'lk:meta':meta,'lk:boxes':boxes,'lk:intervals':intervals};
+  boxes.forEach(b=>{data['lk:cards:'+b.id]=allCards[b.id]||[];});
+  return data;
+}
+
+async function restoreFromData(data){
+  if(!data['lk:boxes'])return;
+  const merge=confirm('Zusammenführen mit lokalen Daten? (OK=Ja / Abbrechen=Ersetzen)');
+  if(!merge){for(const b of boxes)await STORE.delete('lk:cards:'+b.id);boxes=[];allCards={};}
+  for(const iBox of data['lk:boxes']){
+    let box=boxes.find(b=>b.name===iBox.name);
+    if(!box){box={...iBox,id:uid()};boxes.push(box);allCards[box.id]=[];}
+    const iCards=data['lk:cards:'+iBox.id]||[];
+    const exist=new Set((allCards[box.id]||[]).map(c=>c.frage));
+    iCards.forEach(c=>{if(!exist.has(c.frage))allCards[box.id].push({...c,id:uid()});});
+    await saveCards(box.id);
+  }
+  if(data['lk:intervals'])intervals=data['lk:intervals'];
+  await saveBoxes();await saveIntervalsSt();
+}
+
+function triggerCSVImport(){document.getElementById('csv-import').click()}
+function triggerJSONImport(){document.getElementById('json-import').click()}
+
+async function importCSV(e){
+  const file=e.target.files[0];if(!file)return;
+  const lines=(await file.text()).split('\n').filter(l=>l.trim());
+  let imported=0,errors=0;
+  for(const line of lines){
+    const parts=line.split(';');if(parts.length<2){errors++;continue;}
+    const frage=parts[0].trim().replace(/^"|"$/g,'');
+    const antwort=parts[1].trim().replace(/^"|"$/g,'');
+    const boxName=(parts[2]||'Import').trim().replace(/^"|"$/g,'');
+    if(!frage||!antwort){errors++;continue;}
+    let box=boxes.find(b=>b.name.toLowerCase()===boxName.toLowerCase());
+    if(!box){const id=uid();box={id,name:boxName,color:BOX_COLORS[boxes.length%BOX_COLORS.length],createdAt:today()};boxes.push(box);allCards[id]=[];await saveBoxes();}
+    allCards[box.id].push({id:uid(),frage,antwort,notiz:'',fach:1,faellig:today(),history:[]});imported++;
+  }
+  for(const box of boxes)await saveCards(box.id);
+  e.target.value='';renderCards();autoSyncIfEnabled();
+  toast(`${imported} Karten importiert${errors?`, ${errors} Fehler`:''}`,3500);
+}
+
+async function importJSON(e){
+  const file=e.target.files[0];if(!file)return;
+  try{
+    await restoreFromData(JSON.parse(await file.text()));
+    e.target.value='';renderCards();renderBoxes();autoSyncIfEnabled();toast('JSON importiert',3000);
+  }catch(err){toast('Fehler: '+err.message,4000);}
+}
+
+function exportJSON(){
+  dl(new Blob([JSON.stringify(buildExportData(),null,2)],{type:'application/json'}),'lernkartei-export.json');
+  toast('JSON exportiert');
+}
+
+function exportCSV(){
+  let csv='Frage;Antwort;Kasten\n';
+  boxes.forEach(box=>{(allCards[box.id]||[]).forEach(c=>{
+    csv+=`"${c.frage.replace(/"/g,'""')}";"${c.antwort.replace(/"/g,'""')}";"${box.name.replace(/"/g,'""')}"\n`;
+  });});
+  dl(new Blob([csv],{type:'text/csv;charset=utf-8'}),'lernkartei-export.csv');toast('CSV exportiert');
+}
+
+function dl(blob,name){
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
 async function copyRefDump(){
   try{
     const keys=await STORE.list('lk:');
     const dump={};
-    const keyList=keys?.keys||Object.keys(localStorage).filter(k=>k.startsWith('lk:'));
-    for(const key of keyList){const v=await STORE.get(key);if(v)dump[key]=JSON.parse(v.value);}
+    const keyList=keys?.keys||[];
+    for(const key of keyList){const v=await STORE.get(key);if(v)try{dump[key]=JSON.parse(v.value)}catch{dump[key]=v.value;}}
     await navigator.clipboard.writeText(JSON.stringify(dump,null,2));
     toast('Referenz-Dump kopiert!',3000);
   }catch(e){toast('Fehler: '+e.message,4000);}
@@ -688,81 +912,11 @@ async function copyRefDump(){
 
 async function deleteAllData(){
   if(!confirm('Wirklich ALLE Daten löschen?'))return;
-  if(!confirm('Letzter Hinweis: Nicht rückgängig machbar!'))return;
+  if(!confirm('Nicht rückgängig machbar — fortfahren?'))return;
   for(const box of boxes)await STORE.delete('lk:cards:'+box.id);
   await STORE.delete('lk:boxes');await STORE.delete('lk:meta');await STORE.delete('lk:intervals');
   boxes=[];allCards={};meta={version:1,streak:0,lastLearnDate:''};intervals=[...DEFAULT_INTERVALS];
   toast('Alle Daten gelöscht');showPage('kaesten');
-}
-
-// ─── IMPORT / EXPORT ───
-function triggerCSVImport(){document.getElementById('csv-import').click()}
-function triggerJSONImport(){document.getElementById('json-import').click()}
-
-async function importCSV(e){
-  const file=e.target.files[0];if(!file)return;
-  const text=await file.text();
-  const lines=text.split('\n').filter(l=>l.trim());
-  let imported=0,errors=0;
-  for(const line of lines){
-    const parts=line.split(';');
-    if(parts.length<2){errors++;continue;}
-    const frage=parts[0].trim().replace(/^"|"$/g,'');
-    const antwort=parts[1].trim().replace(/^"|"$/g,'');
-    const boxName=(parts[2]||'Import').trim().replace(/^"|"$/g,'');
-    if(!frage||!antwort){errors++;continue;}
-    let box=boxes.find(b=>b.name.toLowerCase()===boxName.toLowerCase());
-    if(!box){
-      const id=uid();
-      box={id,name:boxName,color:BOX_COLORS[boxes.length%BOX_COLORS.length],createdAt:today()};
-      boxes.push(box);allCards[id]=[];await saveBoxes();
-    }
-    allCards[box.id].push({id:uid(),frage,antwort,notiz:'',fach:1,faellig:today(),history:[]});
-    imported++;
-  }
-  for(const box of boxes)await saveCards(box.id);
-  e.target.value='';renderCards();toast(`${imported} Karten importiert${errors?`, ${errors} Fehler`:''}`,3500);
-}
-
-async function importJSON(e){
-  const file=e.target.files[0];if(!file)return;
-  try{
-    const data=JSON.parse(await file.text());
-    if(!data['lk:boxes']){toast('Ungültiges Format');return;}
-    const merge=confirm('Zusammenführen? (OK=Ja, Abbrechen=Ersetzen)');
-    if(!merge){for(const b of boxes)await STORE.delete('lk:cards:'+b.id);boxes=[];allCards={};}
-    for(const iBox of data['lk:boxes']){
-      let box=boxes.find(b=>b.name===iBox.name);
-      if(!box){box={...iBox,id:uid()};boxes.push(box);allCards[box.id]=[];}
-      const iCards=data['lk:cards:'+iBox.id]||[];
-      const exist=new Set((allCards[box.id]||[]).map(c=>c.frage));
-      iCards.forEach(c=>{if(!exist.has(c.frage))allCards[box.id].push({...c,id:uid()});});
-      await saveCards(box.id);
-    }
-    await saveBoxes();e.target.value='';renderCards();renderBoxes();toast('JSON importiert',3000);
-  }catch(err){toast('Fehler: '+err.message,4000);}
-}
-
-function exportJSON(){
-  const data={'lk:meta':meta,'lk:boxes':boxes};
-  boxes.forEach(b=>{data['lk:cards:'+b.id]=allCards[b.id]||[];});
-  dl(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),'lernkartei-export.json');
-  toast('JSON exportiert');
-}
-
-function exportCSV(){
-  let csv='Frage;Antwort;Kasten\n';
-  boxes.forEach(box=>{
-    (allCards[box.id]||[]).forEach(c=>{
-      csv+=`"${c.frage.replace(/"/g,'""')}";"${c.antwort.replace(/"/g,'""')}";"${box.name.replace(/"/g,'""')}"\n`;
-    });
-  });
-  dl(new Blob([csv],{type:'text/csv;charset=utf-8'}),'lernkartei-export.csv');toast('CSV exportiert');
-}
-
-function dl(blob,name){
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 
 // ─── MODAL ───
@@ -781,20 +935,24 @@ document.addEventListener('keydown',e=>{
 
 // ─── INIT ───
 async function init(){
+  document.getElementById('loading-sub').textContent='Lokale Daten werden geladen…';
   await loadAll();
+  document.getElementById('loading-sub').textContent='Google-Authentifizierung wird geprüft…';
+  handleOAuthCallback();
   if(!boxes.length){
     const id=uid();
     boxes.push({id,name:'Beispiel Deutsch',color:BOX_COLORS[0],createdAt:today()});
     allCards[id]=[
       {id:uid(),frage:'Was ist die Hauptstadt von Deutschland?',antwort:'Berlin\n- Größte Stadt Deutschlands\n- Hauptstadt seit 1990',notiz:'Wiedervereinigung 1990',fach:1,faellig:today(),history:[]},
       {id:uid(),frage:'Erkläre den Begriff "Spaced Repetition"',antwort:'Lernmethode mit zunehmenden Wiederholungsintervallen:\n1. Neue Karte: heute\n2. Danach: 1 Tag\n3. Danach: 3 Tage\n\nBasiert auf der Ebbinghaus-Vergessenskurve.',notiz:'Wissenschaftlich belegt',fach:1,faellig:today(),history:[]},
-      {id:uid(),frage:'Wie lauten die Bewertungsstufen?',antwort:'- 1 = Nicht gewusst → Fach 1\n- 2 = Schwer → Fach bleibt\n- 3 = Gewusst → Fach +1\n- 4 = Sehr leicht → Fach +2',notiz:'Leertaste = umdrehen, 1-4 = bewerten',fach:1,faellig:today(),history:[]},
+      {id:uid(),frage:'Bewertungsstufen beim Lernen',antwort:'- 1 = Nicht gewusst → Fach 1\n- 2 = Schwer → Fach bleibt\n- 3 = Gewusst → Fach +1\n- 4 = Sehr leicht → Fach +2',notiz:'Leertaste = umdrehen, 1–4 = bewerten',fach:1,faellig:today(),history:[]},
     ];
     await saveBoxes();await saveCards(id);
   }
   document.getElementById('loading').style.display='none';
   document.getElementById('app').style.display='block';
   showPage('lernen');
+  if(gAccessToken&&gAutoSync)gdrivePull();
 }
 init();
 </script>
