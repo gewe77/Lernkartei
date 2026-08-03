@@ -5,28 +5,54 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <title>Lernkartei 2</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23378add'/><rect x='22' y='30' width='56' height='40' rx='6' fill='white'/><rect x='30' y='22' width='56' height='40' rx='6' fill='white' opacity='.55'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231B9AAA'/><rect x='22' y='30' width='56' height='40' rx='6' fill='white'/><rect x='30' y='22' width='56' height='40' rx='6' fill='white' opacity='.55'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap">
 <style>
 /* ===== Design-Tokens =====================================================
-   Übernommen aus Lernkartei 1. Die neuen Tokens aus KONZEPT §8 kommen mit
-   dem Oberflächen-Umbau in Stufe 2 — hier bewusst unverändert.
+   KONZEPT §8: türkiser Akzent, warmes Orange für Fälligkeiten, eigene
+   Bewertungsfarben 1–4. Alte Namen (--red/--orange/--green/--blue) bleiben
+   als Aliase erhalten, damit nicht jede Fundstelle einzeln angefasst werden
+   musste — sie zeigen jetzt auf die neuen Tokens. Einzige Ausnahme: die
+   Bewertungsknöpfe (.bew1–4) und die Auswertungsfarben in malAbschluss()
+   referenzieren --bewertung-1..4 direkt, weil --blue (jetzt Akzent-Türkis)
+   und --bewertung-4 (Blau) zwei bewusst verschiedene Farben sind.
    ======================================================================== */
 :root{
   --bg:#fff; --bg2:#f5f4f0; --bg3:#eeecea;
   --txt:#1a1a1a; --txt2:#555; --txt3:#888;
   --border:rgba(0,0,0,.12); --border2:rgba(0,0,0,.22);
-  --red:#e24b4a; --orange:#ef9f27; --green:#639922; --blue:#378add;
-  --red-bg:#fcebeb; --orange-bg:#faeeda; --green-bg:#eaf3de; --blue-bg:#e6f1fb;
-  --radius:10px; --radius2:14px;
+
+  --akzent:#1B9AAA; --akzent-bg:#e3f3f4;
+  --faellig:#F2994A; --faellig-bg:#fdeee0;
+  --bewertung-1:#E2584D; --bewertung-1-bg:#fcebea;
+  --bewertung-2:#F2994A; --bewertung-2-bg:#fdeee0;
+  --bewertung-3:#27AE60; --bewertung-3-bg:#e3f6ec;
+  --bewertung-4:#2D7FF9; --bewertung-4-bg:#e5effe;
+
+  /* Alt-Namen — bewusst als Alias, siehe Kommentar oben */
+  --red:var(--bewertung-1);   --red-bg:var(--bewertung-1-bg);
+  --orange:var(--faellig);    --orange-bg:var(--faellig-bg);
+  --green:var(--bewertung-3); --green-bg:var(--bewertung-3-bg);
+  --blue:var(--akzent);       --blue-bg:var(--akzent-bg);
+
+  --radius:16px; --radius2:var(--radius);
   --schatten:0 1px 2px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.06);
-  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --font:'Nunito',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
 }
 html[data-theme="dark"]{
   --bg:#1e1e1e; --bg2:#262626; --bg3:#323232;
   --txt:#ececec; --txt2:#b3b3b3; --txt3:#8a8a8a;
   --border:rgba(255,255,255,.14); --border2:rgba(255,255,255,.28);
-  --red:#e8635f; --orange:#f2ac48; --green:#84b93f; --blue:#5aa2e8;
-  --red-bg:#3b2321; --orange-bg:#3a2e1b; --green-bg:#26311a; --blue-bg:#1d2c3c;
+
+  --akzent:#3dbbcb; --akzent-bg:#16333a;
+  --faellig:#f5ac69; --faellig-bg:#3a2e1b;
+  --bewertung-1:#ea7267; --bewertung-1-bg:#3b2321;
+  --bewertung-2:#f5ac69; --bewertung-2-bg:#3a2e1b;
+  --bewertung-3:#4fcb89; --bewertung-3-bg:#173828;
+  --bewertung-4:#5b9bfb; --bewertung-4-bg:#1d2c3c;
+
   --schatten:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.35);
 }
 *{box-sizing:border-box}
@@ -41,7 +67,7 @@ h1{font-size:22px}h2{font-size:18px}h3{font-size:15px}
 p{margin:0 0 10px}
 a{color:var(--blue)}
 :focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
-.wrap{max-width:860px;margin:0 auto;padding:18px 16px 60px}
+.wrap{max-width:860px;margin:0 auto;padding:18px 16px 60px;flex:1;min-width:0}
 .muted{color:var(--txt2)}
 .mini{font-size:13px;color:var(--txt3)}
 .mt{margin-top:18px}.mt2{margin-top:28px}
@@ -77,21 +103,29 @@ label.feld > span{display:block;font-size:13px;font-weight:600;color:var(--txt2)
 .karo{display:flex;gap:8px;align-items:center;padding:7px 0;cursor:pointer}
 .karo input{flex:none}
 
-/* ===== Kopfleiste ======================================================= */
-#topbar{
-  position:sticky;top:0;z-index:40;background:var(--bg);
-  border-bottom:1px solid var(--border);
+/* ===== Navigation: Seitenleiste (Desktop) / Bottom-Bar (Mobil) ========== */
+#app{display:flex;min-height:100vh}
+#topbar-mobil{
+  display:none;position:sticky;top:0;z-index:40;background:var(--bg);
+  border-bottom:1px solid var(--border);padding:12px 16px;
 }
-.topbar-in{max-width:860px;margin:0 auto;padding:8px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.marke{font-weight:700;font-size:15px;margin-right:2px;white-space:nowrap}
-nav{display:flex;gap:2px;flex-wrap:wrap;flex:1}
+#seitenleiste{
+  position:sticky;top:0;align-self:flex-start;height:100vh;
+  width:220px;flex:none;display:flex;flex-direction:column;gap:4px;
+  padding:20px 14px;border-right:1px solid var(--border);background:var(--bg);
+}
+.sl-marke{font-weight:800;font-size:17px;padding:0 10px 14px;white-space:nowrap}
+.marke{font-weight:700;font-size:15px;white-space:nowrap}
+nav{display:flex;flex-direction:column;gap:2px;flex:1}
 nav button{
-  border:0;background:transparent;color:var(--txt2);padding:7px 11px;
-  border-radius:8px;font-size:14px;font-weight:500;
+  display:flex;align-items:center;gap:10px;
+  border:0;background:transparent;color:var(--txt2);padding:10px 12px;
+  border-radius:var(--radius);font-size:14.5px;font-weight:500;text-align:left;width:100%;
 }
 nav button:hover{background:var(--bg2);color:var(--txt)}
-nav button.aktiv{background:var(--bg3);color:var(--txt);font-weight:600}
-.statuszeile{display:flex;gap:7px;align-items:center;font-size:12px;color:var(--txt3);white-space:nowrap}
+nav button.aktiv{background:var(--akzent-bg);color:var(--akzent);font-weight:700}
+.nav-ico{font-size:16px;flex:none;line-height:1}
+.statuszeile{display:flex;gap:7px;align-items:center;font-size:12px;color:var(--txt3);white-space:nowrap;padding:10px 12px}
 .punkt{width:8px;height:8px;border-radius:50%;background:var(--txt3);flex:none}
 .punkt.ok{background:var(--green)}
 .punkt.warte{background:var(--orange)}
@@ -124,6 +158,35 @@ nav button.aktiv{background:var(--bg3);color:var(--txt);font-weight:600}
 .punkt-farbe{width:11px;height:11px;border-radius:50%;flex:none;margin-top:5px}
 .leer{text-align:center;color:var(--txt3);padding:36px 16px;font-size:14px}
 
+/* ===== Startbildschirm (Dashboard) ======================================= */
+.dash-kopf{display:flex;gap:22px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.dash-ring{position:relative;width:112px;height:112px;flex:none}
+.dash-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.dash-ring circle{fill:none;stroke-width:10}
+.dash-ring .spur{stroke:var(--bg3)}
+.dash-ring .fuell{stroke:var(--akzent);stroke-linecap:round;transition:stroke-dashoffset .4s}
+.dash-ring-mitte{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.dash-ring-mitte b{font-size:19px;line-height:1.1;font-variant-numeric:tabular-nums}
+.dash-ring-mitte span{font-size:10.5px;color:var(--txt3)}
+.dash-kennzahlen{display:flex;gap:22px;flex-wrap:wrap}
+.dash-kennzahl b{display:block;font-size:22px;line-height:1.15;font-variant-numeric:tabular-nums}
+.dash-kennzahl span{font-size:12px;color:var(--txt2)}
+
+.dash-decks{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:14px 0}
+.dash-deck{
+  border:1.5px solid var(--border);border-radius:var(--radius);padding:12px 14px;background:var(--bg);
+  cursor:pointer;transition:border-color .12s,background .12s;text-align:left;font:inherit;color:inherit;
+}
+.dash-deck:hover{background:var(--bg2)}
+.dash-deck.gewaehlt{border-color:var(--akzent);background:var(--akzent-bg)}
+.dash-deck .dd-name{font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.dash-deck .dd-faellig{font-size:24px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;color:var(--faellig)}
+.dash-deck .dd-rest{font-size:11.5px;color:var(--txt3);margin-top:2px}
+
+.dash-fachleiste{display:flex;height:8px;border-radius:99px;overflow:hidden;background:var(--bg3);margin:10px 0 4px}
+.dash-fachleiste > div{height:100%}
+.dash-fach-legende{display:flex;justify-content:space-between;font-size:10.5px;color:var(--txt3)}
+
 /* ===== Lernen =========================================================== */
 .flip-buehne{perspective:1400px;margin:14px 0}
 .flip-karte{
@@ -155,10 +218,10 @@ nav button.aktiv{background:var(--bg3);color:var(--txt);font-weight:600}
 .bew b{font-size:17px;line-height:1.1}
 .bew span{font-size:11.5px;font-weight:600;text-align:center;line-height:1.2}
 .bew small{font-size:10.5px;color:var(--txt3);font-weight:500}
-.bew1{color:var(--red);border-color:var(--red)}   .bew1:hover{background:var(--red-bg)}
-.bew2{color:var(--orange);border-color:var(--orange)} .bew2:hover{background:var(--orange-bg)}
-.bew3{color:var(--green);border-color:var(--green)}   .bew3:hover{background:var(--green-bg)}
-.bew4{color:var(--blue);border-color:var(--blue)}     .bew4:hover{background:var(--blue-bg)}
+.bew1{color:var(--bewertung-1);border-color:var(--bewertung-1)} .bew1:hover{background:var(--bewertung-1-bg)}
+.bew2{color:var(--bewertung-2);border-color:var(--bewertung-2)} .bew2:hover{background:var(--bewertung-2-bg)}
+.bew3{color:var(--bewertung-3);border-color:var(--bewertung-3)} .bew3:hover{background:var(--bewertung-3-bg)}
+.bew4{color:var(--bewertung-4);border-color:var(--bewertung-4)} .bew4:hover{background:var(--bewertung-4-bg)}
 .tastenhilfe{font-size:12px;color:var(--txt3);text-align:center;margin-top:12px}
 kbd{
   font-family:var(--font);font-size:11px;border:1px solid var(--border2);
@@ -233,13 +296,25 @@ pre.code{
 }
 [hidden]{display:none !important}
 
-@media(max-width:560px){
-  .wrap{padding:14px 12px 70px}
-  .topbar-in{padding:7px 12px;gap:6px}
-  .marke{order:1;font-size:14px}
-  .statuszeile{order:2;margin-left:auto}
-  nav{order:3;flex:0 0 100%;width:100%;gap:1px;justify-content:space-between;flex-wrap:nowrap}
-  nav button{flex:1 1 0;min-width:0;padding:7px 2px;font-size:12px;text-align:center}
+@media(max-width:900px){
+  #app{display:block}
+  #topbar-mobil{display:flex;align-items:center;padding:12px 16px}
+  #seitenleiste{
+    position:fixed;top:auto;bottom:0;left:0;right:0;z-index:40;
+    width:auto;height:auto;flex-direction:row;align-items:center;
+    padding:6px 6px env(safe-area-inset-bottom);gap:0;
+    border-right:0;border-top:1px solid var(--border);
+  }
+  .sl-marke{display:none}
+  nav{flex-direction:row;gap:1px}
+  nav button{flex:1 1 0;min-width:0;flex-direction:column;gap:2px;padding:7px 2px;
+    font-size:11px;text-align:center;justify-content:center;border-radius:10px}
+  .nav-txt{font-size:10.5px}
+  .nav-ico{font-size:17px}
+  .statuszeile{flex:none;padding:0 6px}
+  #status-text{display:none}
+  #toast{bottom:74px}
+  .wrap{padding:14px 12px 84px}
   .bew span{font-size:10.5px}
   .bew small{display:none}
   .flip-text{font-size:18px}
@@ -290,19 +365,21 @@ pre.code{
 
 <!-- ===== App ========================================================== -->
 <div id="app" hidden>
-  <header id="topbar"><div class="topbar-in">
-    <span class="marke">Lernkartei&nbsp;2</span>
+  <header id="topbar-mobil"><span class="marke">Lernkartei&nbsp;2</span></header>
+
+  <div id="seitenleiste">
+    <div class="sl-marke">Lernkartei&nbsp;2</div>
     <nav id="nav">
-      <button data-seite="lernen" class="aktiv">Lernen</button>
-      <button data-seite="kaesten">Kästen</button>
-      <button data-seite="karten">Karten</button>
-      <button data-seite="statistik">Statistik</button>
-      <button data-seite="einstellungen">Einstellungen</button>
+      <button data-seite="lernen" class="aktiv"><span class="nav-ico" aria-hidden="true">🎯</span><span class="nav-txt">Lernen</span></button>
+      <button data-seite="kaesten"><span class="nav-ico" aria-hidden="true">🗂️</span><span class="nav-txt">Kästen</span></button>
+      <button data-seite="karten"><span class="nav-ico" aria-hidden="true">🗒️</span><span class="nav-txt">Karten</span></button>
+      <button data-seite="statistik"><span class="nav-ico" aria-hidden="true">📊</span><span class="nav-txt">Statistik</span></button>
+      <button data-seite="einstellungen"><span class="nav-ico" aria-hidden="true">⚙️</span><span class="nav-txt">Einstellungen</span></button>
     </nav>
     <span class="statuszeile" id="status" title="Verbindung zu Firestore">
       <span class="punkt" id="status-punkt"></span><span id="status-text">…</span>
     </span>
-  </div></header>
+  </div>
 
   <main class="wrap">
     <section id="seite-lernen"></section>
@@ -365,6 +442,7 @@ window.matchMedia?.('(prefers-color-scheme: dark)')
 
 let CFG, SDK_VERSION, KONTEN_HINWEIS = [], TAGESGRENZE = 4;
 let FB = null;   // gebündelte Firebase-Funktionen
+let FSRS = null; // gebündeltes ts-fsrs-Modul (Stufe 2)
 
 async function start() {
   // 1a. firebase-config.js
@@ -420,6 +498,19 @@ async function start() {
       <p class="mini">Technische Meldung: ${esc(e.message)}</p>`);
   }
 
+  // 1c2. FSRS-Bibliothek (Stufe 2) — eigenständiges Bundle ohne Abhängigkeiten
+  bootText('Lernalgorithmus wird geladen …');
+  try {
+    FSRS = await import('https://unpkg.com/ts-fsrs@5.4.1/dist/index.mjs');
+  } catch (e) {
+    return fatal(`
+      <div class="hinweis rot">Die FSRS-Bibliothek (ts-fsrs) konnte nicht geladen werden.</div>
+      <p class="mt">Versucht wurde <code>unpkg.com/ts-fsrs@5.4.1</code>. Mögliche Ursachen:</p>
+      <ul><li>Keine Internetverbindung beim allerersten Start (danach läuft die App offline).</li>
+      <li>Ein Inhaltsblocker verhindert den Zugriff auf unpkg.com.</li></ul>
+      <p class="mini">Technische Meldung: ${esc(e.message)}</p>`);
+  }
+
   // 1d. Initialisieren
   bootText('Verbindung wird hergestellt …');
   try {
@@ -449,12 +540,14 @@ let fbApp = null, auth = null, db = null;
 const STANDARD_INTERVALLE = [1, 3, 7, 14, 21, 30, 45, 60, 90, 120, 180, 365];
 
 const STANDARD_EINSTELLUNGEN = () => ({
-  version: 2,
+  version: 3,
   intervalle: STANDARD_INTERVALLE.slice(),
-  klassikModus: true,     // Stufe 1 rechnet noch klassisch; FSRS folgt in Stufe 2
-  retention: 0.88,        // Stufe 2
-  neuProTag: 20,          // Stufe 2
-  zielMinuten: 15,        // Stufe 2
+  klassikModus: false,    // Stufe 2: FSRS ist der neue Standard (KONZEPT §4.1)
+  retention: 0.88,        // KONZEPT §4.2 — Bereich 0,80–0,95
+  neuProTag: 20,          // KONZEPT §6 Punkt 2 — Bereich 5–50
+  zielMinuten: 15,
+  zielKarten: 30,
+  zielEinheit: 'minuten', // 'minuten' | 'karten'
   theme: 'auto',
   modi: ['aufdecken'],    // Stufe 3
   streak: 0,
@@ -474,11 +567,14 @@ const S = {
   kartenLimit: 60,
   auswahl: new Set(),
   statDeck: 'alle',
-  reviewsGeladen: false
+  reviewsGeladen: false,
+  heutigeNeu: 0,           // Stufe 2: heute bereits eingeführte neue Karten (Tagesdeckel)
+  heutigeAnzahl: 0, heutigeSekunden: 0   // Stufe 2: für den Tagesziel-Ring
 };
 
 let sitzung = null;
 let bekannteDecks = new Set();
+let migrationshinweisAusstehend = false;
 
 /* ---------- 3. Datum, Zufall, IDs -------------------------------------- */
 
@@ -801,6 +897,13 @@ function datenAnbinden() {
           $('#boot').hidden = true;
           $('#app').hidden = false;
           alleSeitenMalen();
+          heutigeStatistikLaden().then(() => { if (S.seite === 'lernen' && !sitzung?.aktiv && !letzteSitzung) malLernen(); });
+          if (migrationshinweisAusstehend) {
+            migrationshinweisAusstehend = false;
+            setTimeout(() => toast(
+              'Neue Bewertungen laufen jetzt über FSRS statt feste Fachintervalle. ' +
+              'Bereits vergebene Termine bleiben erhalten. Umschaltbar in Einstellungen.'), 500);
+          }
           fertig();
         });
       }
@@ -814,6 +917,19 @@ function datenAnbinden() {
         S.einstellungen.intervalle = STANDARD_INTERVALLE.slice();
       S.einstellungen.intervalle = S.einstellungen.intervalle.map((v, i) =>
         zahl(v, 1, 3650, STANDARD_INTERVALLE[i]));
+
+      // Migration Stufe 1 -> Stufe 2: Konten von vor Stufe 2 (version < 3)
+      // wechseln einmalig auf FSRS als neuen Standard-Scheduler (KONZEPT
+      // §4.1). Termine bereits gelernter Karten bleiben unangetastet — nur
+      // künftige Bewertungen laufen ab jetzt über FSRS statt feste Intervalle.
+      if (daten && (!Number.isFinite(daten.version) || daten.version < 3)) {
+        S.einstellungen.klassikModus = false;
+        S.einstellungen.version = 3;
+        schreibe(FB.setDoc(refEinstellungen(),
+          { klassikModus: false, version: 3 }, { merge: true }), 'Stufe-2-Migration');
+        migrationshinweisAusstehend = true;
+      }
+
       themeWunsch = S.einstellungen.theme || 'auto';
       themeAnwenden(themeWunsch);
       try { localStorage.setItem('lk2:theme', themeWunsch); } catch (_) {}
@@ -878,7 +994,7 @@ async function erstStartPruefen() {
      'Der Effekt ist gut belegt: gleiche Behaltensleistung bei deutlich weniger Wiederholungen.'],
     ['Wofür stehen die Bewertungen 1 bis 4?',
      '1 = nicht gewusst, 2 = schwer, 3 = gewusst, 4 = sehr leicht',
-     '1 setzt die Karte auf Fach 1 zurück, 4 überspringt ein Fach.'],
+     '1 setzt die Karte zurück, 4 verlängert den Abstand bis zur nächsten Abfrage am stärksten.'],
     ['Wie kommen meine alten Karten hierher?',
      'Einstellungen → Daten → Altbestand übernehmen',
      'Entweder aus dem Browser dieser Domain oder aus der JSON-Datei der alten App.']
@@ -911,8 +1027,13 @@ function neueKarte({ deckId, frage, antwort, notiz }) {
     tags: [],
     typ: 'standard',            // Stufe 3: cloze | bild
     fach: 1,
-    stability: 0,               // Stufe 2 (FSRS) — bis dahin = Intervall des Fachs
-    difficulty: 5,
+    stability: 0,
+    // difficulty MUSS bei einer noch nie gelernten Karte zusammen mit
+    // stability:0 auf 0 stehen — ts-fsrs erkennt eine "frische" Karte genau
+    // an dieser Kombination und initialisiert sie über die Erstbewertungs-
+    // formel. Jeder andere Wert hier lässt FSRS bei der ersten Bewertung
+    // mit "Invalid memory state" abstürzen.
+    difficulty: 0,
     due: heute(),               // neue Karten sind sofort dran
     lastReview: null,
     reps: 0,
@@ -937,11 +1058,17 @@ const deckName      = id => S.decks.find(d => d.id === id)?.name || 'Ohne Kasten
 const deckFarbe     = id => S.decks.find(d => d.id === id)?.farbe || 'var(--txt3)';
 const kartenVon     = id => S.cards.filter(k => k.deckId === id);
 
-/* Fach ableiten für Karten, die (nach einem Stufe-2-Import) keins mehr haben */
+/** Fach ist die Anzeige-Ebene der Karteikarten-Metapher (KONZEPT §4.3).
+ *  Klassik-Modus: Fach ist eine gespeicherte Terminierungsgröße (wie Stufe 1).
+ *  FSRS-Modus: Fach ist eine reine Ableitung aus der Stabilität — keine
+ *  gespeicherte Größe, ändert sich also automatisch mit jeder Bewertung. */
 function fachVon(k) {
-  if (Number.isFinite(k.fach) && k.fach >= 1) return Math.min(12, Math.round(k.fach));
+  if (S.einstellungen.klassikModus) {
+    return Number.isFinite(k.fach) && k.fach >= 1 ? Math.min(12, Math.round(k.fach)) : 1;
+  }
   const s = Number(k.stability) || 0;
-  return Math.min(12, STANDARD_INTERVALLE.filter(g => s >= g).length + (s > 0 ? 0 : 1) || 1);
+  const schwellen = STANDARD_INTERVALLE.filter(g => s >= g).length;
+  return Math.max(1, Math.min(12, schwellen + 1));
 }
 
 /* ---------- 8. Navigation ---------------------------------------------- */
@@ -1011,30 +1138,62 @@ function malLernen() {
   const alleN  = gewaehlt.filter(istFaellig).length;
   const dran   = modus === 'heute' ? heuteN : alleN;
 
+  const e = S.einstellungen;
+  const zielKarten = e.zielEinheit === 'karten';
+  const heutigerWert = zielKarten ? (S.heutigeAnzahl || 0) : Math.round((S.heutigeSekunden || 0) / 60);
+  const zielWert = zielKarten ? zahl(e.zielKarten, 1, 2000, 30) : zahl(e.zielMinuten, 1, 600, 15);
+  const anteil = Math.max(0, Math.min(1, zielWert ? heutigerWert / zielWert : 0));
+  const UMFANG = Math.round(2 * Math.PI * 46);
+
+  const proFach = Array.from({ length: 12 }, (_, i) =>
+    gewaehlt.filter(k => !k.suspendiert && fachVon(k) === i + 1).length);
+  const fachGesamt = proFach.reduce((a, b) => a + b, 0);
+
   ziel.innerHTML = `
     <h1>Lernen</h1>
-    <div class="box">
-      <div class="spread" style="margin-bottom:10px">
-        <h2 style="margin:0">Kästen</h2>
-        <span class="row" style="gap:6px">
-          <button class="btn klein" data-tu="alleAn">Alle</button>
-          <button class="btn klein" data-tu="alleAus">Keiner</button>
-        </span>
+
+    <div class="dash-kopf">
+      <div class="dash-ring">
+        <svg viewBox="0 0 100 100">
+          <circle class="spur" cx="50" cy="50" r="46"></circle>
+          <circle class="fuell" cx="50" cy="50" r="46"
+            stroke-dasharray="${UMFANG}" stroke-dashoffset="${Math.round(UMFANG * (1 - anteil))}"></circle>
+        </svg>
+        <div class="dash-ring-mitte"><b>${heutigerWert}/${zielWert}</b><span>${zielKarten ? 'Karten' : 'Minuten'}</span></div>
       </div>
+      <div class="dash-kennzahlen">
+        <div class="dash-kennzahl"><b>${dran}</b><span>${modus === 'heute' ? 'heute fällig' : 'fällig gesamt'}</span></div>
+        <div class="dash-kennzahl"><b>${e.streak || 0}</b><span>Tage Streak</span></div>
+        <div class="dash-kennzahl"><b>${gewaehlt.length}</b><span>Karten gewählt</span></div>
+      </div>
+    </div>
+
+    ${fachGesamt ? `
+    <div class="dash-fachleiste">${proFach.map((n, i) =>
+      n ? `<div style="width:${(n / fachGesamt * 100).toFixed(2)}%;background:var(--akzent);opacity:${(0.28 + i * 0.06).toFixed(2)}" title="Fach ${i + 1}: ${n} Karten"></div>` : ''
+    ).join('')}</div>
+    <div class="dash-fach-legende"><span>Fach 1</span><span>Fach 12</span></div>` : ''}
+
+    <div class="spread mt2" style="margin-bottom:8px">
+      <h2 style="margin:0">Kästen</h2>
+      <span class="row" style="gap:6px">
+        <button class="btn klein" data-tu="alleAn">Alle</button>
+        <button class="btn klein" data-tu="alleAus">Keiner</button>
+      </span>
+    </div>
+    <div class="dash-decks">
       ${S.decks.map(d => {
         const k = kartenVon(d.id);
         const f = k.filter(istFaellig).length;
-        return `<label class="karo">
-          <input type="checkbox" data-deck="${esc(d.id)}" ${lernAuswahl.has(d.id) ? 'checked' : ''}>
-          <span class="punkt-farbe" style="background:${esc(d.farbe)};margin:0"></span>
-          <span style="flex:1">${esc(d.name)}</span>
-          <span class="badge ${f ? 'faellig' : ''}">${f} fällig</span>
-          <span class="badge">${k.length} gesamt</span>
-        </label>`;
+        return `<button type="button" class="dash-deck ${lernAuswahl.has(d.id) ? 'gewaehlt' : ''}" data-deck="${esc(d.id)}" aria-pressed="${lernAuswahl.has(d.id)}">
+          <div class="dd-name"><span class="punkt-farbe" style="background:${esc(d.farbe)};margin:0"></span>${esc(d.name)}</div>
+          <div class="dd-faellig" ${f ? '' : 'style="color:var(--txt3)"'}>${f}</div>
+          <div class="dd-rest">fällig · ${k.length} gesamt</div>
+        </button>`;
       }).join('')}
     </div>
 
-    <div class="box">
+    <div class="box mt">
       <h2>Umfang</h2>
       <label class="karo"><input type="radio" name="modus" value="heute" ${modus === 'heute' ? 'checked' : ''}>
         <span style="flex:1">Nur heute fällig</span><span class="badge">${heuteN}</span></label>
@@ -1054,8 +1213,9 @@ function malLernen() {
       <kbd>1</kbd>–<kbd>4</kbd> bewerten · <kbd>Esc</kbd> beenden</p>`;
 
   verdrahten(ziel);
-  $$('#seite-lernen input[data-deck]').forEach(cb => cb.addEventListener('change', () => {
-    cb.checked ? lernAuswahl.add(cb.dataset.deck) : lernAuswahl.delete(cb.dataset.deck);
+  $$('#seite-lernen .dash-deck').forEach(btn => btn.addEventListener('click', () => {
+    const id = btn.dataset.deck;
+    lernAuswahl.has(id) ? lernAuswahl.delete(id) : lernAuswahl.add(id);
     malLernen();
   }));
   $$('#seite-lernen input[name=modus]').forEach(r => r.addEventListener('change', () => {
@@ -1078,16 +1238,43 @@ function naechsteFaelligkeitText() {
   return `${datumDeutsch(d)} (in ${n} ${n === 1 ? 'Tag' : 'Tagen'})`;
 }
 
-function sitzungStarten() {
+/** Heutige Tagesstatistik (neue Karten, Anzahl, Sekunden) — für den
+ *  Tagesdeckel und den Fortschrittsring auf dem Startbildschirm. Bei
+ *  Fehlern (offline, kein Cache) bleiben die zuletzt bekannten Werte
+ *  stehen statt die App zu blockieren. */
+async function heutigeStatistikLaden() {
+  try {
+    const snap = await FB.getDoc(FB.doc(colReviews(), heute()));
+    const d = snap.exists() ? snap.data() : null;
+    S.heutigeNeu = Number(d?.neu) || 0;
+    S.heutigeAnzahl = Number(d?.anzahl) || 0;
+    S.heutigeSekunden = Number(d?.sekunden) || 0;
+  } catch (_) { /* Werte bleiben wie sie waren */ }
+  return S.heutigeNeu;
+}
+
+async function sitzungStarten() {
   const modus = lernModus();
-  const pool = S.cards.filter(k => lernAuswahl.has(k.deckId))
+  let pool = S.cards.filter(k => lernAuswahl.has(k.deckId))
     .filter(modus === 'heute' ? istHeuteGenau : istFaellig);
   if (!pool.length) return toast('Keine fälligen Karten in der Auswahl.');
+
+  const heutigeNeu = await heutigeStatistikLaden();
+  const deckel = zahl(S.einstellungen.neuProTag, 5, 50, 20);
+  const nochFrei = Math.max(0, deckel - heutigeNeu);
+  const alte = pool.filter(k => !istNeu(k));
+  let neue = pool.filter(istNeu);
+  const uebrig = Math.max(0, neue.length - nochFrei);
+  if (neue.length > nochFrei) neue = mischen(neue).slice(0, nochFrei);
+  pool = alte.concat(neue);
+  if (!pool.length) return toast(
+    `Tagesgrenze für neue Karten erreicht (${deckel}/Tag). In der Auswahl sind nur noch neue Karten fällig.`, 'fehler');
+
   sitzung = {
     karten: mischen(pool), i: 0, aufgedeckt: false, aktiv: true,
     zaehler: { 1: 0, 2: 0, 3: 0, 4: 0 }, gesamt: pool.length,
     start: Date.now(), kartenStart: Date.now(), sekunden: 0,
-    proDeck: {}, bewertet: 0
+    proDeck: {}, bewertet: 0, uebrigeNeue: uebrig
   };
   malSitzung();
 }
@@ -1151,18 +1338,42 @@ function aktionenVerdrahten() {
     b.addEventListener('click', () => bewerten(Number(b.dataset.bew))));
 }
 
+/** Text für "in wie vielen Tagen" unter jedem Bewertungsknopf. */
+function intervallTextAus(tage) {
+  return tage <= 0 ? 'heute' : tage === 1 ? 'morgen' : tage < 31 ? tage + ' Tage'
+    : tage < 365 ? Math.round(tage / 30) + ' Mon.' : Math.round(tage / 365 * 10) / 10 + ' J.';
+}
+/** Vorschau für alle vier Bewertungen — je nach Modus aus der festen
+ *  Intervalltabelle oder direkt von FSRS. repeat() liefert alle vier
+ *  Ausgänge auf einen Schlag, genau passend für diese Vorschau. */
+function intervallVorschauTexte(k) {
+  if (S.einstellungen.klassikModus) {
+    const iv = S.einstellungen.intervalle;
+    const max = iv.length;
+    const alt = fachVon(k);
+    const out = {};
+    [1, 2, 3, 4].forEach(r => {
+      const neu = r === 1 ? 1 : r === 2 ? alt : Math.min(max, alt + (r === 3 ? 1 : 2));
+      out[r] = intervallTextAus(iv[neu - 1] ?? iv[max - 1]);
+    });
+    return out;
+  }
+  try {
+    const vorschau = fsrsMotor().repeat(fsrsKarteAus(k), fsrsJetzt());
+    const out = {};
+    [1, 2, 3, 4].forEach(r => { out[r] = intervallTextAus(tageDiff(datumZuIso(vorschau[r].card.due), heute())); });
+    return out;
+  } catch (e) {
+    console.warn('[Vorschau]', e);
+    return { 1: '–', 2: '–', 3: '–', 4: '–' };
+  }
+}
+
 function bewertungsHtml(k) {
-  const iv = S.einstellungen.intervalle;
-  const max = iv.length;
-  const alt = fachVon(k);
-  const vorschau = r => {
-    const neu = r === 1 ? 1 : r === 2 ? alt : Math.min(max, alt + (r === 3 ? 1 : 2));
-    const t = iv[neu - 1];
-    return t === 1 ? 'morgen' : t < 31 ? t + ' Tage' : t < 365 ? Math.round(t / 30) + ' Mon.' : '1 Jahr';
-  };
+  const vorschauTexte = intervallVorschauTexte(k);
   const knopf = (r, titel) =>
     `<button class="bew bew${r}" data-bew="${r}">
-       <b>${r}</b><span>${titel}</span><small>${vorschau(r)}</small></button>`;
+       <b>${r}</b><span>${titel}</span><small>${vorschauTexte[r]}</small></button>`;
   return `<div class="bewertung">
       ${knopf(1, 'Nicht gewusst')}${knopf(2, 'Schwer')}${knopf(3, 'Gewusst')}${knopf(4, 'Sehr leicht')}
     </div>
@@ -1181,47 +1392,148 @@ function umdrehen() {
   aktionenVerdrahten();
 }
 
+/* ---------- 9b. FSRS (Stufe 2) ------------------------------------------ */
+
+/** ts-fsrs rechnet mit echten Datumsobjekten und eigener Tagesarithmetik
+ *  (dateDiffInDays, UTC-Kalendertage). Die App rechnet Tage konsequent über
+ *  ISO-Strings und eine eigene Tagesgrenze (heute(), TAGESGRENZE). Damit
+ *  beide dieselben Tage zählen, wird FSRS nie der reale Sekunden-Zeitpunkt
+ *  übergeben, sondern die UTC-Mitternacht des App-"heute". */
+function isoZuDatum(iso) { return new Date((iso || heute()) + 'T00:00:00.000Z'); }
+function datumZuIso(d) {
+  if (!(d instanceof Date) || isNaN(d.getTime())) return heute();
+  return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getUTCDate()).padStart(2, '0');
+}
+function fsrsJetzt() { return isoZuDatum(heute()); }
+
+/** Parameter frisch aufbauen statt zu cachen — die Retention kann sich in
+ *  den Einstellungen jederzeit ändern. Lernschritte bewusst auf einen
+ *  kurzen Schritt reduziert (KONZEPT §4.1: „keine mehrstufigen Ketten“). */
+function fsrsMotor() {
+  return new FSRS.FSRS(FSRS.generatorParameters({
+    request_retention: S.einstellungen.retention,
+    learning_steps: ['10m'],
+    relearning_steps: ['10m']
+  }));
+}
+
+/** App-Karte in das von ts-fsrs erwartete Card-Objekt übersetzen. */
+function fsrsKarteAus(k) {
+  return {
+    due: isoZuDatum(k.due),
+    stability: Number(k.stability) || 0,
+    difficulty: Number(k.difficulty) || 0,
+    elapsed_days: 0,          // wird von ts-fsrs aus last_review + jetzt neu berechnet
+    scheduled_days: 0,
+    learning_steps: Number(k.learningSteps) || 0,
+    reps: Number(k.reps) || 0,
+    lapses: Number(k.lapses) || 0,
+    state: [0, 1, 2, 3].includes(k.state) ? k.state : 0,
+    last_review: k.lastReview ? isoZuDatum(k.lastReview) : undefined
+  };
+}
+
+const FSRS_STANDARD_GEWICHTE = [
+  0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001, 1.8722,
+  0.1666, 0.796, 1.4835, 0.0614, 0.2629, 1.6483, 0.6014, 1.8729, 0.5425,
+  0.0912, 0.0658, 0.1542
+];
+/** Intervallformel von ts-fsrs (FSRS-6), unabhängig nachgebildet für die
+ *  Folgeabschätzung des Retention-Reglers — eine echte Simulation über alle
+ *  Karten wäre dafür zu teuer, eine Näherung reicht als Orientierung. */
+function fsrsIntervallTage(stability, retention, w) {
+  const decay = -w[20];
+  const factor = Math.exp(Math.log(0.9) / decay) - 1;
+  const modifier = (Math.pow(retention, 1 / decay) - 1) / factor;
+  return Math.min(36500, Math.max(1, Math.round((stability || 0.5) * modifier)));
+}
+/** Renewal-Theorie-Näherung: Summe 1/Intervall über alle aktiven Karten
+ *  ergibt die erwartete Anzahl Wiederholungen pro Tag im eingeschwungenen
+ *  Zustand. Nur eine Orientierungshilfe, keine exakte Vorhersage. */
+function geschaetzteWiederholungenProTag(retention) {
+  const karten = S.cards.filter(k => !k.suspendiert);
+  if (!karten.length) return 0;
+  let summe = 0;
+  karten.forEach(k => { summe += 1 / fsrsIntervallTage(Number(k.stability) || 0.5, retention, FSRS_STANDARD_GEWICHTE); });
+  return Math.round(summe * 10) / 10;
+}
+
+/** Datenbank-Patch für eine Bewertung — Klassik-Modus (feste Fachintervalle,
+ *  wie Stufe 1) oder FSRS, je nach Einstellung. */
+function bewertungsPatch(k, rating) {
+  if (S.einstellungen.klassikModus) {
+    const iv = S.einstellungen.intervalle;
+    const max = iv.length;
+    const alt = fachVon(k);
+    const neuFach = rating === 1 ? 1
+                  : rating === 2 ? alt
+                  : Math.min(max, alt + (rating === 3 ? 1 : 2));
+    const tage = iv[neuFach - 1] ?? iv[max - 1];
+    return {
+      fach: neuFach,
+      due: plusTage(heute(), tage),
+      stability: tage,
+      lastReview: heute(),
+      reps: (Number(k.reps) || 0) + 1,
+      lapses: (Number(k.lapses) || 0) + (rating === 1 ? 1 : 0),
+      state: rating === 1 ? 3 : 2
+    };
+  }
+  const { card } = fsrsMotor().next(fsrsKarteAus(k), fsrsJetzt(), rating);
+  const schwellen = STANDARD_INTERVALLE.filter(g => card.stability >= g).length;
+  return {
+    due: datumZuIso(card.due),
+    stability: card.stability,
+    difficulty: card.difficulty,
+    lastReview: heute(),
+    reps: card.reps,
+    lapses: card.lapses,
+    state: card.state,
+    learningSteps: card.learning_steps || 0,
+    // "fach" wird auch im FSRS-Modus als Spiegel der Stabilität mitgeschrieben
+    // (KONZEPT §4.3-Schwellen) — nicht weil FSRS ihn braucht, sondern damit
+    // ein späteres Zurückschalten in den Klassik-Modus nicht auf einem
+    // veralteten Fach-Wert aufsetzt und Monate an Fortschritt zurückwirft.
+    fach: Math.max(1, Math.min(12, schwellen + 1))
+  };
+}
+
 function bewerten(rating) {
   const s = sitzung;
   if (!s?.aktiv || !s.aufgedeckt) return;
   const k = s.karten[s.i];
   if (!k) return;
 
-  const iv = S.einstellungen.intervalle;
-  const max = iv.length;
-  const alt = fachVon(k);
-  const neuFach = rating === 1 ? 1
-                : rating === 2 ? alt
-                : Math.min(max, alt + (rating === 3 ? 1 : 2));
-  const tage = iv[neuFach - 1] ?? iv[max - 1];
   const sekunden = Math.min(600, Math.round((Date.now() - s.kartenStart) / 1000));
-
-  const patch = {
-    fach: neuFach,
-    due: plusTage(heute(), tage),
-    stability: tage,
-    lastReview: heute(),
-    reps: (Number(k.reps) || 0) + 1,
-    lapses: (Number(k.lapses) || 0) + (rating === 1 ? 1 : 0),
-    state: rating === 1 ? 3 : 2
-  };
+  const warNeu = istNeu(k);
+  let patch;
+  try {
+    patch = bewertungsPatch(k, rating);
+  } catch (e) {
+    console.error('[Terminierung]', e);
+    toast('Terminierung fehlgeschlagen, Karte wird übersprungen: ' + (e?.message || e), 'fehler');
+    s.i++; s.aufgedeckt = false; s.kartenStart = Date.now();
+    return malSitzung();
+  }
   Object.assign(k, patch);                                   // lokal sofort
   schreibe(FB.updateDoc(FB.doc(colCards(), k.id), patch), 'Bewertung');
 
   s.zaehler[rating]++; s.bewertet++; s.sekunden += sekunden;
   s.proDeck[k.deckId] = (s.proDeck[k.deckId] || 0) + 1;
-  tagesstatistikSchreiben(rating, sekunden, k.deckId);
+  tagesstatistikSchreiben(rating, sekunden, k.deckId, warNeu);
   streakPflegen();
 
   s.i++; s.aufgedeckt = false; s.kartenStart = Date.now();
   malSitzung();
 }
 
-function tagesstatistikSchreiben(rating, sekunden, deckId) {
+function tagesstatistikSchreiben(rating, sekunden, deckId, warNeu) {
   const tag = heute();
   schreibe(FB.setDoc(FB.doc(colReviews(), tag), {
     datum: tag,
     anzahl: FB.increment(1),
+    neu: FB.increment(warNeu ? 1 : 0),
     sekunden: FB.increment(sekunden),
     bewertungen: { [rating]: FB.increment(1) },
     proDeck: { [deckId]: FB.increment(1) }
@@ -1252,6 +1564,7 @@ function malAbschluss() {
   s.aktiv = false;
   letzteSitzung = s;
   sitzung = null;
+  heutigeStatistikLaden();   // im Hintergrund auffrischen, für den Ring auf dem Startbildschirm
   const min = Math.max(1, Math.round(s.sekunden / 60));
   const proKarte = s.bewertet ? (s.sekunden / s.bewertet).toFixed(1) : '0';
   const offenN = s.gesamt - s.bewertet;
@@ -1271,13 +1584,16 @@ function malAbschluss() {
     <div class="box mt">
       ${[1, 2, 3, 4].map(r => {
         const n = s.zaehler[r], p = s.bewertet ? Math.round(n / s.bewertet * 100) : 0;
-        const farbe = ['var(--red)', 'var(--orange)', 'var(--green)', 'var(--blue)'][r - 1];
+        const farbe = ['var(--bewertung-1)', 'var(--bewertung-2)', 'var(--bewertung-3)', 'var(--bewertung-4)'][r - 1];
         const t = ['Nicht gewusst', 'Schwer', 'Gewusst', 'Sehr leicht'][r - 1];
         return `<div class="balken"><span class="lab">${r} ${t.slice(0, 6)}.</span>
           <span class="spur"><span class="fuell" style="width:${p}%;background:${farbe}"></span></span>
           <span class="val">${n}</span></div>`;
       }).join('')}
     </div>
+    ${s.uebrigeNeue ? `<p class="mini mt" style="text-align:center">
+      ${s.uebrigeNeue} weitere neue ${s.uebrigeNeue === 1 ? 'Karte wartet' : 'Karten warten'} —
+      Tagesgrenze für neue Karten erreicht.</p>` : ''}
     <div class="row mt2" style="justify-content:center">
       <button class="btn primary" data-tu="nochmal">Zur Übersicht</button>
       <button class="btn" data-tu="zuStatistik">Statistik ansehen</button>
@@ -1460,6 +1776,7 @@ async function karteBearbeiten(id) {
   if (id && !k) return;
   if (!S.decks.length) return toast('Zuerst einen Kasten anlegen.');
   const vorDeck = k?.deckId || (S.kartenFilterDeck !== 'alle' ? S.kartenFilterDeck : S.decks[0].id);
+  const klassik = S.einstellungen.klassikModus;
 
   const r = await modal({
     titel: k ? 'Karte bearbeiten' : 'Neue Karte',
@@ -1471,15 +1788,18 @@ async function karteBearbeiten(id) {
       <label class="feld"><span>Kasten</span><select id="m-deck">${S.decks.map(d =>
         `<option value="${esc(d.id)}" ${d.id === vorDeck ? 'selected' : ''}>${esc(d.name)}</option>`).join('')}</select></label>
       ${k ? `<div class="row" style="justify-content:space-between;gap:10px">
-        <label class="feld" style="flex:1;margin:0"><span>Fach (1–12)</span>
-          <input type="number" id="m-fach" min="1" max="12" value="${fachVon(k)}"></label>
+        <label class="feld" style="flex:1;margin:0"><span>Fach (1–12)${klassik ? '' : ' — abgeleitet'}</span>
+          ${klassik
+            ? `<input type="number" id="m-fach" min="1" max="12" value="${fachVon(k)}">`
+            : `<input type="text" value="${fachVon(k)}" disabled title="Im FSRS-Modus ergibt sich das Fach aus der Stabilität und ist hier nicht editierbar.">`}
+        </label>
         <label class="feld" style="flex:1;margin:0"><span>Fällig am</span>
           <input type="date" id="m-due" value="${esc(k.due || heute())}"></label>
       </div>
       <label class="karo" style="margin-top:6px"><input type="checkbox" id="m-susp" ${k.suspendiert ? 'checked' : ''}>
         <span>Ruhen lassen (kommt nicht mehr dran)</span></label>
       <p class="mini">${k.reps || 0} Wiederholungen · ${k.lapses || 0} Aussetzer ·
-         zuletzt ${datumDeutsch(k.lastReview)}</p>` : ''}`,
+         zuletzt ${datumDeutsch(k.lastReview)}${klassik ? '' : ` · Stabilität ${Math.round(Number(k.stability) || 0)} Tage`}</p>` : ''}`,
     knoepfe: [{ text: 'Abbrechen', wert: null }, {
       text: k ? 'Speichern' : 'Anlegen', wert: 'ok', art: 'primary',
       pruefen: () => {
@@ -1499,10 +1819,15 @@ async function karteBearbeiten(id) {
   if (!werte.frage || !werte.antwort) return;
 
   if (k) {
-    const fachNeu = zahl(W('m-fach', fachVon(k)), 1, 12, fachVon(k));
+    // Terminierung nur im Klassik-Modus über das Fach neu berechnen — im
+    // FSRS-Modus ist die Stabilität eine gemessene Größe, kein aus dem Fach
+    // abgeleiteter Wert, und darf beim bloßen Bearbeiten von Text nicht
+    // überschrieben werden (sonst geht echter FSRS-Fortschritt verloren).
+    if (klassik) {
+      const fachNeu = zahl(W('m-fach', fachVon(k)), 1, 12, fachVon(k));
+      Object.assign(werte, { fach: fachNeu, stability: S.einstellungen.intervalle[fachNeu - 1] });
+    }
     Object.assign(werte, {
-      fach: fachNeu,
-      stability: S.einstellungen.intervalle[fachNeu - 1],
       due: W('m-due', k.due || heute()),
       suspendiert: letzteWerte['m-susp'] === true
     });
@@ -1660,10 +1985,53 @@ function malEinstellungen() {
     </div>
 
     <div class="box">
+      <h2>Lernmethode</h2>
+      <label class="karo"><input type="checkbox" id="s-klassik" ${e.klassikModus ? 'checked' : ''}>
+        <span><strong>Klassik-Modus</strong> — feste Fachintervalle statt FSRS</span></label>
+      <p class="mini" style="margin-top:2px">${e.klassikModus
+        ? 'Aktiv: Bewertungen richten sich nach den festen Intervallen unten, wie in der Vorgängerversion. Bereits vorhandene Termine bleiben beim Umschalten erhalten.'
+        : 'FSRS ist aktiv: Der Abstand bis zur nächsten Abfrage wird je Karte aus der bisherigen Vergessenskurve berechnet — bei gleicher Behaltensleistung meist deutlich weniger Wiederholungen als feste Intervalle.'}</p>
+
+      <div id="s-retention-block" ${e.klassikModus ? 'hidden' : ''} style="margin-top:16px">
+        <label class="feld" style="margin-bottom:4px">
+          <span>Gewünschte Behaltensleistung — <strong id="s-retention-wert">${Math.round(e.retention * 100)}%</strong></span>
+          <input type="range" id="s-retention" min="0.80" max="0.95" step="0.01" value="${e.retention}">
+        </label>
+        <p class="mini">Höher = seltener vergessen, aber mehr Wiederholungen. Empfehlung: 85–90%.</p>
+        <p class="mini" id="s-retention-schaetzung" style="margin-top:6px"></p>
+        <div id="s-retention-warnung" class="hinweis" style="margin-top:8px" ${e.retention > 0.93 ? '' : 'hidden'}>
+          Über 93% steigt der Aufwand stark, der Zugewinn an Behaltensleistung ist gering.
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <h2>Tagespensum</h2>
+      <p class="mini">Begrenzt, wie viele neue Karten pro Tag eingeführt werden — der
+        wirksamste Hebel gegen zu hohe Tageslast, da jede neue Karte künftige
+        Wiederholungen erzeugt.</p>
+      <label class="feld" style="margin-top:10px"><span>Neue Karten pro Tag (5–50)</span>
+        <input type="number" id="s-neuprotag" min="5" max="50" value="${zahl(e.neuProTag, 5, 50, 20)}"></label>
+      <label class="feld"><span>Tagesziel</span>
+        <div class="row" style="gap:14px">
+          <label class="karo" style="padding:2px 0"><input type="radio" name="s-zieleinheit" value="minuten" ${e.zielEinheit !== 'karten' ? 'checked' : ''}> <span>Minuten</span></label>
+          <label class="karo" style="padding:2px 0"><input type="radio" name="s-zieleinheit" value="karten" ${e.zielEinheit === 'karten' ? 'checked' : ''}> <span>Karten</span></label>
+        </div>
+      </label>
+      <div class="row" style="gap:10px">
+        <label class="feld" style="flex:1"><span>Minuten/Tag</span>
+          <input type="number" id="s-zielminuten" min="1" max="600" value="${zahl(e.zielMinuten, 1, 600, 15)}"></label>
+        <label class="feld" style="flex:1"><span>Karten/Tag</span>
+          <input type="number" id="s-zielkarten" min="1" max="2000" value="${zahl(e.zielKarten, 1, 2000, 30)}"></label>
+      </div>
+      <button class="btn primary" data-tu="tagespensumSpeichern">Speichern</button>
+    </div>
+
+    <div class="box">
       <h2>Intervalle pro Fach</h2>
-      <p class="mini">Tage bis zur nächsten Abfrage. Voreinstellung orientiert sich an
-         SM-2 und der Vergessenskurve. In Stufe 2 kommt FSRS dazu — diese Werte
-         bleiben dann als Klassik-Modus erhalten.</p>
+      <p class="mini">Tage bis zur nächsten Abfrage im Klassik-Modus. Im FSRS-Modus hat diese
+         Tabelle keinen Einfluss — die Fach-Anzeige verwendet dort feste Schwellen
+         (1/3/7/14/…/365 Tage, KONZEPT §4.3), unabhängig von den Werten hier.</p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:8px;margin-top:10px">
         ${e.intervalle.map((v, i) => `<label class="feld" style="margin:0">
           <span>Fach ${i + 1}</span>
@@ -1725,6 +2093,34 @@ function malEinstellungen() {
     themeAnwenden(themeWunsch);
     try { localStorage.setItem('lk2:theme', themeWunsch); } catch (_) {}
     schreibe(FB.setDoc(refEinstellungen(), { theme: themeWunsch }, { merge: true }), 'Theme');
+  });
+
+  $('#s-klassik').addEventListener('change', ev => {
+    const neu = ev.target.checked;
+    S.einstellungen.klassikModus = neu;
+    schreibe(FB.setDoc(refEinstellungen(), { klassikModus: neu, version: 3 }, { merge: true }), 'Klassik-Modus');
+    toast(neu ? 'Klassik-Modus aktiv — feste Intervalle.' : 'FSRS aktiv.');
+    malEinstellungen();
+  });
+
+  const retentionAnzeigen = () => {
+    const r = Math.min(0.95, Math.max(0.80, Number($('#s-retention')?.value) || e.retention));
+    const wert = $('#s-retention-wert'); if (wert) wert.textContent = Math.round(r * 100) + '%';
+    const schaetz = $('#s-retention-schaetzung');
+    if (schaetz) {
+      const aktiv = S.cards.filter(k => !k.suspendiert).length;
+      schaetz.textContent = aktiv
+        ? `≈ ${geschaetzteWiederholungenProTag(r)} Wiederholungen/Tag bei ${aktiv} aktiven Karten.`
+        : 'Noch keine Karten vorhanden — Schätzung folgt, sobald welche angelegt sind.';
+    }
+    const warn = $('#s-retention-warnung'); if (warn) warn.hidden = r <= 0.93;
+  };
+  retentionAnzeigen();
+  $('#s-retention')?.addEventListener('input', retentionAnzeigen);
+  $('#s-retention')?.addEventListener('change', ev => {
+    const r = Math.min(0.95, Math.max(0.80, Math.round((Number(ev.target.value) || 0.88) * 100) / 100));
+    S.einstellungen.retention = r;
+    schreibe(FB.setDoc(refEinstellungen(), { retention: r }, { merge: true }), 'Retention');
   });
 }
 
@@ -2325,6 +2721,16 @@ const AKTION = {
     schreibe(FB.setDoc(refEinstellungen(),
       { intervalle: STANDARD_INTERVALLE.slice() }, { merge: true }), 'Intervalle');
     malEinstellungen();
+  },
+  tagespensumSpeichern: () => {
+    const neuProTag = zahl($('#s-neuprotag')?.value, 5, 50, 20);
+    const zielMinuten = zahl($('#s-zielminuten')?.value, 1, 600, 15);
+    const zielKarten = zahl($('#s-zielkarten')?.value, 1, 2000, 30);
+    const zielEinheit = $('input[name=s-zieleinheit]:checked')?.value === 'karten' ? 'karten' : 'minuten';
+    Object.assign(S.einstellungen, { neuProTag, zielMinuten, zielKarten, zielEinheit });
+    schreibe(FB.setDoc(refEinstellungen(),
+      { neuProTag, zielMinuten, zielKarten, zielEinheit }, { merge: true }), 'Tagespensum');
+    toast('Tagespensum gespeichert.');
   },
 
   /* Import / Export */
