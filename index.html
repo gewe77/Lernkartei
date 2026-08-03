@@ -1,962 +1,2536 @@
-<!DOCTYPE html>
-<html lang="de">
+<!doctype html>
+<html lang="de" data-theme="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lernkartei</title>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Lernkartei 2</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23378add'/><rect x='22' y='30' width='56' height='40' rx='6' fill='white'/><rect x='30' y='22' width='56' height='40' rx='6' fill='white' opacity='.55'/></svg>">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+/* ===== Design-Tokens =====================================================
+   Übernommen aus Lernkartei 1. Die neuen Tokens aus KONZEPT §8 kommen mit
+   dem Oberflächen-Umbau in Stufe 2 — hier bewusst unverändert.
+   ======================================================================== */
 :root{
---bg:#fff;--bg2:#f5f4f0;--bg3:#eeecea;
---txt:#1a1a1a;--txt2:#555;--txt3:#888;
---border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);
---radius:10px;--radius2:14px;
---red:#e24b4a;--orange:#ef9f27;--green:#639922;--blue:#378add;
---red-bg:#fcebeb;--orange-bg:#faeeda;--green-bg:#eaf3de;--blue-bg:#e6f1fb;
+  --bg:#fff; --bg2:#f5f4f0; --bg3:#eeecea;
+  --txt:#1a1a1a; --txt2:#555; --txt3:#888;
+  --border:rgba(0,0,0,.12); --border2:rgba(0,0,0,.22);
+  --red:#e24b4a; --orange:#ef9f27; --green:#639922; --blue:#378add;
+  --red-bg:#fcebeb; --orange-bg:#faeeda; --green-bg:#eaf3de; --blue-bg:#e6f1fb;
+  --radius:10px; --radius2:14px;
+  --schatten:0 1px 2px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.06);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
 }
-@media(prefers-color-scheme:dark){:root{
---bg:#1e1e1e;--bg2:#272727;--bg3:#303030;
---txt:#f0ede8;--txt2:#aaa;--txt3:#666;
---border:rgba(255,255,255,0.12);--border2:rgba(255,255,255,0.22);
---red-bg:#501313;--orange-bg:#412402;--green-bg:#173404;--blue-bg:#042c53;
-}}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;color:var(--txt);background:var(--bg);min-height:100vh;line-height:1.6}
-#app{max-width:720px;margin:0 auto;padding:0 0 80px}
-nav{display:flex;gap:2px;padding:10px 16px;border-bottom:0.5px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100;flex-wrap:wrap;align-items:center}
-nav button{background:none;border:none;padding:6px 12px;border-radius:var(--radius);cursor:pointer;font-size:13px;color:var(--txt2);font-weight:400;transition:background .15s,color .15s}
-nav button.active{background:var(--bg2);color:var(--txt);font-weight:500}
-nav button:hover:not(.active){background:var(--bg2)}
-#gdrive-status{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--txt3)}
-#gdrive-status .dot{width:8px;height:8px;border-radius:50%;background:var(--txt3)}
-#gdrive-status.connected .dot{background:var(--green)}
-#gdrive-status.connected{color:var(--green)}
-.page{padding:16px;display:none}
-.page.active{display:block}
-h2{font-size:18px;font-weight:500;margin-bottom:16px;color:var(--txt)}
-h3{font-size:15px;font-weight:500;margin-bottom:10px;color:var(--txt)}
-.card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius2);padding:16px 20px;margin-bottom:12px}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius);border:0.5px solid var(--border2);background:none;color:var(--txt);cursor:pointer;font-size:14px;font-weight:400;transition:background .15s,transform .1s;white-space:nowrap}
+html[data-theme="dark"]{
+  --bg:#1e1e1e; --bg2:#262626; --bg3:#323232;
+  --txt:#ececec; --txt2:#b3b3b3; --txt3:#8a8a8a;
+  --border:rgba(255,255,255,.14); --border2:rgba(255,255,255,.28);
+  --red:#e8635f; --orange:#f2ac48; --green:#84b93f; --blue:#5aa2e8;
+  --red-bg:#3b2321; --orange-bg:#3a2e1b; --green-bg:#26311a; --blue-bg:#1d2c3c;
+  --schatten:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font);background:var(--bg);color:var(--txt);
+  font-size:15px;line-height:1.5;-webkit-text-size-adjust:100%;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+h1,h2,h3{margin:0 0 12px;line-height:1.25}
+h1{font-size:22px}h2{font-size:18px}h3{font-size:15px}
+p{margin:0 0 10px}
+a{color:var(--blue)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
+.wrap{max-width:860px;margin:0 auto;padding:18px 16px 60px}
+.muted{color:var(--txt2)}
+.mini{font-size:13px;color:var(--txt3)}
+.mt{margin-top:18px}.mt2{margin-top:28px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.spread{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+hr{border:0;border-top:1px solid var(--border);margin:22px 0}
+
+/* ===== Bedienelemente =================================================== */
+button{font:inherit;cursor:pointer}
+.btn{
+  border:1px solid var(--border2);background:var(--bg);color:var(--txt);
+  border-radius:var(--radius);padding:9px 15px;font-size:14px;font-weight:500;
+  transition:background .12s,transform .06s,border-color .12s;
+}
 .btn:hover{background:var(--bg2)}
-.btn:active{transform:scale(0.98)}
-.btn-primary{background:var(--txt);color:var(--bg);border-color:var(--txt)}
-.btn-primary:hover{opacity:.85}
-.btn-sm{padding:5px 10px;font-size:13px}
-.btn-danger{color:var(--red)}
-.btn-google{background:#4285f4;color:#fff;border-color:#4285f4}
-.btn-google:hover{opacity:.9;background:#4285f4}
-input,select,textarea{width:100%;padding:8px 12px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg2);color:var(--txt);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}
-input:focus,select:focus,textarea:focus{border-color:var(--blue)}
-textarea{resize:vertical;min-height:80px;line-height:1.6;white-space:pre-wrap}
-label{font-size:13px;color:var(--txt2);display:block;margin-bottom:4px;margin-top:12px}
-label:first-child{margin-top:0}
-.row{display:flex;gap:8px;align-items:center}
-.row-wrap{display:flex;gap:8px;flex-wrap:wrap}
-.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:12px;font-weight:500}
-.empty{text-align:center;padding:40px 16px;color:var(--txt3);font-size:14px}
-#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;font-size:15px;color:var(--txt2);gap:8px}
-#loading-sub{font-size:13px;color:var(--txt3)}
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--txt);color:var(--bg);padding:10px 20px;border-radius:var(--radius);font-size:14px;opacity:0;transition:all .3s;z-index:999;pointer-events:none;white-space:nowrap}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.progress-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:12px}
-.progress-fill{height:100%;background:var(--blue);border-radius:3px;transition:width .3s}
-.fach-chip{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;background:var(--blue-bg);color:var(--blue);font-weight:500}
-.flip-scene{perspective:1200px;width:100%;min-height:240px;cursor:pointer;margin-bottom:16px}
-.flip-card{position:relative;width:100%;min-height:240px;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1)}
-.flip-card.flipped{transform:rotateY(180deg)}
-.flip-face{position:absolute;inset:0;backface-visibility:hidden;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius2);padding:28px 24px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
-.flip-back{transform:rotateY(180deg)}
-.flip-face .frage{font-size:18px;font-weight:500;color:var(--txt);line-height:1.5}
-.flip-face .antwort{font-size:15px;color:var(--txt);line-height:1.7;text-align:left;width:100%;max-width:560px}
-.flip-face .notiz{font-size:13px;color:var(--txt3);margin-top:12px;font-style:italic;text-align:left;width:100%;max-width:560px;white-space:pre-wrap}
-.flip-face .hint{font-size:13px;color:var(--txt3)}
-.rating-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px}
-.rating-btn{padding:12px 0;border-radius:var(--radius);border:1.5px solid;cursor:pointer;font-size:13px;font-weight:500;transition:transform .1s;display:flex;flex-direction:column;align-items:center;gap:2px}
-.rating-btn:active{transform:scale(0.96)}
-.r1{background:var(--red-bg);border-color:var(--red);color:var(--red)}
-.r2{background:var(--orange-bg);border-color:var(--orange);color:var(--orange)}
-.r3{background:var(--green-bg);border-color:var(--green);color:var(--green)}
-.r4{background:var(--blue-bg);border-color:var(--blue);color:var(--blue)}
-.box-color-dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
-.stat-num{font-size:28px;font-weight:500}
-.stat-label{font-size:13px;color:var(--txt2)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.bar-wrap{margin-bottom:8px}
-.bar-label{font-size:12px;color:var(--txt2);margin-bottom:3px;display:flex;justify-content:space-between}
-.bar{height:12px;background:var(--blue-bg);border-radius:4px;overflow:hidden}
-.bar-fill{height:100%;background:var(--blue);border-radius:4px;transition:width .4s}
-.search-row{display:flex;gap:8px;margin-bottom:12px}
-.search-row input{flex:1}
-.card-list-item{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border:0.5px solid var(--border);border-radius:var(--radius2);margin-bottom:8px;background:var(--bg)}
-.card-list-item .q{font-weight:500;font-size:14px;flex:1;min-width:0;word-break:break-word;white-space:pre-wrap}
-.card-list-item .a{font-size:13px;color:var(--txt2);flex:1;min-width:0;word-break:break-word}
-.card-list-item .actions{display:flex;gap:4px;flex-shrink:0}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
-.modal{background:var(--bg);border-radius:var(--radius2);padding:24px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;border:0.5px solid var(--border)}
-.modal h3{margin-bottom:16px}
-.box-item{display:flex;align-items:center;gap:10px;padding:12px 16px;border:0.5px solid var(--border);border-radius:var(--radius2);margin-bottom:8px;background:var(--bg);cursor:pointer;transition:background .15s}
-.box-item:hover{background:var(--bg2)}
-.box-info{flex:1;min-width:0}
-.box-name{font-weight:500;font-size:15px}
-.box-meta{font-size:12px;color:var(--txt3)}
-.kbd{display:inline-block;padding:2px 6px;background:var(--bg2);border:0.5px solid var(--border2);border-radius:4px;font-size:11px;color:var(--txt2);font-family:monospace}
-.color-picker-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-.color-dot-pick{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s}
-.color-dot-pick.selected{border-color:var(--txt)}
-.interval-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:8px}
-.interval-item{display:flex;flex-direction:column;gap:4px}
-.interval-item label{font-size:12px;margin:0}
-.interval-item input{padding:4px 8px;font-size:13px}
-.antwort ul,.antwort ol{padding-left:1.4em;margin:4px 0}
-.antwort li{margin-bottom:2px}
-.sync-info{font-size:12px;color:var(--txt3);margin-top:6px}
-.gdrive-section{border:0.5px solid var(--border);border-radius:var(--radius2);padding:16px;margin-bottom:16px;background:var(--bg2)}
-@media(max-width:480px){.rating-row{grid-template-columns:repeat(2,1fr)}}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn.primary{background:var(--txt);color:var(--bg);border-color:var(--txt)}
+.btn.primary:hover{opacity:.87;background:var(--txt)}
+.btn.klein{padding:5px 10px;font-size:13px;border-radius:8px}
+.btn.gefahr{color:var(--red);border-color:var(--red)}
+.btn.gefahr:hover{background:var(--red-bg)}
+.btn.breit{width:100%;justify-content:center}
+.btn.gross{padding:13px 22px;font-size:16px}
+input,textarea,select{
+  font:inherit;font-size:14px;background:var(--bg);color:var(--txt);
+  border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;width:100%;
+}
+input[type=checkbox],input[type=radio]{width:auto;accent-color:var(--blue)}
+textarea{resize:vertical;min-height:76px;line-height:1.45}
+label.feld{display:block;margin-bottom:12px}
+label.feld > span{display:block;font-size:13px;font-weight:600;color:var(--txt2);margin-bottom:4px}
+.karo{display:flex;gap:8px;align-items:center;padding:7px 0;cursor:pointer}
+.karo input{flex:none}
+
+/* ===== Kopfleiste ======================================================= */
+#topbar{
+  position:sticky;top:0;z-index:40;background:var(--bg);
+  border-bottom:1px solid var(--border);
+}
+.topbar-in{max-width:860px;margin:0 auto;padding:8px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.marke{font-weight:700;font-size:15px;margin-right:2px;white-space:nowrap}
+nav{display:flex;gap:2px;flex-wrap:wrap;flex:1}
+nav button{
+  border:0;background:transparent;color:var(--txt2);padding:7px 11px;
+  border-radius:8px;font-size:14px;font-weight:500;
+}
+nav button:hover{background:var(--bg2);color:var(--txt)}
+nav button.aktiv{background:var(--bg3);color:var(--txt);font-weight:600}
+.statuszeile{display:flex;gap:7px;align-items:center;font-size:12px;color:var(--txt3);white-space:nowrap}
+.punkt{width:8px;height:8px;border-radius:50%;background:var(--txt3);flex:none}
+.punkt.ok{background:var(--green)}
+.punkt.warte{background:var(--orange)}
+.punkt.aus{background:var(--txt3)}
+.punkt.fehler{background:var(--red)}
+
+/* ===== Karten / Listen ================================================== */
+.box{
+  border:1px solid var(--border);border-radius:var(--radius2);
+  padding:16px 18px;background:var(--bg);margin-bottom:12px;
+}
+.box.flach{background:var(--bg2);border-color:transparent}
+.liste-item{
+  display:flex;gap:12px;align-items:flex-start;
+  border:1px solid var(--border);border-radius:var(--radius);
+  padding:11px 13px;margin-bottom:8px;background:var(--bg);
+}
+.liste-item .haupt{flex:1;min-width:0}
+.liste-item .frage{font-weight:600;word-break:break-word}
+.liste-item .antwort{color:var(--txt2);font-size:13.5px;margin-top:2px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.liste-item .werkzeuge{display:flex;gap:5px;flex:none}
+.badge{
+  display:inline-block;font-size:11.5px;font-weight:600;padding:2px 7px;
+  border-radius:99px;background:var(--bg3);color:var(--txt2);white-space:nowrap;
+}
+.badge.faellig{background:var(--orange-bg);color:var(--orange)}
+.badge.neu{background:var(--blue-bg);color:var(--blue)}
+.badge.ruht{background:var(--bg3);color:var(--txt3)}
+.punkt-farbe{width:11px;height:11px;border-radius:50%;flex:none;margin-top:5px}
+.leer{text-align:center;color:var(--txt3);padding:36px 16px;font-size:14px}
+
+/* ===== Lernen =========================================================== */
+.flip-buehne{perspective:1400px;margin:14px 0}
+.flip-karte{
+  position:relative;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.4,.15,.2,1);
+  min-height:230px;
+}
+.flip-karte.gedreht{transform:rotateY(180deg)}
+.flip-seite{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border:1px solid var(--border2);border-radius:var(--radius2);background:var(--bg);
+  padding:26px 22px;display:flex;flex-direction:column;justify-content:center;
+  align-items:center;text-align:center;overflow:auto;box-shadow:var(--schatten);
+}
+.flip-seite.hinten{transform:rotateY(180deg);background:var(--bg2)}
+.flip-text{font-size:20px;font-weight:600;white-space:pre-wrap;word-break:break-word;max-width:100%}
+.flip-seite.hinten .flip-text{font-weight:500}
+.flip-notiz{margin-top:14px;font-size:13.5px;color:var(--txt2);white-space:pre-wrap;
+  border-top:1px solid var(--border);padding-top:10px;max-width:100%}
+.flip-kopf{position:absolute;top:10px;left:0;right:0;display:flex;justify-content:space-between;
+  padding:0 14px;font-size:11.5px;color:var(--txt3);font-weight:600}
+.fortschritt{height:6px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.fortschritt > div{height:100%;background:var(--blue);border-radius:99px;transition:width .25s}
+.bewertung{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.bew{
+  border:1px solid;border-radius:var(--radius);padding:11px 6px;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .06s,background .12s;
+}
+.bew:active{transform:scale(.96)}
+.bew b{font-size:17px;line-height:1.1}
+.bew span{font-size:11.5px;font-weight:600;text-align:center;line-height:1.2}
+.bew small{font-size:10.5px;color:var(--txt3);font-weight:500}
+.bew1{color:var(--red);border-color:var(--red)}   .bew1:hover{background:var(--red-bg)}
+.bew2{color:var(--orange);border-color:var(--orange)} .bew2:hover{background:var(--orange-bg)}
+.bew3{color:var(--green);border-color:var(--green)}   .bew3:hover{background:var(--green-bg)}
+.bew4{color:var(--blue);border-color:var(--blue)}     .bew4:hover{background:var(--blue-bg)}
+.tastenhilfe{font-size:12px;color:var(--txt3);text-align:center;margin-top:12px}
+kbd{
+  font-family:var(--font);font-size:11px;border:1px solid var(--border2);
+  border-bottom-width:2px;border-radius:5px;padding:1px 5px;color:var(--txt2);background:var(--bg2);
+}
+
+/* ===== Statistik ======================================================== */
+.kennzahlen{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.kennzahl{border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;background:var(--bg)}
+.kennzahl b{display:block;font-size:26px;line-height:1.15;font-variant-numeric:tabular-nums}
+.kennzahl span{font-size:12.5px;color:var(--txt2)}
+.balken{display:flex;align-items:center;gap:9px;margin-bottom:5px;font-size:13px}
+.balken .lab{width:62px;flex:none;color:var(--txt2);font-variant-numeric:tabular-nums}
+.balken .spur{display:block;flex:1;height:17px;background:var(--bg3);border-radius:5px;overflow:hidden}
+/* display:block ist zwingend — als inline-Element würde das span Breite und
+   Höhe schlicht ignorieren und der Balken bliebe unsichtbar. */
+.balken .fuell{display:block;height:100%;background:var(--blue);border-radius:5px;min-width:2px;transition:width .3s}
+.balken .val{width:44px;flex:none;text-align:right;font-variant-numeric:tabular-nums;color:var(--txt2)}
+.tage{display:flex;align-items:flex-end;gap:3px;height:110px;margin-top:6px}
+.tage > div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%}
+.tage .saeule{width:100%;background:var(--blue);border-radius:4px 4px 0 0;min-height:2px}
+.tage .saeule.null{background:var(--bg3)}
+.tage .tag{font-size:10px;color:var(--txt3);white-space:nowrap}
+table.daten{width:100%;border-collapse:collapse;font-size:14px}
+table.daten th,table.daten td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--border)}
+table.daten th{font-size:12px;color:var(--txt2);font-weight:600}
+table.daten td.num,table.daten th.num{text-align:right;font-variant-numeric:tabular-nums}
+
+/* ===== Modal / Toast / Overlays ========================================= */
+#modal-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:100;
+  display:flex;align-items:center;justify-content:center;padding:16px;
+}
+#modal{
+  background:var(--bg);border-radius:var(--radius2);width:100%;max-width:480px;
+  max-height:88vh;overflow:auto;padding:20px;box-shadow:0 12px 48px rgba(0,0,0,.3);
+}
+#modal h2{margin-bottom:14px}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+#toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,140%);
+  background:var(--txt);color:var(--bg);padding:11px 18px;border-radius:99px;
+  font-size:14px;font-weight:500;z-index:200;transition:transform .25s;
+  max-width:calc(100vw - 32px);text-align:center;box-shadow:var(--schatten);
+}
+#toast.an{transform:translate(-50%,0)}
+#toast.fehler{background:var(--red);color:#fff}
+#boot,#fatal,#login{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);z-index:60;padding:20px;
+}
+#boot{flex-direction:column;gap:14px;color:var(--txt2)}
+.spinner{
+  width:26px;height:26px;border:3px solid var(--border2);border-top-color:var(--blue);
+  border-radius:50%;animation:dreh .8s linear infinite;
+}
+@keyframes dreh{to{transform:rotate(360deg)}}
+#fatal,#login{overflow:auto;align-items:flex-start}
+.mittig{width:100%;max-width:430px;margin:auto;padding:24px 0}
+#fatal .mittig{max-width:640px}
+.hinweis{
+  border:1px solid var(--border);border-left:3px solid var(--orange);
+  background:var(--orange-bg);color:var(--txt);border-radius:8px;padding:11px 13px;font-size:13.5px;
+}
+.hinweis.rot{border-left-color:var(--red);background:var(--red-bg)}
+.hinweis.blau{border-left-color:var(--blue);background:var(--blue-bg)}
+.hinweis code{font-size:12.5px;background:rgba(0,0,0,.06);padding:1px 4px;border-radius:4px;word-break:break-all}
+html[data-theme="dark"] .hinweis code{background:rgba(255,255,255,.1)}
+pre.code{
+  background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:11px;
+  font-size:12px;overflow:auto;white-space:pre-wrap;word-break:break-word;max-height:220px;
+}
+[hidden]{display:none !important}
+
+@media(max-width:560px){
+  .wrap{padding:14px 12px 70px}
+  .topbar-in{padding:7px 12px;gap:6px}
+  .marke{order:1;font-size:14px}
+  .statuszeile{order:2;margin-left:auto}
+  nav{order:3;flex:0 0 100%;width:100%;gap:1px;justify-content:space-between;flex-wrap:nowrap}
+  nav button{flex:1 1 0;min-width:0;padding:7px 2px;font-size:12px;text-align:center}
+  .bew span{font-size:10.5px}
+  .bew small{display:none}
+  .flip-text{font-size:18px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{transition:none !important;animation-duration:.01ms !important}
+  .flip-karte{transition:none !important}
+}
 </style>
 </head>
 <body>
-<div id="loading">
-  <div>Lernkartei wird geladen…</div>
-  <div id="loading-sub"></div>
-</div>
-<div id="toast"></div>
-<div id="app" style="display:none">
-<nav>
-  <button onclick="showPage('lernen')" data-page="lernen">📚 Lernen</button>
-  <button onclick="showPage('kaesten')" data-page="kaesten">📦 Kästen</button>
-  <button onclick="showPage('karten')" data-page="karten">🗂 Karten</button>
-  <button onclick="showPage('statistik')" data-page="statistik">📊 Statistik</button>
-  <button onclick="showPage('einstellungen')" data-page="einstellungen">⚙ Einstellungen</button>
-  <div id="gdrive-status" title="Google Drive Status">
-    <div class="dot"></div>
-    <span id="gdrive-label">Nicht verbunden</span>
-  </div>
-</nav>
 
-<!-- LERNEN -->
-<div id="page-lernen" class="page">
-  <div id="lernen-start">
-    <h2>Lernen</h2>
-    <div id="streak-display" style="margin-bottom:16px"></div>
-    <div id="due-summary" style="margin-bottom:16px;font-size:14px;color:var(--txt2)"></div>
-    <label>Kästen auswählen</label>
-    <div id="box-checkboxes" style="margin:8px 0 16px"></div>
-    <div class="row-wrap" style="gap:16px;margin-bottom:12px">
-      <label style="margin:0;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px">
-        <input type="radio" name="lmode" value="heute" checked style="width:auto"> Nur heute fällig
-      </label>
-      <label style="margin:0;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px">
-        <input type="radio" name="lmode" value="alle" style="width:auto"> Alle fälligen
-      </label>
-    </div>
-    <button class="btn btn-primary" onclick="startSession()">Sitzung starten</button>
+<!-- ===== Ladeindikator ================================================= -->
+<div id="boot">
+  <div class="spinner"></div>
+  <div id="boot-text">Lernkartei wird geladen …</div>
+</div>
+
+<!-- ===== Harter Fehler (Konfiguration/SDK) ============================= -->
+<div id="fatal" hidden><div class="mittig">
+  <h1>Lernkartei 2 startet nicht</h1>
+  <div id="fatal-text"></div>
+</div></div>
+
+<!-- ===== Anmeldung ==================================================== -->
+<div id="login" hidden><div class="mittig">
+  <h1 style="margin-bottom:4px">Lernkartei 2</h1>
+  <p class="mini" style="margin-bottom:22px">Anmeldung mit E-Mail und Passwort</p>
+  <form id="login-form" autocomplete="on">
+    <label class="feld"><span>E-Mail</span>
+      <input type="email" id="login-mail" required autocomplete="username" inputmode="email" autocapitalize="off" spellcheck="false">
+    </label>
+    <label class="feld"><span>Passwort</span>
+      <input type="password" id="login-pw" required autocomplete="current-password">
+    </label>
+    <div id="login-fehler" class="hinweis rot" hidden style="margin-bottom:12px"></div>
+    <button class="btn primary breit gross" id="login-btn" type="submit">Anmelden</button>
+  </form>
+  <div class="row" style="justify-content:space-between;margin-top:14px">
+    <button class="btn klein" id="login-reset" type="button">Passwort vergessen</button>
+    <span class="mini" id="login-konten"></span>
   </div>
-  <div id="lernen-session" style="display:none">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <div style="font-size:13px;color:var(--txt2)" id="session-counter"></div>
-      <button class="btn btn-sm" onclick="endSession()">Abbrechen</button>
+  <p class="mini mt2">
+    Neue Konten werden ausschließlich in der Firebase-Konsole angelegt.
+    Eine Registrierung in der App gibt es bewusst nicht.
+  </p>
+</div></div>
+
+<!-- ===== App ========================================================== -->
+<div id="app" hidden>
+  <header id="topbar"><div class="topbar-in">
+    <span class="marke">Lernkartei&nbsp;2</span>
+    <nav id="nav">
+      <button data-seite="lernen" class="aktiv">Lernen</button>
+      <button data-seite="kaesten">Kästen</button>
+      <button data-seite="karten">Karten</button>
+      <button data-seite="statistik">Statistik</button>
+      <button data-seite="einstellungen">Einstellungen</button>
+    </nav>
+    <span class="statuszeile" id="status" title="Verbindung zu Firestore">
+      <span class="punkt" id="status-punkt"></span><span id="status-text">…</span>
+    </span>
+  </div></header>
+
+  <main class="wrap">
+    <section id="seite-lernen"></section>
+    <section id="seite-kaesten" hidden></section>
+    <section id="seite-karten" hidden></section>
+    <section id="seite-statistik" hidden></section>
+    <section id="seite-einstellungen" hidden></section>
+  </main>
+</div>
+
+<div id="modal-bg" hidden><div id="modal" role="dialog" aria-modal="true"></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+/* =========================================================================
+   Lernkartei 2 — Stufe 1
+   Fundament: Firebase Auth (E-Mail/Passwort), Firestore mit Offline-Cache,
+   Datenmodell nach KONZEPT §3, Import des Altbestands.
+   Funktionsumfang entspricht der Vorgängerversion; Scheduler (FSRS) und die
+   neue Oberfläche folgen in Stufe 2.
+   ========================================================================= */
+
+/* ---------- 0. Kleine Helfer, die schon vor dem Start gebraucht werden ---- */
+
+const $  = (s, w = document) => w.querySelector(s);
+const $$ = (s, w = document) => Array.from(w.querySelectorAll(s));
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function fatal(titelHtml) {
+  $('#boot').hidden = true;
+  $('#login').hidden = true;
+  $('#app').hidden = true;
+  $('#fatal-text').innerHTML = titelHtml;
+  $('#fatal').hidden = false;
+}
+
+function bootText(t) { const e = $('#boot-text'); if (e) e.textContent = t; }
+
+/* Theme so früh wie möglich setzen, damit es nicht weiß aufblitzt.
+   localStorage dient hier ausschließlich als Anzeige-Zwischenspeicher —
+   die verbindliche Einstellung liegt in Firestore. */
+function themeAnwenden(wunsch) {
+  const dunkelSystem = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+  const wirklich = wunsch === 'dunkel' ? 'dark'
+                 : wunsch === 'hell'   ? 'light'
+                 : (dunkelSystem ? 'dark' : 'light');
+  document.documentElement.dataset.theme = wirklich;
+}
+let themeWunsch = 'auto';
+try { themeWunsch = localStorage.getItem('lk2:theme') || 'auto'; } catch (_) {}
+themeAnwenden(themeWunsch);
+window.matchMedia?.('(prefers-color-scheme: dark)')
+  .addEventListener?.('change', () => themeAnwenden(themeWunsch));
+
+/* ---------- 1. Konfiguration und SDK laden ------------------------------ */
+
+let CFG, SDK_VERSION, KONTEN_HINWEIS = [], TAGESGRENZE = 4;
+let FB = null;   // gebündelte Firebase-Funktionen
+
+async function start() {
+  // 1a. firebase-config.js
+  let cfgModul;
+  try {
+    cfgModul = await import('./firebase-config.js');
+  } catch (e) {
+    return fatal(`
+      <div class="hinweis rot">Die Datei <code>firebase-config.js</code> konnte nicht geladen werden.</div>
+      <p class="mt">Sie muss im selben Ordner liegen wie <code>index.html</code>. Prüfe:</p>
+      <ul><li>Ist die Datei im Repository vorhanden?</li>
+      <li>Heißt sie exakt <code>firebase-config.js</code> (klein geschrieben)?</li>
+      <li>Wurde GitHub Pages nach dem Hochladen neu gebaut? Das dauert ein bis zwei Minuten.</li></ul>
+      <p class="mini">Technische Meldung: ${esc(e.message)}</p>`);
+  }
+
+  CFG = cfgModul.firebaseConfig;
+  SDK_VERSION = cfgModul.SDK_VERSION || '12.15.0';
+  KONTEN_HINWEIS = cfgModul.KONTEN_HINWEIS || [];
+  TAGESGRENZE = Number.isFinite(cfgModul.TAGESGRENZE_STUNDE) ? cfgModul.TAGESGRENZE_STUNDE : 4;
+
+  // 1b. Platzhalter erkennen, bevor Firebase mit kryptischen Fehlern um sich wirft
+  const fehlend = ['apiKey', 'authDomain', 'projectId', 'appId']
+    .filter(k => !CFG?.[k] || /HIER_|DEIN-PROJEKT|^0+$|^1:0+:/.test(String(CFG[k])));
+  if (fehlend.length) {
+    return fatal(`
+      <div class="hinweis">In <code>firebase-config.js</code> stehen noch Platzhalter.</div>
+      <p class="mt">Nicht ausgefüllt: <code>${fehlend.map(esc).join('</code>, <code>')}</code></p>
+      <p>Die Werte stehen in der Firebase-Konsole unter
+         <em>Projekteinstellungen → Meine Apps → Web-App → Konfiguration</em>.
+         Schritt für Schritt steht das in der <code>README.md</code>.</p>`);
+  }
+
+  // 1c. Firebase-SDK vom Google-CDN
+  bootText('Firebase wird geladen …');
+  const basis = `https://www.gstatic.com/firebasejs/${SDK_VERSION}`;
+  try {
+    const [app, auth, fs] = await Promise.all([
+      import(`${basis}/firebase-app.js`),
+      import(`${basis}/firebase-auth.js`),
+      import(`${basis}/firebase-firestore.js`)
+    ]);
+    FB = { ...app, ...auth, ...fs };
+  } catch (e) {
+    return fatal(`
+      <div class="hinweis rot">Das Firebase-SDK konnte nicht geladen werden.</div>
+      <p class="mt">Versucht wurde Version <code>${esc(SDK_VERSION)}</code> von
+         <code>www.gstatic.com</code>. Mögliche Ursachen:</p>
+      <ul><li>Keine Internetverbindung beim allerersten Start (danach läuft die App offline).</li>
+      <li>Die Versionsnummer <code>SDK_VERSION</code> in <code>firebase-config.js</code> gibt es nicht.
+          Aktuelle Nummer: <a href="https://firebase.google.com/docs/web/setup" target="_blank" rel="noopener">firebase.google.com/docs/web/setup</a></li>
+      <li>Ein Inhaltsblocker verhindert den Zugriff auf gstatic.com.</li></ul>
+      <p class="mini">Technische Meldung: ${esc(e.message)}</p>`);
+  }
+
+  // 1d. Initialisieren
+  bootText('Verbindung wird hergestellt …');
+  try {
+    fbApp = FB.initializeApp(CFG);
+    auth  = FB.getAuth(fbApp);
+    db    = FB.initializeFirestore(fbApp, {
+      localCache: FB.persistentLocalCache({ tabManager: FB.persistentMultipleTabManager() })
+    });
+  } catch (e) {
+    return fatal(`
+      <div class="hinweis rot">Firebase ließ sich nicht initialisieren.</div>
+      <p class="mt">Meist stimmt ein Wert in <code>firebase-config.js</code> nicht.</p>
+      <p class="mini">Technische Meldung: ${esc(e.message)}</p>`);
+  }
+
+  // Angemeldet bleiben, bis ausdrücklich abgemeldet wird
+  try { await FB.setPersistence(auth, FB.browserLocalPersistence); } catch (_) {}
+
+  loginVorbereiten();
+  FB.onAuthStateChanged(auth, benutzerGewechselt);
+}
+
+let fbApp = null, auth = null, db = null;
+
+/* ---------- 2. Zustand -------------------------------------------------- */
+
+const STANDARD_INTERVALLE = [1, 3, 7, 14, 21, 30, 45, 60, 90, 120, 180, 365];
+
+const STANDARD_EINSTELLUNGEN = () => ({
+  version: 2,
+  intervalle: STANDARD_INTERVALLE.slice(),
+  klassikModus: true,     // Stufe 1 rechnet noch klassisch; FSRS folgt in Stufe 2
+  retention: 0.88,        // Stufe 2
+  neuProTag: 20,          // Stufe 2
+  zielMinuten: 15,        // Stufe 2
+  theme: 'auto',
+  modi: ['aufdecken'],    // Stufe 3
+  streak: 0,
+  lastLearnDate: null,
+  lastSeen: null
+});
+
+const S = {
+  uid: null, email: null,
+  einstellungen: STANDARD_EINSTELLUNGEN(),
+  decks: [], cards: [], reviews: [],
+  seite: 'lernen',
+  bereitDecks: false, bereitCards: false, bereitSettings: false,
+  abmelder: [],            // aktive onSnapshot-Abmeldefunktionen
+  kartenFilterDeck: 'alle',
+  kartenSuche: '',
+  kartenLimit: 60,
+  auswahl: new Set(),
+  statDeck: 'alle',
+  reviewsGeladen: false
+};
+
+let sitzung = null;
+let bekannteDecks = new Set();
+
+/* ---------- 3. Datum, Zufall, IDs -------------------------------------- */
+
+function isoDatum(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+/** Heutiges Lerndatum. Tagesgrenze liegt lokal um TAGESGRENZE Uhr (KONZEPT §2):
+ *  wer um 01:30 Uhr lernt, arbeitet noch am Vortag weiter. */
+function heute() {
+  const d = new Date();
+  d.setHours(d.getHours() - TAGESGRENZE);
+  return isoDatum(d);
+}
+/** Alles, was als Datum hereinkommt, auf YYYY-MM-DD zwingen. Fremde
+ *  Sicherungen enthalten mitunter Zeitstempel als Zahl oder gar nichts —
+ *  ein solcher Wert darf die Oberfläche nicht lahmlegen. */
+function isoOder(v, ersatz) {
+  if (typeof v === 'number' && Number.isFinite(v)) {
+    const d = new Date(v);
+    if (!isNaN(d.getTime())) return isoDatum(d);
+  }
+  if (v instanceof Date && !isNaN(v.getTime())) return isoDatum(v);
+  if (v && typeof v === 'object' && typeof v.seconds === 'number') {   // Firestore-Timestamp
+    const d = new Date(v.seconds * 1000);
+    if (!isNaN(d.getTime())) return isoDatum(d);
+  }
+  const s = String(v ?? '').slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : ersatz;
+}
+function plusTage(iso, n) {
+  const [y, m, t] = isoOder(iso, heute()).split('-').map(Number);
+  return isoDatum(new Date(y, m - 1, t + Number(n || 0)));
+}
+function tageDiff(isoA, isoB) {           // isoA - isoB in Tagen
+  const p = s => {
+    const [y, m, t] = isoOder(s, heute()).split('-').map(Number);
+    return Date.UTC(y, m - 1, t);
+  };
+  return Math.round((p(isoA) - p(isoB)) / 86400000);
+}
+function datumDeutsch(iso) {
+  const s = isoOder(iso, null);
+  if (!s) return '—';
+  const [y, m, t] = s.split('-');
+  return `${t}.${m}.${y}`;
+}
+function neueId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+/** Firestore-Dokument-IDs dürfen kein "/" enthalten, nicht "." oder ".." sein
+ *  und nicht dem Muster __xyz__ folgen. Alt-IDs werden entsprechend entschärft. */
+function sichereId(roh) {
+  let s = String(roh ?? '').replace(/\//g, '_').trim();
+  if (!s || s === '.' || s === '..' || /^__.*__$/.test(s) || s.length > 200) return neueId();
+  return s;
+}
+function mischen(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function zahl(v, min, max, ersatz) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return ersatz;
+  return Math.min(max, Math.max(min, Math.round(n)));
+}
+
+/* ---------- 4. Toast und Modal ----------------------------------------- */
+
+let toastTimer = null;
+function toast(text, art) {
+  const t = $('#toast');
+  t.textContent = text;
+  t.classList.toggle('fehler', art === 'fehler');
+  t.classList.add('an');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('an'), art === 'fehler' ? 5200 : 2600);
+}
+
+/* Werte des zuletzt geschlossenen Dialogs. Notwendig, weil der Dialog beim
+   Schließen geleert wird — nach dem await gibt es die Felder nicht mehr. */
+let letzteWerte = {};
+function W(id, ersatz) {
+  const v = letzteWerte[id];
+  return v === undefined || v === '' ? ersatz : v;
+}
+function WRadio(name, ersatz) {
+  return letzteWerte['radio:' + name] ?? ersatz;
+}
+
+/**
+ * @param {{titel:string, html:string, knoepfe:Array, breit?:boolean,
+ *          beimOeffnen?:Function}} opt
+ * Knopf: {text, wert, art:'primary'|'gefahr'|'', pruefen?:Function}
+ * Liefert den Wert des gedrückten Knopfes oder null bei Abbruch.
+ * Die Feldinhalte stehen danach über W('feld-id') bereit.
+ */
+function modal(opt) {
+  return new Promise(fertig => {
+    const bg = $('#modal-bg'), m = $('#modal');
+    Object.keys(m.dataset).forEach(k => delete m.dataset[k]);
+    m.innerHTML =
+      `<h2>${esc(opt.titel)}</h2><div id="modal-body">${opt.html || ''}</div>
+       <div class="modal-btns">${(opt.knoepfe || []).map((k, i) =>
+        `<button class="btn ${k.art || ''}" data-i="${i}">${esc(k.text)}</button>`).join('')}</div>`;
+    m.style.maxWidth = opt.breit ? '640px' : '480px';
+    bg.hidden = false;
+
+    const schliesse = wert => {
+      letzteWerte = Object.assign({}, m.dataset);
+      $$('input,textarea,select', m).forEach(el => {
+        if (el.id) letzteWerte[el.id] =
+          (el.type === 'checkbox' || el.type === 'radio') ? el.checked : el.value;
+        if (el.type === 'radio' && el.checked && el.name) letzteWerte['radio:' + el.name] = el.value;
+      });
+      bg.hidden = true; m.innerHTML = '';
+      document.removeEventListener('keydown', beiTaste, true);
+      bg.removeEventListener('click', beiHintergrund);
+      fertig(wert);
+    };
+
+    $$('.modal-btns button', m).forEach(b => b.addEventListener('click', () => {
+      const k = opt.knoepfe[Number(b.dataset.i)];
+      if (k.pruefen && k.pruefen() === false) return;
+      schliesse(k.wert);
+    }));
+    function beiHintergrund(e) { if (e.target === bg) schliesse(null); }
+    bg.addEventListener('click', beiHintergrund);
+
+    function beiTaste(e) {
+      if (e.key === 'Escape') { e.stopPropagation(); schliesse(null); }
+      if (e.key === 'Enter' && !e.shiftKey && e.target.tagName !== 'TEXTAREA') {
+        const prim = opt.knoepfe?.findIndex(k => k.art === 'primary');
+        if (prim >= 0) {
+          e.preventDefault();
+          $(`.modal-btns button[data-i="${prim}"]`, m)?.click();
+        }
+      }
+    }
+    document.addEventListener('keydown', beiTaste, true);
+    opt.beimOeffnen?.(m);
+    // Sofort setzen, nicht über einen Timer: sonst springt der Fokus dem
+    // Nutzer unter den Fingern weg, wenn er gleich lostippt.
+    (m.querySelector('input,textarea,select') || m.querySelector('button'))?.focus();
+  });
+}
+
+function frage(titel, text, jaText = 'Ja', art = '') {
+  return modal({
+    titel, html: `<p>${text}</p>`,
+    knoepfe: [{ text: 'Abbrechen', wert: null }, { text: jaText, wert: true, art: art || 'primary' }]
+  }).then(v => v === true);
+}
+
+/* ---------- 5. Anmeldung ------------------------------------------------ */
+
+function loginVorbereiten() {
+  if (KONTEN_HINWEIS.length) {
+    $('#login-konten').textContent = KONTEN_HINWEIS.length + ' Konten eingerichtet';
+    $('#login-konten').title = KONTEN_HINWEIS.join('\n');
+  }
+  $('#login-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = $('#login-btn'), fehler = $('#login-fehler');
+    fehler.hidden = true;
+    btn.disabled = true; btn.textContent = 'Anmeldung läuft …';
+    try {
+      await FB.signInWithEmailAndPassword(auth, $('#login-mail').value.trim(), $('#login-pw').value);
+      $('#login-pw').value = '';
+    } catch (err) {
+      fehler.innerHTML = esc(authFehler(err));
+      fehler.hidden = false;
+    } finally {
+      btn.disabled = false; btn.textContent = 'Anmelden';
+    }
+  });
+
+  $('#login-reset').addEventListener('click', async () => {
+    const mail = $('#login-mail').value.trim();
+    if (!mail) { $('#login-mail').focus(); return toast('Bitte zuerst die E-Mail-Adresse eintragen.'); }
+    if (!await frage('Passwort zurücksetzen',
+      `An <strong>${esc(mail)}</strong> eine E-Mail zum Zurücksetzen des Passworts schicken?`,
+      'E-Mail senden')) return;
+    try {
+      await FB.sendPasswordResetEmail(auth, mail);
+      toast('E-Mail ist unterwegs. Bitte auch den Spam-Ordner prüfen.');
+    } catch (err) { toast(authFehler(err), 'fehler'); }
+  });
+}
+
+function authFehler(err) {
+  const c = err?.code || '';
+  const t = {
+    'auth/invalid-credential':   'E-Mail oder Passwort stimmt nicht.',
+    'auth/wrong-password':       'E-Mail oder Passwort stimmt nicht.',
+    'auth/user-not-found':       'E-Mail oder Passwort stimmt nicht.',
+    'auth/invalid-email':        'Diese E-Mail-Adresse sieht nicht gültig aus.',
+    'auth/user-disabled':        'Dieses Konto wurde in der Firebase-Konsole deaktiviert.',
+    'auth/too-many-requests':    'Zu viele Fehlversuche. Bitte einige Minuten warten.',
+    'auth/network-request-failed': 'Keine Verbindung. Für die Anmeldung wird Internet gebraucht.',
+    'auth/operation-not-allowed': 'E-Mail/Passwort ist in der Firebase-Konsole nicht aktiviert (Authentication → Sign-in method).',
+    'auth/unauthorized-domain':  'Diese Domain ist in Firebase nicht freigegeben (Authentication → Settings → Authorized domains).',
+    'auth/missing-password':     'Bitte ein Passwort eingeben.'
+  }[c];
+  return t || (err?.message || 'Unbekannter Fehler') + (c ? ` (${c})` : '');
+}
+
+async function benutzerGewechselt(user) {
+  S.abmelder.forEach(f => { try { f(); } catch (_) {} });
+  S.abmelder = [];
+  sitzung = null;
+
+  if (!user) {
+    S.uid = null; S.email = null;
+    S.decks = []; S.cards = []; S.reviews = [];
+    S.bereitDecks = S.bereitCards = S.bereitSettings = false;
+    S.einstellungen = STANDARD_EINSTELLUNGEN();
+    S.kartenFilterDeck = 'alle'; S.kartenSuche = ''; S.kartenLimit = 60;
+    S.statDeck = 'alle'; S.reviewsGeladen = false;
+    S.auswahl.clear();
+    lernAuswahl = null; letzteSitzung = null; bekannteDecks = new Set();
+    // Wichtig: die gezeichneten Seiten leeren. Sonst stünden die Kästen und
+    // Karten des abgemeldeten Kontos noch im (verborgenen) Dokument, wenn sich
+    // jemand anderes an demselben Gerät anmeldet.
+    S.seite = 'lernen';
+    SEITEN.forEach(s => {
+      const el = $('#seite-' + s);
+      if (el) { el.innerHTML = ''; el.hidden = (s !== 'lernen'); }
+    });
+    $$('#nav button').forEach(b => b.classList.toggle('aktiv', b.dataset.seite === 'lernen'));
+    $('#app').hidden = true; $('#boot').hidden = true; $('#fatal').hidden = true;
+    $('#login').hidden = false;
+    setTimeout(() => $('#login-mail')?.focus(), 40);
+    return;
+  }
+
+  S.uid = user.uid; S.email = user.email;
+  $('#login').hidden = true;
+  $('#boot').hidden = false;
+  bootText('Daten werden geladen …');
+  try {
+    await datenAnbinden();
+  } catch (e) {
+    console.error(e);
+    fatal(`<div class="hinweis rot">Die Daten konnten nicht geladen werden.</div>
+      <p class="mt">${esc(firestoreFehler(e))}</p>
+      <button class="btn mt" onclick="location.reload()">Neu laden</button>`);
+  }
+}
+
+function firestoreFehler(e) {
+  const c = e?.code || '';
+  if (c === 'permission-denied' || /permission/i.test(e?.message || ''))
+    return 'Firestore verweigert den Zugriff. Sind die Security Rules aus firestore.rules veröffentlicht?';
+  if (c === 'unavailable')
+    return 'Firestore ist gerade nicht erreichbar. Die App arbeitet mit den lokal gespeicherten Daten weiter.';
+  if (c === 'failed-precondition')
+    return 'Der Offline-Zwischenspeicher konnte nicht angelegt werden (privates Fenster oder mehrere Tabs?).';
+  return (e?.message || String(e)) + (c ? ` (${c})` : '');
+}
+
+/* ---------- 6. Firestore-Anbindung ------------------------------------- */
+
+const refEinstellungen = () => FB.doc(db, 'users', S.uid, 'settings', 'app');
+const colDecks   = () => FB.collection(db, 'users', S.uid, 'decks');
+const colCards   = () => FB.collection(db, 'users', S.uid, 'cards');
+const colReviews = () => FB.collection(db, 'users', S.uid, 'reviews');
+
+/**
+ * Firestore-Schreibvorgänge lösen ihr Promise erst auf, wenn der Server
+ * bestätigt hat — offline bleiben sie liegen. Deshalb wird nirgends auf einen
+ * Schreibvorgang gewartet: der lokale Zwischenspeicher aktualisiert die
+ * Oberfläche sofort, der Server zieht nach, sobald wieder Netz da ist.
+ */
+function schreibe(promise, wobei) {
+  Promise.resolve(promise).catch(e => {
+    console.error('[Schreibfehler]', wobei, e);
+    toast('Nicht gespeichert: ' + firestoreFehler(e), 'fehler');
+  });
+}
+
+let statusZustand = { cache: false, offen: false };
+
+function statusMalen() {
+  const p = $('#status-punkt'), t = $('#status-text');
+  if (!p) return;
+  let klasse = 'ok', text = 'Synchronisiert';
+  if (statusZustand.offen)      { klasse = 'warte'; text = 'Wird gespeichert …'; }
+  else if (!navigator.onLine)   { klasse = 'aus';   text = 'Offline'; }
+  else if (statusZustand.cache) { klasse = 'aus';   text = 'Aus Zwischenspeicher'; }
+  p.className = 'punkt ' + klasse;
+  t.textContent = text;
+  $('#status').title = statusZustand.offen
+    ? 'Änderungen liegen lokal und werden übertragen, sobald wieder Verbindung besteht.'
+    : (navigator.onLine ? 'Alle Änderungen sind bei Firestore angekommen.'
+                        : 'Ohne Netz. Lernen funktioniert weiter, alles wird lokal gespeichert.');
+  const d = $('#diag-status'); if (d) diagnoseMalen();
+}
+window.addEventListener('online',  statusMalen);
+window.addEventListener('offline', statusMalen);
+
+function datenAnbinden() {
+  return new Promise((fertig, schiefgegangen) => {
+    let erledigt = false;
+    const pruefen = () => {
+      if (erledigt) return;
+      if (S.bereitSettings && S.bereitDecks && S.bereitCards) {
+        erledigt = true;
+        // Der Erststart-Test darf den Programmstart nicht aufhalten, falls
+        // Firestore ohne Netz keine Antwort liefert.
+        Promise.race([
+          erstStartPruefen().catch(e => console.warn('Erststart', e)),
+          new Promise(r => setTimeout(r, 4000))
+        ]).then(() => {
+          $('#boot').hidden = true;
+          $('#app').hidden = false;
+          alleSeitenMalen();
+          fertig();
+        });
+      }
+    };
+    const meta = { includeMetadataChanges: true };
+
+    S.abmelder.push(FB.onSnapshot(refEinstellungen(), meta, snap => {
+      const daten = snap.exists() ? snap.data() : null;
+      S.einstellungen = Object.assign(STANDARD_EINSTELLUNGEN(), daten || {});
+      if (!Array.isArray(S.einstellungen.intervalle) || S.einstellungen.intervalle.length !== 12)
+        S.einstellungen.intervalle = STANDARD_INTERVALLE.slice();
+      S.einstellungen.intervalle = S.einstellungen.intervalle.map((v, i) =>
+        zahl(v, 1, 3650, STANDARD_INTERVALLE[i]));
+      themeWunsch = S.einstellungen.theme || 'auto';
+      themeAnwenden(themeWunsch);
+      try { localStorage.setItem('lk2:theme', themeWunsch); } catch (_) {}
+      S.bereitSettings = true;
+      if (erledigt) alleSeitenMalen(); else pruefen();
+    }, e => { console.error(e); if (!erledigt) schiefgegangen(e); }));
+
+    S.abmelder.push(FB.onSnapshot(colDecks(), meta, snap => {
+      S.decks = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'de'));
+      // Neu hinzugekommene Kästen sind beim Lernen von Anfang an dabei
+      if (lernAuswahl) S.decks.forEach(d => {
+        if (!bekannteDecks.has(d.id)) lernAuswahl.add(d.id);
+      });
+      bekannteDecks = new Set(S.decks.map(d => d.id));
+      statusAusSnapshot(snap);
+      S.bereitDecks = true;
+      if (erledigt) alleSeitenMalen(); else pruefen();
+    }, e => { console.error(e); if (!erledigt) schiefgegangen(e); }));
+
+    S.abmelder.push(FB.onSnapshot(colCards(), meta, snap => {
+      S.cards = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (S.auswahl.size) {                       // gelöschte Karten aus der Auswahl nehmen
+        const da = new Set(S.cards.map(k => k.id));
+        S.auswahl.forEach(x => { if (!da.has(x)) S.auswahl.delete(x); });
+      }
+      statusAusSnapshot(snap);
+      S.bereitCards = true;
+      if (erledigt) alleSeitenMalen(); else pruefen();
+    }, e => { console.error(e); if (!erledigt) schiefgegangen(e); }));
+  });
+}
+
+function statusAusSnapshot(snap) {
+  statusZustand.cache = !!snap.metadata?.fromCache;
+  statusZustand.offen = !!snap.metadata?.hasPendingWrites;
+  statusMalen();
+}
+
+/** Erster Start eines Kontos: Einstellungen und Beispielkasten anlegen. */
+async function erstStartPruefen() {
+  if (S.decks.length || S.cards.length) {
+    schreibe(FB.setDoc(refEinstellungen(),
+      { lastSeen: new Date().toISOString() }, { merge: true }), 'lastSeen');
+    return;
+  }
+  // Nur anlegen, wenn sicher feststeht, dass es noch keine Einstellungen gibt.
+  // Schlägt die Abfrage fehl (offline, kein Cache), wird nichts erzeugt —
+  // sonst entstünde bei jedem Start ein weiterer Beispielkasten.
+  let snap = null;
+  try { snap = await FB.getDoc(refEinstellungen()); } catch (_) { return; }
+  if (!snap || snap.exists()) return;
+
+  const deckId = neueId();
+  const b = FB.writeBatch(db);
+  b.set(refEinstellungen(), Object.assign(STANDARD_EINSTELLUNGEN(),
+    { lastSeen: new Date().toISOString() }));
+  b.set(FB.doc(colDecks(), deckId), neuesDeck('Beispiel'));
+  [
+    ['Was bedeutet „Spaced Repetition“?',
+     'Wiederholen in wachsenden Abständen — kurz vor dem Vergessen.',
+     'Der Effekt ist gut belegt: gleiche Behaltensleistung bei deutlich weniger Wiederholungen.'],
+    ['Wofür stehen die Bewertungen 1 bis 4?',
+     '1 = nicht gewusst, 2 = schwer, 3 = gewusst, 4 = sehr leicht',
+     '1 setzt die Karte auf Fach 1 zurück, 4 überspringt ein Fach.'],
+    ['Wie kommen meine alten Karten hierher?',
+     'Einstellungen → Daten → Altbestand übernehmen',
+     'Entweder aus dem Browser dieser Domain oder aus der JSON-Datei der alten App.']
+  ].forEach(([f, a, n]) => {
+    b.set(FB.doc(colCards(), neueId()), neueKarte({ deckId, frage: f, antwort: a, notiz: n }));
+  });
+  schreibe(b.commit(), 'Erststart');
+}
+
+/* ---------- 7. Datenmodell (KONZEPT §3) --------------------------------- */
+
+function neuesDeck(name, farbe) {
+  return {
+    name: String(name || 'Neuer Kasten').slice(0, 120),
+    farbe: farbe || DECK_FARBEN[Math.floor(Math.random() * DECK_FARBEN.length)],
+    richtung: 'vorwaerts',      // Stufe 3
+    pruefungsdatum: null,       // Stufe 4
+    createdAt: heute(),
+    archiviert: false
+  };
+}
+const DECK_FARBEN = ['#378add', '#639922', '#ef9f27', '#e24b4a', '#8e6bd6', '#1B9AAA', '#d6538e', '#5b7083'];
+
+function neueKarte({ deckId, frage, antwort, notiz }) {
+  return {
+    deckId,
+    frage: String(frage || '').trim(),
+    antwort: String(antwort || '').trim(),
+    notiz: String(notiz || '').trim(),
+    tags: [],
+    typ: 'standard',            // Stufe 3: cloze | bild
+    fach: 1,
+    stability: 0,               // Stufe 2 (FSRS) — bis dahin = Intervall des Fachs
+    difficulty: 5,
+    due: heute(),               // neue Karten sind sofort dran
+    lastReview: null,
+    reps: 0,
+    lapses: 0,
+    state: 0,                   // 0 neu, 1 lernen, 2 Wiederholung, 3 erneut lernen
+    suspendiert: false,
+    createdAt: heute()
+  };
+}
+
+/** Karten, deren Kasten nicht (mehr) existiert. Sie kämen sonst in keiner
+ *  Sitzung mehr vor, würden aber weiter mitgezählt. */
+function verwaisteKarten() {
+  const da = new Set(S.decks.map(d => d.id));
+  return S.cards.filter(k => !da.has(k.deckId));
+}
+
+const istFaellig    = k => !k.suspendiert && (k.due || heute()) <= heute();
+const istHeuteGenau = k => !k.suspendiert && (k.due || heute()) === heute();
+const istNeu        = k => !k.reps;
+const deckName      = id => S.decks.find(d => d.id === id)?.name || 'Ohne Kasten';
+const deckFarbe     = id => S.decks.find(d => d.id === id)?.farbe || 'var(--txt3)';
+const kartenVon     = id => S.cards.filter(k => k.deckId === id);
+
+/* Fach ableiten für Karten, die (nach einem Stufe-2-Import) keins mehr haben */
+function fachVon(k) {
+  if (Number.isFinite(k.fach) && k.fach >= 1) return Math.min(12, Math.round(k.fach));
+  const s = Number(k.stability) || 0;
+  return Math.min(12, STANDARD_INTERVALLE.filter(g => s >= g).length + (s > 0 ? 0 : 1) || 1);
+}
+
+/* ---------- 8. Navigation ---------------------------------------------- */
+
+const SEITEN = ['lernen', 'kaesten', 'karten', 'statistik', 'einstellungen'];
+
+$('#nav').addEventListener('click', e => {
+  const b = e.target.closest('button[data-seite]');
+  if (b) seiteZeigen(b.dataset.seite);
+});
+
+function seiteZeigen(name) {
+  if (!SEITEN.includes(name)) return;
+  if (name !== 'lernen') { sitzung = null; letzteSitzung = null; }
+  S.seite = name;
+  SEITEN.forEach(s => { $('#seite-' + s).hidden = (s !== name); });
+  $$('#nav button').forEach(b => b.classList.toggle('aktiv', b.dataset.seite === name));
+  window.scrollTo({ top: 0 });
+  seiteMalen(name);
+}
+
+/* Wird nach jeder Firestore-Aktualisierung aufgerufen. Eine laufende Sitzung
+   wird dabei bewusst nicht neu gezeichnet — sonst springt die Karte oder der
+   Abschlussbildschirm verschwindet, sobald der eigene Schreibvorgang
+   zurückkommt. */
+function alleSeitenMalen() {
+  if (sitzung?.aktiv || letzteSitzung) return;
+  // Nicht mitten in eine Eingabe hineinzeichnen — sonst verliert das Suchfeld
+  // den Fokus, sobald eine Aktualisierung von Firestore eintrifft.
+  const f = document.activeElement;
+  if (f && (f.tagName === 'INPUT' || f.tagName === 'TEXTAREA') && f.closest('main')) return;
+  seiteMalen(S.seite);
+}
+
+function seiteMalen(name) {
+  if (!S.uid) return;
+  ({
+    lernen: malLernen, kaesten: malKaesten, karten: malKarten,
+    statistik: malStatistik, einstellungen: malEinstellungen
+  })[name]?.();
+}
+
+/* ---------- 9. Lernen --------------------------------------------------- */
+
+let lernAuswahl = null;      // Set von deckIds, null = alle
+let letzteSitzung = null;    // hält den Abschlussbildschirm, bis er weggeklickt wird
+
+function malLernen() {
+  if (sitzung?.aktiv) return malSitzung();
+  if (letzteSitzung) return malAbschluss();
+  const ziel = $('#seite-lernen');
+
+  if (!S.decks.length) {
+    ziel.innerHTML = `<div class="leer">
+      Noch kein Kasten vorhanden.<br><br>
+      <button class="btn primary" data-tu="ersterKasten">Ersten Kasten anlegen</button>
+      &nbsp;
+      <button class="btn" data-tu="zuEinstellungen">Altbestand übernehmen</button>
+    </div>`;
+    return verdrahten(ziel);
+  }
+
+  if (!lernAuswahl) lernAuswahl = new Set(S.decks.map(d => d.id));
+  const modus = lernModus();
+  const gewaehlt = S.cards.filter(k => lernAuswahl.has(k.deckId));
+  const heuteN = gewaehlt.filter(istHeuteGenau).length;
+  const alleN  = gewaehlt.filter(istFaellig).length;
+  const dran   = modus === 'heute' ? heuteN : alleN;
+
+  ziel.innerHTML = `
+    <h1>Lernen</h1>
+    <div class="box">
+      <div class="spread" style="margin-bottom:10px">
+        <h2 style="margin:0">Kästen</h2>
+        <span class="row" style="gap:6px">
+          <button class="btn klein" data-tu="alleAn">Alle</button>
+          <button class="btn klein" data-tu="alleAus">Keiner</button>
+        </span>
+      </div>
+      ${S.decks.map(d => {
+        const k = kartenVon(d.id);
+        const f = k.filter(istFaellig).length;
+        return `<label class="karo">
+          <input type="checkbox" data-deck="${esc(d.id)}" ${lernAuswahl.has(d.id) ? 'checked' : ''}>
+          <span class="punkt-farbe" style="background:${esc(d.farbe)};margin:0"></span>
+          <span style="flex:1">${esc(d.name)}</span>
+          <span class="badge ${f ? 'faellig' : ''}">${f} fällig</span>
+          <span class="badge">${k.length} gesamt</span>
+        </label>`;
+      }).join('')}
     </div>
-    <div class="progress-bar"><div class="progress-fill" id="session-progress"></div></div>
-    <div id="karte-wrap"></div>
-    <div style="text-align:center;font-size:13px;color:var(--txt3);margin-bottom:8px">
-      <span class="kbd">Leertaste</span> = umdrehen &nbsp;|&nbsp; <span class="kbd">1–4</span> = bewerten
+
+    <div class="box">
+      <h2>Umfang</h2>
+      <label class="karo"><input type="radio" name="modus" value="heute" ${modus === 'heute' ? 'checked' : ''}>
+        <span style="flex:1">Nur heute fällig</span><span class="badge">${heuteN}</span></label>
+      <label class="karo"><input type="radio" name="modus" value="alle" ${modus === 'alle' ? 'checked' : ''}>
+        <span style="flex:1">Alle fälligen, auch überfällige</span><span class="badge">${alleN}</span></label>
     </div>
-    <div id="rating-area" style="display:none">
-      <div class="rating-row">
-        <button class="rating-btn r1" onclick="bewerten(1)">1<span>Nicht gewusst</span></button>
-        <button class="rating-btn r2" onclick="bewerten(2)">2<span>Schwer</span></button>
-        <button class="rating-btn r3" onclick="bewerten(3)">3<span>Gewusst</span></button>
-        <button class="rating-btn r4" onclick="bewerten(4)">4<span>Sehr leicht</span></button>
+
+    <button class="btn primary gross breit" data-tu="starten" ${dran ? '' : 'disabled'}>
+      ${dran ? `Sitzung starten — ${dran} ${dran === 1 ? 'Karte' : 'Karten'}` : 'Nichts fällig'}
+    </button>
+    ${!dran && alleN ? `<p class="mini mt" style="text-align:center">
+        Heute ist nichts dran, aber ${alleN} überfällige Karten warten. Umfang umstellen.</p>` : ''}
+    ${!dran && !alleN ? `<p class="mini mt" style="text-align:center">
+        Alles erledigt. Nächste Fälligkeit: ${esc(naechsteFaelligkeitText())}</p>` : ''}
+
+    <p class="tastenhilfe mt2"><kbd>Leertaste</kbd> umdrehen ·
+      <kbd>1</kbd>–<kbd>4</kbd> bewerten · <kbd>Esc</kbd> beenden</p>`;
+
+  verdrahten(ziel);
+  $$('#seite-lernen input[data-deck]').forEach(cb => cb.addEventListener('change', () => {
+    cb.checked ? lernAuswahl.add(cb.dataset.deck) : lernAuswahl.delete(cb.dataset.deck);
+    malLernen();
+  }));
+  $$('#seite-lernen input[name=modus]').forEach(r => r.addEventListener('change', () => {
+    try { localStorage.setItem('lk2:modus', r.value); } catch (_) {}
+    malLernen();
+  }));
+}
+
+function lernModus() {
+  try { return localStorage.getItem('lk2:modus') === 'alle' ? 'alle' : 'heute'; }
+  catch (_) { return 'heute'; }
+}
+
+function naechsteFaelligkeitText() {
+  const offen = S.cards.filter(k => !k.suspendiert && k.due).map(k => k.due).sort();
+  if (!offen.length) return 'keine Karten';
+  const d = offen.find(x => x > heute());
+  if (!d) return 'heute';
+  const n = tageDiff(d, heute());
+  return `${datumDeutsch(d)} (in ${n} ${n === 1 ? 'Tag' : 'Tagen'})`;
+}
+
+function sitzungStarten() {
+  const modus = lernModus();
+  const pool = S.cards.filter(k => lernAuswahl.has(k.deckId))
+    .filter(modus === 'heute' ? istHeuteGenau : istFaellig);
+  if (!pool.length) return toast('Keine fälligen Karten in der Auswahl.');
+  sitzung = {
+    karten: mischen(pool), i: 0, aufgedeckt: false, aktiv: true,
+    zaehler: { 1: 0, 2: 0, 3: 0, 4: 0 }, gesamt: pool.length,
+    start: Date.now(), kartenStart: Date.now(), sekunden: 0,
+    proDeck: {}, bewertet: 0
+  };
+  malSitzung();
+}
+
+function malSitzung() {
+  const ziel = $('#seite-lernen');
+  const s = sitzung;
+  if (!s) return malLernen();
+
+  if (s.i >= s.karten.length) return malAbschluss();
+
+  const k = s.karten[s.i];
+  const fach = fachVon(k);
+  const proz = Math.round((s.i / s.gesamt) * 100);
+  const ueberfaellig = tageDiff(heute(), k.due || heute());
+
+  ziel.innerHTML = `
+    <div class="spread" style="margin-bottom:8px">
+      <span class="mini">${s.i + 1} / ${s.gesamt}</span>
+      <button class="btn klein" data-tu="abbrechen">Beenden</button>
+    </div>
+    <div class="fortschritt"><div style="width:${proz}%"></div></div>
+
+    <div class="flip-buehne">
+      <div class="flip-karte ${s.aufgedeckt ? 'gedreht' : ''}" id="flip">
+        <div class="flip-seite vorn">
+          <div class="flip-kopf">
+            <span style="color:${esc(deckFarbe(k.deckId))}">${esc(deckName(k.deckId))}</span>
+            <span>Fach ${fach}${istNeu(k) ? ' · neu' : ''}${ueberfaellig > 0 ? ` · ${ueberfaellig} T. überfällig` : ''}</span>
+          </div>
+          <div class="flip-text">${esc(k.frage)}</div>
+        </div>
+        <div class="flip-seite hinten">
+          <div class="flip-kopf">
+            <span style="color:${esc(deckFarbe(k.deckId))}">${esc(deckName(k.deckId))}</span>
+            <span>Fach ${fach}</span>
+          </div>
+          <div class="flip-text">${esc(k.antwort)}</div>
+          ${k.notiz ? `<div class="flip-notiz">${esc(k.notiz)}</div>` : ''}
+        </div>
       </div>
     </div>
-  </div>
-  <div id="lernen-done" style="display:none;text-align:center;padding:40px 16px">
-    <div style="font-size:48px;margin-bottom:12px">🎉</div>
-    <h2 style="margin-bottom:8px">Sitzung abgeschlossen!</h2>
-    <div id="session-result" style="color:var(--txt2);font-size:14px;margin-bottom:24px"></div>
-    <button class="btn btn-primary" onclick="showLernenStart()">Zurück</button>
-  </div>
-</div>
 
-<!-- KÄSTEN -->
-<div id="page-kaesten" class="page">
-  <div class="row" style="margin-bottom:16px;justify-content:space-between">
-    <h2 style="margin:0">Kästen</h2>
-    <button class="btn btn-sm" onclick="openBoxModal()">+ Neuer Kasten</button>
-  </div>
-  <div id="box-list"></div>
-</div>
+    <div id="aktionen">${s.aufgedeckt ? bewertungsHtml(k) : aufdeckHtml()}</div>`;
 
-<!-- KARTEN -->
-<div id="page-karten" class="page">
-  <div class="row" style="margin-bottom:12px;justify-content:space-between">
-    <h2 style="margin:0">Karten</h2>
-    <button class="btn btn-sm" onclick="openCardModal()">+ Neue Karte</button>
-  </div>
-  <div class="search-row">
-    <input type="text" id="search-input" placeholder="Suchen…" oninput="renderCards()">
-    <select id="filter-box" onchange="renderCards()" style="width:auto"><option value="">Alle Kästen</option></select>
-  </div>
-  <div id="card-list"></div>
-  <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
-    <button class="btn btn-sm" onclick="triggerCSVImport()">📥 CSV importieren</button>
-    <button class="btn btn-sm" onclick="triggerJSONImport()">📥 JSON importieren</button>
-    <button class="btn btn-sm" onclick="exportJSON()">📤 JSON exportieren</button>
-    <button class="btn btn-sm" onclick="exportCSV()">📤 CSV exportieren</button>
-  </div>
-  <input type="file" id="csv-import" accept=".csv" style="display:none" onchange="importCSV(event)">
-  <input type="file" id="json-import" accept=".json" style="display:none" onchange="importJSON(event)">
-</div>
+  verdrahten(ziel);
+  aktionenVerdrahten();
+  $('#flip')?.addEventListener('click', () => { if (!sitzung?.aufgedeckt) umdrehen(); });
+}
 
-<!-- STATISTIK -->
-<div id="page-statistik" class="page">
-  <h2>Statistik</h2>
-  <div id="stat-content"></div>
-</div>
+function aufdeckHtml() {
+  return `<button class="btn primary gross breit" data-tu="umdrehen">Antwort zeigen</button>
+          <p class="tastenhilfe"><kbd>Leertaste</kbd></p>`;
+}
 
-<!-- EINSTELLUNGEN -->
-<div id="page-einstellungen" class="page">
-  <h2>Einstellungen</h2>
+function aktionenVerdrahten() {
+  const a = $('#aktionen');
+  if (!a) return;
+  verdrahten(a);
+  $$('[data-bew]', a).forEach(b =>
+    b.addEventListener('click', () => bewerten(Number(b.dataset.bew))));
+}
 
-  <h3>Google Drive Synchronisation</h3>
-  <div class="gdrive-section">
-    <div id="gdrive-setup-hint" style="font-size:13px;color:var(--txt2);margin-bottom:12px;padding:10px;background:var(--orange-bg);border-radius:var(--radius);border:0.5px solid var(--orange);display:none">
-      ⚠️ Bitte zuerst deine Google Client-ID eintragen (siehe unten).
+function bewertungsHtml(k) {
+  const iv = S.einstellungen.intervalle;
+  const max = iv.length;
+  const alt = fachVon(k);
+  const vorschau = r => {
+    const neu = r === 1 ? 1 : r === 2 ? alt : Math.min(max, alt + (r === 3 ? 1 : 2));
+    const t = iv[neu - 1];
+    return t === 1 ? 'morgen' : t < 31 ? t + ' Tage' : t < 365 ? Math.round(t / 30) + ' Mon.' : '1 Jahr';
+  };
+  const knopf = (r, titel) =>
+    `<button class="bew bew${r}" data-bew="${r}">
+       <b>${r}</b><span>${titel}</span><small>${vorschau(r)}</small></button>`;
+  return `<div class="bewertung">
+      ${knopf(1, 'Nicht gewusst')}${knopf(2, 'Schwer')}${knopf(3, 'Gewusst')}${knopf(4, 'Sehr leicht')}
     </div>
-    <div style="margin-bottom:12px">
-      <label style="margin-top:0">Google OAuth Client-ID</label>
-      <input type="text" id="goog-client-id" placeholder="123456789-abc...apps.googleusercontent.com" oninput="saveClientId()">
-      <div class="sync-info">Erstelle eine Client-ID unter <a href="https://console.cloud.google.com" target="_blank" style="color:var(--blue)">console.cloud.google.com</a> → APIs &amp; Dienste → Anmeldedaten → OAuth 2.0</div>
+    <p class="tastenhilfe"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd></p>`;
+}
+
+/* Nicht neu zeichnen, sondern nur umklappen — sonst entsteht das Element neu
+   und die CSS-Animation läuft gar nicht erst an. */
+function umdrehen() {
+  if (!sitzung?.aktiv || sitzung.aufgedeckt) return;
+  sitzung.aufgedeckt = true;
+  const karte = $('#flip'), a = $('#aktionen');
+  if (!karte || !a) return malSitzung();
+  karte.classList.add('gedreht');
+  a.innerHTML = bewertungsHtml(sitzung.karten[sitzung.i]);
+  aktionenVerdrahten();
+}
+
+function bewerten(rating) {
+  const s = sitzung;
+  if (!s?.aktiv || !s.aufgedeckt) return;
+  const k = s.karten[s.i];
+  if (!k) return;
+
+  const iv = S.einstellungen.intervalle;
+  const max = iv.length;
+  const alt = fachVon(k);
+  const neuFach = rating === 1 ? 1
+                : rating === 2 ? alt
+                : Math.min(max, alt + (rating === 3 ? 1 : 2));
+  const tage = iv[neuFach - 1] ?? iv[max - 1];
+  const sekunden = Math.min(600, Math.round((Date.now() - s.kartenStart) / 1000));
+
+  const patch = {
+    fach: neuFach,
+    due: plusTage(heute(), tage),
+    stability: tage,
+    lastReview: heute(),
+    reps: (Number(k.reps) || 0) + 1,
+    lapses: (Number(k.lapses) || 0) + (rating === 1 ? 1 : 0),
+    state: rating === 1 ? 3 : 2
+  };
+  Object.assign(k, patch);                                   // lokal sofort
+  schreibe(FB.updateDoc(FB.doc(colCards(), k.id), patch), 'Bewertung');
+
+  s.zaehler[rating]++; s.bewertet++; s.sekunden += sekunden;
+  s.proDeck[k.deckId] = (s.proDeck[k.deckId] || 0) + 1;
+  tagesstatistikSchreiben(rating, sekunden, k.deckId);
+  streakPflegen();
+
+  s.i++; s.aufgedeckt = false; s.kartenStart = Date.now();
+  malSitzung();
+}
+
+function tagesstatistikSchreiben(rating, sekunden, deckId) {
+  const tag = heute();
+  schreibe(FB.setDoc(FB.doc(colReviews(), tag), {
+    datum: tag,
+    anzahl: FB.increment(1),
+    sekunden: FB.increment(sekunden),
+    bewertungen: { [rating]: FB.increment(1) },
+    proDeck: { [deckId]: FB.increment(1) }
+  }, { merge: true }), 'Tagesstatistik');
+  S.reviewsGeladen = false;
+}
+
+function streakPflegen() {
+  const tag = heute();
+  const e = S.einstellungen;
+  if (e.lastLearnDate === tag) return;
+  const neuerStreak = e.lastLearnDate === plusTage(tag, -1) ? (Number(e.streak) || 0) + 1 : 1;
+  e.lastLearnDate = tag; e.streak = neuerStreak;
+  schreibe(FB.setDoc(refEinstellungen(),
+    { lastLearnDate: tag, streak: neuerStreak }, { merge: true }), 'Streak');
+}
+
+function sitzungBeenden(still) {
+  if (!sitzung) return;
+  if (still) { sitzung = null; letzteSitzung = null; return; }
+  sitzung.aktiv = false;
+  malAbschluss();
+}
+
+function malAbschluss() {
+  const s = sitzung || letzteSitzung;
+  if (!s) return malLernen();
+  s.aktiv = false;
+  letzteSitzung = s;
+  sitzung = null;
+  const min = Math.max(1, Math.round(s.sekunden / 60));
+  const proKarte = s.bewertet ? (s.sekunden / s.bewertet).toFixed(1) : '0';
+  const offenN = s.gesamt - s.bewertet;
+
+  $('#seite-lernen').innerHTML = `
+    <div style="text-align:center;padding:26px 0">
+      <div style="font-size:44px;line-height:1">🎉</div>
+      <h1 style="margin-top:12px">${offenN ? 'Sitzung beendet' : 'Sitzung abgeschlossen!'}</h1>
+      <p class="muted">${s.bewertet} von ${s.gesamt} Karten bewertet${offenN ? ` · ${offenN} offen` : ''}</p>
     </div>
-    <div id="gdrive-auth-area">
-      <button class="btn btn-google" onclick="gdriveLogin()" id="btn-gdrive-login">🔑 Mit Google anmelden</button>
-      <button class="btn btn-sm btn-danger" onclick="gdriveLogout()" id="btn-gdrive-logout" style="display:none">Abmelden</button>
+    <div class="kennzahlen">
+      <div class="kennzahl"><b>${s.bewertet}</b><span>Karten</span></div>
+      <div class="kennzahl"><b>${min}</b><span>Minuten</span></div>
+      <div class="kennzahl"><b>${proKarte}s</b><span>pro Karte</span></div>
+      <div class="kennzahl"><b>${S.einstellungen.streak || 0}</b><span>Tage Streak</span></div>
     </div>
-    <div id="gdrive-user-info" style="margin-top:10px;font-size:13px;color:var(--txt2)"></div>
-    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap" id="gdrive-sync-btns" style="display:none">
-      <button class="btn btn-sm" onclick="gdrivePush()">☁️ Zu Drive hochladen</button>
-      <button class="btn btn-sm" onclick="gdrivePull()">⬇️ Von Drive laden</button>
-      <button class="btn btn-sm" onclick="gdriveAutoSync()" id="btn-autosync">🔄 Auto-Sync: AUS</button>
+    <div class="box mt">
+      ${[1, 2, 3, 4].map(r => {
+        const n = s.zaehler[r], p = s.bewertet ? Math.round(n / s.bewertet * 100) : 0;
+        const farbe = ['var(--red)', 'var(--orange)', 'var(--green)', 'var(--blue)'][r - 1];
+        const t = ['Nicht gewusst', 'Schwer', 'Gewusst', 'Sehr leicht'][r - 1];
+        return `<div class="balken"><span class="lab">${r} ${t.slice(0, 6)}.</span>
+          <span class="spur"><span class="fuell" style="width:${p}%;background:${farbe}"></span></span>
+          <span class="val">${n}</span></div>`;
+      }).join('')}
     </div>
-    <div class="sync-info" id="last-sync-info"></div>
-  </div>
+    <div class="row mt2" style="justify-content:center">
+      <button class="btn primary" data-tu="nochmal">Zur Übersicht</button>
+      <button class="btn" data-tu="zuStatistik">Statistik ansehen</button>
+    </div>`;
+  verdrahten($('#seite-lernen'));
+}
 
-  <h3>Intervalle pro Fach (Tage)</h3>
-  <p style="font-size:13px;color:var(--txt2);margin-bottom:8px">Standard: SM-2 / Ebbinghaus-optimiert.</p>
-  <div class="interval-grid" id="interval-grid"></div>
-  <div style="display:flex;gap:8px;margin-top:16px">
-    <button class="btn btn-sm" onclick="saveIntervals()">Speichern</button>
-    <button class="btn btn-sm" onclick="resetIntervals()">Zurücksetzen</button>
-  </div>
+/* ---------- 10. Kästen -------------------------------------------------- */
 
-  <div style="margin-top:24px;border-top:0.5px solid var(--border);padding-top:20px">
-    <h3>Referenz-Dump</h3>
-    <p style="font-size:13px;color:var(--txt2);margin-bottom:10px">Vollständiger JSON-Abzug aller Daten in die Zwischenablage (für Diagnose oder manuelle Sicherung).</p>
-    <button class="btn btn-sm" onclick="copyRefDump()">📋 Referenz-Dump kopieren</button>
-  </div>
+function malKaesten() {
+  const ziel = $('#seite-kaesten');
+  ziel.innerHTML = `
+    <div class="spread"><h1 style="margin:0">Kästen</h1>
+      <button class="btn primary" data-tu="neuerKasten">+ Neuer Kasten</button></div>
+    <div class="mt">${S.decks.length ? S.decks.map(d => {
+      const k = kartenVon(d.id);
+      const f = k.filter(istFaellig).length;
+      const neu = k.filter(istNeu).length;
+      return `<div class="liste-item">
+        <span class="punkt-farbe" style="background:${esc(d.farbe)}"></span>
+        <div class="haupt">
+          <div class="frage">${esc(d.name)}</div>
+          <div class="row mini" style="gap:6px;margin-top:4px">
+            <span class="badge">${k.length} Karten</span>
+            ${f ? `<span class="badge faellig">${f} fällig</span>` : ''}
+            ${neu ? `<span class="badge neu">${neu} neu</span>` : ''}
+          </div>
+        </div>
+        <div class="werkzeuge">
+          <button class="btn klein" data-tu="deckBearbeiten" data-id="${esc(d.id)}">Bearbeiten</button>
+          <button class="btn klein" data-tu="deckCsv" data-id="${esc(d.id)}">CSV</button>
+          <button class="btn klein gefahr" data-tu="deckLoeschen" data-id="${esc(d.id)}">Löschen</button>
+        </div></div>`;
+    }).join('') : `<div class="leer">Noch keine Kästen.</div>`}</div>`;
+  verdrahten(ziel);
+}
 
-  <div style="margin-top:24px;border-top:0.5px solid var(--border);padding-top:20px">
-    <h3>Alle Daten löschen</h3>
-    <p style="font-size:13px;color:var(--txt2);margin-bottom:10px">Löscht alle Kästen, Karten und Statistiken unwiderruflich.</p>
-    <button class="btn btn-sm btn-danger" onclick="deleteAllData()">Alle Daten löschen</button>
-  </div>
-</div>
-</div>
+function farbwahlHtml(aktiv) {
+  return `<label class="feld"><span>Farbe</span><div class="row" id="m-farben">${
+    DECK_FARBEN.map(f => `<button type="button" class="btn klein" data-farbe="${f}"
+      aria-label="Farbe ${f}" style="background:${f};border-color:${f};width:34px;height:30px;${
+      f === aktiv ? 'outline:2px solid var(--txt);outline-offset:1px' : ''}"></button>`).join('')
+  }</div></label>`;
+}
+function farbwahlVerdrahten(m, start) {
+  m.dataset.farbe = start;
+  $('#m-farben', m)?.addEventListener('click', e => {
+    const b = e.target.closest('[data-farbe]'); if (!b) return;
+    m.dataset.farbe = b.dataset.farbe;
+    $$('#m-farben button', m).forEach(x => x.style.outline = '');
+    b.style.outline = '2px solid var(--txt)';
+    b.style.outlineOffset = '1px';
+  });
+}
 
-<div id="modal-bg" class="modal-bg" style="display:none" onclick="closeModalOnBg(event)">
-  <div class="modal" id="modal-content"></div>
-</div>
+/** Legt einen Kasten an. Liefert die neue deckId oder null. */
+async function deckAnlegen(vorschlag) {
+  const r = await modal({
+    titel: 'Neuer Kasten',
+    html: `<label class="feld"><span>Name</span>
+             <input id="m-name" maxlength="120" placeholder="z. B. Englisch" value="${esc(vorschlag || '')}"></label>
+           ${farbwahlHtml(DECK_FARBEN[0])}`,
+    knoepfe: [{ text: 'Abbrechen', wert: null }, {
+      text: 'Anlegen', wert: 'ok', art: 'primary',
+      pruefen: () => {
+        if (!$('#m-name').value.trim()) { toast('Bitte einen Namen eingeben.'); return false; }
+      }
+    }],
+    beimOeffnen: m => farbwahlVerdrahten(m, DECK_FARBEN[0])
+  });
+  if (r !== 'ok') return null;
+  const name = String(W('m-name', '')).trim();
+  if (!name) return null;
+  const id = neueId();
+  schreibe(FB.setDoc(FB.doc(colDecks(), id), neuesDeck(name, W('farbe', DECK_FARBEN[0]))), 'Kasten anlegen');
+  lernAuswahl?.add(id);
+  toast('Kasten „' + name + '“ angelegt.');
+  return id;
+}
 
-<script>
-// ══════════════════════════════════════════════
-// KONFIGURATION
-// ══════════════════════════════════════════════
-const GOOGLE_CLIENT_ID = '473987487036-3jkj99mnmr0pan7k6o1jsqfiop7e5gfj.apps.googleusercontent.com';  // <-- Zeile 274: Client-ID hier eintragen
-const GDRIVE_FILE_NAME = 'lernkartei-data.json';
-const GDRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+/* ---------- 11. Karten -------------------------------------------------- */
 
-const BOX_COLORS = ['#378add','#639922','#e24b4a','#ef9f27','#d4537e','#1d9e75','#7f77dd','#ba7517'];
-const DEFAULT_INTERVALS = [1,3,7,14,21,30,45,60,90,120,180,365];
+function gefilterteKarten() {
+  const q = S.kartenSuche.trim().toLowerCase();
+  let l = S.cards;
+  if (S.kartenFilterDeck !== 'alle') l = l.filter(k => k.deckId === S.kartenFilterDeck);
+  if (q) {
+    const teile = q.split(/\s+/);
+    l = l.filter(k => {
+      const heu = (k.frage + ' ' + k.antwort + ' ' + (k.notiz || '') + ' ' +
+                   deckName(k.deckId) + ' ' + (k.tags || []).join(' ')).toLowerCase();
+      return teile.every(t => heu.includes(t));
+    });
+  }
+  return l.slice().sort((a, b) =>
+    (a.due || '').localeCompare(b.due || '') || (a.frage || '').localeCompare(b.frage || '', 'de'));
+}
 
-let boxes=[], allCards={}, meta={}, intervals=[...DEFAULT_INTERVALS];
-let session=null, currentFlipped=false;
-let gAccessToken=null, gUserName='', gAutoSync=false, gFileId=null;
+function malKarten() {
+  const ziel = $('#seite-karten');
+  const alle = gefilterteKarten();
+  const zeigen = alle.slice(0, S.kartenLimit);
+  const ausw = S.auswahl.size;
 
-// ─── STORAGE ───
-const STORE = {
-  async get(k){
-    if(window.storage){try{return await window.storage.get(k)}catch(e){}}
-    const v=localStorage.getItem(k); return v?{value:v}:null;
+  ziel.innerHTML = `
+    <div class="spread"><h1 style="margin:0">Karten</h1>
+      <button class="btn primary" data-tu="neueKarte">+ Neue Karte</button></div>
+
+    <div class="row mt" style="gap:8px">
+      <input id="k-suche" placeholder="Suchen in Frage, Antwort, Notiz …"
+             value="${esc(S.kartenSuche)}" style="flex:2;min-width:180px">
+      <select id="k-deck" style="flex:1;min-width:140px">
+        <option value="alle">Alle Kästen (${S.cards.length})</option>
+        ${S.decks.map(d => `<option value="${esc(d.id)}" ${S.kartenFilterDeck === d.id ? 'selected' : ''}>
+          ${esc(d.name)} (${kartenVon(d.id).length})</option>`).join('')}
+      </select>
+    </div>
+
+    ${ausw ? `<div class="box flach mt row" style="justify-content:space-between">
+      <span><strong>${ausw}</strong> ausgewählt</span>
+      <span class="row">
+        <button class="btn klein" data-tu="massVerschieben">Verschieben</button>
+        <button class="btn klein gefahr" data-tu="massLoeschen">Löschen</button>
+        <button class="btn klein" data-tu="massAus">Aufheben</button>
+      </span></div>` : ''}
+
+    <p class="mini mt">${alle.length} ${alle.length === 1 ? 'Karte' : 'Karten'}${
+      S.kartenSuche ? ' gefunden' : ''}${alle.length > zeigen.length ? ` · ${zeigen.length} angezeigt` : ''}</p>
+
+    <div>${zeigen.length ? zeigen.map(k => {
+      const f = istFaellig(k);
+      return `<div class="liste-item">
+        <input type="checkbox" data-sel="${esc(k.id)}" ${S.auswahl.has(k.id) ? 'checked' : ''}
+               style="margin-top:3px" aria-label="Karte auswählen">
+        <div class="haupt">
+          <div class="frage">${esc(k.frage) || '<em class="muted">ohne Frage</em>'}</div>
+          <div class="antwort">${esc(k.antwort)}</div>
+          <div class="row mini" style="gap:5px;margin-top:5px">
+            <span class="badge" style="background:${esc(deckFarbe(k.deckId))}22;color:${esc(deckFarbe(k.deckId))}">
+              ${esc(deckName(k.deckId))}</span>
+            <span class="badge">Fach ${fachVon(k)}</span>
+            ${k.suspendiert ? '<span class="badge ruht">ruht</span>'
+              : istNeu(k) ? '<span class="badge neu">neu</span>'
+              : `<span class="badge ${f ? 'faellig' : ''}">${f ? 'fällig' : datumDeutsch(k.due)}</span>`}
+          </div>
+        </div>
+        <div class="werkzeuge">
+          <button class="btn klein" data-tu="karteBearbeiten" data-id="${esc(k.id)}">Bearbeiten</button>
+          <button class="btn klein gefahr" data-tu="karteLoeschen" data-id="${esc(k.id)}">×</button>
+        </div></div>`;
+    }).join('') : `<div class="leer">${S.kartenSuche || S.kartenFilterDeck !== 'alle'
+        ? 'Nichts gefunden.' : 'Noch keine Karten.'}</div>`}</div>
+
+    ${alle.length > zeigen.length
+      ? `<button class="btn breit mt" data-tu="mehrKarten">Weitere ${
+          Math.min(60, alle.length - zeigen.length)} laden</button>` : ''}`;
+
+  verdrahten(ziel);
+  const suche = $('#k-suche');
+  suche.addEventListener('input', () => {
+    S.kartenSuche = suche.value; S.kartenLimit = 60;
+    clearTimeout(suche._t);
+    suche._t = setTimeout(() => {
+      const pos = suche.selectionStart;
+      malKarten();
+      const neu = $('#k-suche'); neu.focus(); neu.setSelectionRange(pos, pos);
+    }, 220);
+  });
+  $('#k-deck').addEventListener('change', e => {
+    S.kartenFilterDeck = e.target.value; S.kartenLimit = 60; malKarten();
+  });
+  $$('#seite-karten input[data-sel]').forEach(cb => cb.addEventListener('change', () => {
+    cb.checked ? S.auswahl.add(cb.dataset.sel) : S.auswahl.delete(cb.dataset.sel);
+    malKarten();
+  }));
+}
+
+async function karteBearbeiten(id) {
+  const k = id ? S.cards.find(x => x.id === id) : null;
+  if (id && !k) return;
+  if (!S.decks.length) return toast('Zuerst einen Kasten anlegen.');
+  const vorDeck = k?.deckId || (S.kartenFilterDeck !== 'alle' ? S.kartenFilterDeck : S.decks[0].id);
+
+  const r = await modal({
+    titel: k ? 'Karte bearbeiten' : 'Neue Karte',
+    breit: true,
+    html: `
+      <label class="feld"><span>Frage</span><textarea id="m-frage">${esc(k?.frage || '')}</textarea></label>
+      <label class="feld"><span>Antwort</span><textarea id="m-antwort">${esc(k?.antwort || '')}</textarea></label>
+      <label class="feld"><span>Notiz (optional)</span><textarea id="m-notiz" style="min-height:56px">${esc(k?.notiz || '')}</textarea></label>
+      <label class="feld"><span>Kasten</span><select id="m-deck">${S.decks.map(d =>
+        `<option value="${esc(d.id)}" ${d.id === vorDeck ? 'selected' : ''}>${esc(d.name)}</option>`).join('')}</select></label>
+      ${k ? `<div class="row" style="justify-content:space-between;gap:10px">
+        <label class="feld" style="flex:1;margin:0"><span>Fach (1–12)</span>
+          <input type="number" id="m-fach" min="1" max="12" value="${fachVon(k)}"></label>
+        <label class="feld" style="flex:1;margin:0"><span>Fällig am</span>
+          <input type="date" id="m-due" value="${esc(k.due || heute())}"></label>
+      </div>
+      <label class="karo" style="margin-top:6px"><input type="checkbox" id="m-susp" ${k.suspendiert ? 'checked' : ''}>
+        <span>Ruhen lassen (kommt nicht mehr dran)</span></label>
+      <p class="mini">${k.reps || 0} Wiederholungen · ${k.lapses || 0} Aussetzer ·
+         zuletzt ${datumDeutsch(k.lastReview)}</p>` : ''}`,
+    knoepfe: [{ text: 'Abbrechen', wert: null }, {
+      text: k ? 'Speichern' : 'Anlegen', wert: 'ok', art: 'primary',
+      pruefen: () => {
+        if (!$('#m-frage').value.trim()) { toast('Die Frage darf nicht leer sein.'); return false; }
+        if (!$('#m-antwort').value.trim()) { toast('Die Antwort darf nicht leer sein.'); return false; }
+      }
+    }]
+  });
+  if (r !== 'ok') return;
+
+  const werte = {
+    frage: String(W('m-frage', '')).trim(),
+    antwort: String(W('m-antwort', '')).trim(),
+    notiz: String(letzteWerte['m-notiz'] ?? '').trim(),
+    deckId: W('m-deck', vorDeck)
+  };
+  if (!werte.frage || !werte.antwort) return;
+
+  if (k) {
+    const fachNeu = zahl(W('m-fach', fachVon(k)), 1, 12, fachVon(k));
+    Object.assign(werte, {
+      fach: fachNeu,
+      stability: S.einstellungen.intervalle[fachNeu - 1],
+      due: W('m-due', k.due || heute()),
+      suspendiert: letzteWerte['m-susp'] === true
+    });
+    Object.assign(k, werte);
+    schreibe(FB.updateDoc(FB.doc(colCards(), k.id), werte), 'Karte ändern');
+    toast('Gespeichert.');
+  } else {
+    schreibe(FB.setDoc(FB.doc(colCards(), neueId()), neueKarte(werte)), 'Karte anlegen');
+    toast('Karte angelegt.');
+  }
+}
+
+/* ---------- 12. Statistik ----------------------------------------------- */
+
+async function reviewsLaden(alles) {
+  if (S.reviewsGeladen && !alles) return;
+  try {
+    const ab = alles ? '0000-00-00' : plusTage(heute(), -70);
+    const q = FB.query(colReviews(), FB.where('datum', '>=', ab));
+    const snap = await FB.getDocs(q);
+    S.reviews = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    S.reviewsGeladen = true;
+  } catch (e) {
+    // Nicht erneut versuchen: malStatistik ruft diese Funktion beim Zeichnen
+    // auf — ohne Merker entstünde eine Endlosschleife aus Abfrage und Neuzeichnen.
+    console.warn('Statistik-Verlauf nicht ladbar', e);
+    S.reviews = Array.isArray(S.reviews) ? S.reviews : [];
+    S.reviewsGeladen = true;
+    S.reviewsFehler = true;
+  }
+}
+
+function malStatistik() {
+  const ziel = $('#seite-statistik');
+  const imDeck = k => S.statDeck === 'alle' || k.deckId === S.statDeck;
+  const karten = S.cards.filter(imDeck);
+  const faellig = karten.filter(istFaellig);
+  const heuteGenau = karten.filter(istHeuteGenau);
+  const ueberf = faellig.length - heuteGenau.length;
+  const neu = karten.filter(istNeu).length;
+  const ruht = karten.filter(k => k.suspendiert).length;
+
+  const proFach = Array.from({ length: 12 }, (_, i) =>
+    karten.filter(k => !k.suspendiert && fachVon(k) === i + 1).length);
+  const maxFach = Math.max(1, ...proFach);
+
+  const tage = Array.from({ length: 14 }, (_, i) => plusTage(heute(), i - 13));
+  const proTag = tage.map(t => {
+    const r = S.reviews.find(x => (x.datum || x.id) === t);
+    if (!r) return 0;
+    if (S.statDeck === 'alle') return Number(r.anzahl) || 0;
+    return Number(r.proDeck?.[S.statDeck]) || 0;
+  });
+  const maxTag = Math.max(1, ...proTag);
+  const summe14 = proTag.reduce((a, b) => a + b, 0);
+  const sekunden14 = S.reviews
+    .filter(r => tage.includes(r.datum || r.id))
+    .reduce((a, r) => a + (Number(r.sekunden) || 0), 0);
+
+  const vorschauTage = Array.from({ length: 7 }, (_, i) => plusTage(heute(), i + 1));
+  const vorschau = vorschauTage.map(t => karten.filter(k => !k.suspendiert && k.due === t).length);
+  const maxVor = Math.max(1, ...vorschau, 1);
+
+  ziel.innerHTML = `
+    <div class="spread"><h1 style="margin:0">Statistik</h1>
+      <select id="st-deck" style="width:auto;min-width:160px">
+        <option value="alle">Alle Kästen</option>
+        ${S.decks.map(d => `<option value="${esc(d.id)}" ${S.statDeck === d.id ? 'selected' : ''}>${esc(d.name)}</option>`).join('')}
+      </select></div>
+
+    <div class="kennzahlen mt">
+      <div class="kennzahl"><b>${karten.length}</b><span>Karten gesamt</span></div>
+      <div class="kennzahl"><b style="color:var(--orange)">${heuteGenau.length}</b><span>heute fällig</span></div>
+      <div class="kennzahl"><b>${ueberf}</b><span>überfällig</span></div>
+      <div class="kennzahl"><b style="color:var(--blue)">${neu}</b><span>noch nie gelernt</span></div>
+      <div class="kennzahl"><b style="color:var(--green)">${S.einstellungen.streak || 0}</b><span>Tage in Folge</span></div>
+      ${ruht ? `<div class="kennzahl"><b>${ruht}</b><span>ruhend</span></div>` : ''}
+    </div>
+
+    <div class="box mt2">
+      <h2>Karten pro Fach</h2>
+      ${proFach.map((n, i) => `<div class="balken">
+        <span class="lab">Fach ${i + 1}</span>
+        <span class="spur"><span class="fuell" style="width:${Math.round(n / maxFach * 100)}%"></span></span>
+        <span class="val">${n}</span></div>`).join('')}
+      <p class="mini" style="margin-top:8px">Intervalle: ${S.einstellungen.intervalle.join(' · ')} Tage</p>
+    </div>
+
+    <div class="box">
+      <h2>Letzte 14 Tage</h2>
+      <p class="mini">${summe14} Bewertungen · ${Math.round(sekunden14 / 60)} Minuten</p>
+      <div class="tage">${proTag.map((n, i) => {
+        const t = tage[i];
+        return `<div title="${datumDeutsch(t)}: ${n}">
+          <span class="mini" style="font-size:10px">${n || ''}</span>
+          <span class="saeule ${n ? '' : 'null'}" style="height:${Math.round(n / maxTag * 100)}%"></span>
+          <span class="tag">${t.slice(8)}.</span></div>`;
+      }).join('')}</div>
+    </div>
+
+    <div class="box">
+      <h2>Die nächsten 7 Tage</h2>
+      <div class="tage">${vorschau.map((n, i) => `<div title="${datumDeutsch(vorschauTage[i])}: ${n}">
+        <span class="mini" style="font-size:10px">${n || ''}</span>
+        <span class="saeule ${n ? '' : 'null'}" style="height:${Math.round(n / maxVor * 100)}%;background:var(--orange)"></span>
+        <span class="tag">${vorschauTage[i].slice(8)}.</span></div>`).join('')}</div>
+    </div>
+
+    ${S.statDeck === 'alle' && S.decks.length ? `<div class="box">
+      <h2>Pro Kasten</h2>
+      <table class="daten"><thead><tr>
+        <th>Kasten</th><th class="num">Karten</th><th class="num">fällig</th>
+        <th class="num">neu</th><th class="num">Ø&nbsp;Fach</th></tr></thead><tbody>
+        ${S.decks.map(d => {
+          const k = kartenVon(d.id);
+          const aktiv = k.filter(x => !x.suspendiert);
+          const schnitt = aktiv.length
+            ? (aktiv.reduce((a, x) => a + fachVon(x), 0) / aktiv.length).toFixed(1) : '—';
+          return `<tr><td>${esc(d.name)}</td><td class="num">${k.length}</td>
+            <td class="num">${k.filter(istFaellig).length}</td>
+            <td class="num">${k.filter(istNeu).length}</td><td class="num">${schnitt}</td></tr>`;
+        }).join('')}
+      </tbody></table></div>` : ''}`;
+
+  $('#st-deck').addEventListener('change', e => { S.statDeck = e.target.value; malStatistik(); });
+  if (!S.reviewsGeladen) reviewsLaden().then(() => { if (S.seite === 'statistik') malStatistik(); });
+}
+
+/* ---------- 13. Einstellungen ------------------------------------------ */
+
+function malEinstellungen() {
+  const ziel = $('#seite-einstellungen');
+  const e = S.einstellungen;
+  ziel.innerHTML = `
+    <h1>Einstellungen</h1>
+
+    <div class="box">
+      <h2>Konto</h2>
+      <p class="mini" style="margin:0">Angemeldet als <strong>${esc(S.email || '')}</strong></p>
+      <p class="mini" style="word-break:break-all">Konto-Kennung: <code>${esc(S.uid || '')}</code></p>
+      <div class="row mt">
+        <button class="btn" data-tu="abmelden">Abmelden</button>
+        <button class="btn klein" data-tu="pwMail">Passwort ändern (E-Mail)</button>
+      </div>
+    </div>
+
+    <div class="box">
+      <h2>Darstellung</h2>
+      <label class="feld" style="margin:0"><span>Erscheinungsbild</span>
+        <select id="s-theme">
+          <option value="auto" ${e.theme === 'auto' ? 'selected' : ''}>Automatisch (Systemeinstellung)</option>
+          <option value="hell" ${e.theme === 'hell' ? 'selected' : ''}>Hell</option>
+          <option value="dunkel" ${e.theme === 'dunkel' ? 'selected' : ''}>Dunkel</option>
+        </select></label>
+    </div>
+
+    <div class="box">
+      <h2>Intervalle pro Fach</h2>
+      <p class="mini">Tage bis zur nächsten Abfrage. Voreinstellung orientiert sich an
+         SM-2 und der Vergessenskurve. In Stufe 2 kommt FSRS dazu — diese Werte
+         bleiben dann als Klassik-Modus erhalten.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:8px;margin-top:10px">
+        ${e.intervalle.map((v, i) => `<label class="feld" style="margin:0">
+          <span>Fach ${i + 1}</span>
+          <input type="number" class="s-iv" data-i="${i}" min="1" max="3650" value="${v}"></label>`).join('')}
+      </div>
+      <div class="row mt">
+        <button class="btn primary" data-tu="ivSpeichern">Speichern</button>
+        <button class="btn" data-tu="ivZuruecksetzen">Auf Standard zurücksetzen</button>
+      </div>
+    </div>
+
+    <div class="box">
+      <h2>Altbestand übernehmen</h2>
+      <p class="mini">Einmalig — holt Kästen, Karten, Fächer und Fälligkeiten aus der
+        Vorgängerversion. Bestehende Karten bleiben dabei unberührt, sofern
+        „Zusammenführen“ gewählt wird.</p>
+      <div class="row mt">
+        <button class="btn primary" data-tu="altBrowser">Aus diesem Browser</button>
+        <button class="btn" data-tu="altDatei">Aus JSON-Datei</button>
+      </div>
+      <p class="mini mt">„Aus diesem Browser“ liest die Daten, die die alte App unter
+        dieser Web-Adresse gespeichert hat. Das funktioniert nur in dem Browser,
+        in dem früher gelernt wurde — und nur, solange die Browserdaten nicht
+        gelöscht wurden.</p>
+    </div>
+
+    <div class="box">
+      <h2>Sichern und Wiederherstellen</h2>
+      <div class="row">
+        <button class="btn" data-tu="expJson">Alles als JSON sichern</button>
+        <button class="btn" data-tu="impJson">JSON einspielen</button>
+      </div>
+      <hr>
+      <div class="row">
+        <button class="btn" data-tu="expCsv">Kasten als CSV</button>
+        <button class="btn" data-tu="impCsv">CSV einlesen</button>
+      </div>
+      <p class="mini mt">CSV-Format: <code>Frage;Antwort;Kasten</code> — Semikolon als Trenner,
+        eine Karte pro Zeile.</p>
+    </div>
+
+    <div class="box">
+      <h2>Diagnose</h2>
+      <div id="diag-status" class="mini"></div>
+    </div>
+
+    <div class="box" style="border-color:var(--red)">
+      <h2 style="color:var(--red)">Gefahrenzone</h2>
+      <p class="mini">Löscht sämtliche Kästen, Karten und Statistiken dieses Kontos —
+        auf allen Geräten. Vorher sichern!</p>
+      <button class="btn gefahr mt" data-tu="allesLoeschen">Alle meine Daten löschen</button>
+    </div>`;
+
+  verdrahten(ziel);
+  diagnoseMalen();
+  $('#s-theme').addEventListener('change', ev => {
+    themeWunsch = ev.target.value;
+    S.einstellungen.theme = themeWunsch;
+    themeAnwenden(themeWunsch);
+    try { localStorage.setItem('lk2:theme', themeWunsch); } catch (_) {}
+    schreibe(FB.setDoc(refEinstellungen(), { theme: themeWunsch }, { merge: true }), 'Theme');
+  });
+}
+
+function diagnoseMalen() {
+  const d = $('#diag-status'); if (!d) return;
+  const alt = altdatenImBrowser();
+  const verwaist = verwaisteKarten();
+  d.innerHTML = `
+    Projekt: <code>${esc(CFG.projectId)}</code><br>
+    Firebase-SDK: <code>${esc(SDK_VERSION)}</code><br>
+    Verbindung: ${statusZustand.offen ? 'Änderungen unterwegs'
+      : navigator.onLine ? 'online' : 'offline'}<br>
+    Daten: ${S.decks.length} Kästen · ${S.cards.length} Karten<br>
+    Lerntag beginnt um ${TAGESGRENZE}:00 Uhr · heute = <code>${heute()}</code><br>
+    Altbestand im Browser: ${alt ? Object.keys(alt).length + ' Einträge gefunden' : 'nichts gefunden'}
+    ${verwaist.length ? `<div class="hinweis" style="margin-top:10px">
+      <strong>${verwaist.length} Karten ohne Kasten.</strong>
+      Sie tauchen in keiner Lernsitzung auf, werden aber in der Statistik mitgezählt.
+      <div style="margin-top:8px"><button class="btn klein" data-tu="verwaisteEinsammeln">
+        In einen Kasten einsammeln</button></div></div>` : ''}`;
+  verdrahten(d);
+}
+
+/* ---------- 14. Import / Export ---------------------------------------- */
+
+function dateiHerunterladen(name, inhalt, typ = 'application/json') {
+  const blob = new Blob([inhalt], { type: typ + ';charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+function dateiWaehlen(endung) {
+  return new Promise(fertig => {
+    const i = document.createElement('input');
+    i.type = 'file'; i.accept = endung;
+    i.addEventListener('cancel', () => fertig(null));
+    i.addEventListener('change', () => {
+      const f = i.files?.[0];
+      if (!f) return fertig(null);
+      const r = new FileReader();
+      r.onload = () => fertig({ name: f.name, text: String(r.result || '') });
+      r.onerror = () => fertig(null);
+      r.readAsText(f, 'utf-8');
+    });
+    i.click();
+  });
+}
+
+/* --- 14a. Export --- */
+
+async function exportJson() {
+  await reviewsLaden();          // sonst wäre der Verlauf in der Sicherung leer
+  const daten = {
+    app: 'Lernkartei 2', version: 2,
+    exportiertAm: new Date().toISOString(),
+    konto: S.email,
+    settings: S.einstellungen,
+    decks: S.decks,
+    cards: S.cards,
+    reviews: S.reviews
+  };
+  const name = `lernkartei2-${heute()}.json`;
+  dateiHerunterladen(name, JSON.stringify(daten, null, 2));
+  toast('Sicherung heruntergeladen: ' + name);
+}
+
+function csvFeld(s) { return '"' + String(s ?? '').replace(/"/g, '""') + '"'; }
+
+/** Karten als CSV "Frage";"Antwort";"Kasten" — mit BOM, damit Excel die
+ *  Umlaute richtig anzeigt. */
+function csvBauen(karten) {
+  return '\uFEFF' + karten.map(k =>
+    [k.frage, k.antwort, deckName(k.deckId)].map(csvFeld).join(';')).join('\r\n');
+}
+function dateiTeil(s) {
+  return String(s).replace(/[^\wäöüÄÖÜß -]+/g, '_').trim().slice(0, 40) || 'export';
+}
+
+/* --- 14b. CSV lesen --- */
+
+function csvZerlegen(text) {
+  text = text.replace(/^\uFEFF/, '');
+  const zeilen = [];
+  let feld = '', zeile = [], inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i], n = text[i + 1];
+    if (inQ) {
+      if (c === '"' && n === '"') { feld += '"'; i++; }
+      else if (c === '"') inQ = false;
+      else feld += c;
+    } else if (c === '"') inQ = true;
+    else if (c === ';' || c === '\t') { zeile.push(feld); feld = ''; }
+    else if (c === '\r') { /* ignorieren */ }
+    else if (c === '\n') { zeile.push(feld); zeilen.push(zeile); zeile = []; feld = ''; }
+    else feld += c;
+  }
+  if (feld !== '' || zeile.length) { zeile.push(feld); zeilen.push(zeile); }
+  return zeilen.filter(z => z.some(f => String(f).trim() !== ''));
+}
+
+/* --- 14c. Altbestand aus dem Browser --- */
+
+function altdatenImBrowser() {
+  try {
+    const out = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('lk:')) out[k] = localStorage.getItem(k);
+    }
+    return Object.keys(out).length ? out : null;
+  } catch (_) { return null; }
+}
+
+/* --- 14d. Alt-Format deuten --- */
+
+function jsonSanft(v) {
+  if (typeof v !== 'string') return v;
+  try { return JSON.parse(v); } catch (_) { return null; }
+}
+
+/**
+ * Erkennt und normalisiert:
+ *  - den JSON-Export von Lernkartei 1   { "lk:boxes":[…], "lk:cards:ID":[…], … }
+ *  - den „Referenz-Dump“ (gleiche Schlüssel, Werte als Zeichenketten)
+ *  - eine Verpackung  { data: { … } }  oder { storage: { … } }
+ *  - den eigenen Export von Lernkartei 2 { app:'Lernkartei 2', decks:[], cards:[] }
+ * Liefert { decks, cards, intervalle, meta, quelle } oder null.
+ */
+/** Kasten aus fremden Daten auf das eigene Schema bringen. */
+function deckNormalisieren(d, i) {
+  const q = (d && typeof d === 'object') ? d : {};
+  const farbe = String(q.farbe ?? q.color ?? '').trim();
+  return {
+    id: sichereId(q.id || neueId()),
+    name: String(q.name ?? 'Kasten').slice(0, 120) || 'Kasten',
+    farbe: /^#[0-9a-fA-F]{3,8}$/.test(farbe) ? farbe : DECK_FARBEN[i % DECK_FARBEN.length],
+    richtung: q.richtung === 'rueckwaerts' || q.richtung === 'beide' ? q.richtung : 'vorwaerts',
+    pruefungsdatum: isoOder(q.pruefungsdatum, null),
+    createdAt: isoOder(q.createdAt, heute()),
+    archiviert: !!q.archiviert
+  };
+}
+
+/** Karte aus fremden Daten auf das eigene Schema bringen.
+ *  Gilt für beide Quellen — jedes Feld wird erzwungen, damit kein Zahlenwert
+ *  in einem Datumsfeld später die Kartenliste blockiert. */
+function karteNormalisieren(k, deckId, ivListe) {
+  const q = (k && typeof k === 'object') ? k : {};
+  const hist = Array.isArray(q.history) ? q.history.filter(h => h && typeof h === 'object') : null;
+  const fach = zahl(q.fach, 1, 12, 1);
+  const reps = hist ? hist.length : zahl(q.reps, 0, 99999, 0);
+  const lapses = hist ? hist.filter(h => Number(h.rating) === 1).length : zahl(q.lapses, 0, 99999, 0);
+  const letzte = hist && hist.length ? hist[hist.length - 1] : null;
+  return {
+    id: sichereId(q.id || neueId()),
+    deckId,
+    frage: String(q.frage ?? q.front ?? '').trim(),
+    antwort: String(q.antwort ?? q.back ?? '').trim(),
+    notiz: String(q.notiz ?? '').trim(),
+    tags: Array.isArray(q.tags) ? q.tags.map(t => String(t).slice(0, 60)).slice(0, 30) : [],
+    typ: ['standard', 'cloze', 'bild'].includes(q.typ) ? q.typ : 'standard',
+    fach,
+    stability: Number.isFinite(Number(q.stability)) && Number(q.stability) > 0
+      ? Math.min(3650, Number(q.stability))
+      : (ivListe[fach - 1] ?? 1),                       // KONZEPT §9
+    difficulty: zahl(q.difficulty, 1, 10, 5),
+    due: isoOder(q.faellig ?? q.due, heute()),
+    lastReview: letzte ? isoOder(letzte.date, null) : isoOder(q.lastReview, null),
+    reps,
+    lapses,
+    state: [0, 1, 2, 3].includes(q.state) ? q.state : (reps ? 2 : 0),
+    suspendiert: !!q.suspendiert,
+    createdAt: isoOder(q.createdAt, heute())
+  };
+}
+
+/** Intervallliste absichern: genau zwölf Werte, jeder eine sinnvolle Zahl.
+ *  Liefert null, wenn die Quelle gar keine Intervalle mitbrachte — dann wird
+ *  auch nicht angeboten, die eigenen Einstellungen zu überschreiben. */
+/** Basis für die Stabilität beim Import: die Intervalle aus der Quelle, falls
+ *  vorhanden — sonst die, die in diesem Konto tatsächlich gelten. Nur so passt
+ *  die abgeleitete Stabilität zum Fach, wenn jemand eigene Intervalle pflegt. */
+function aktuelleIntervalle() {
+  const iv = S.einstellungen?.intervalle;
+  return (Array.isArray(iv) && iv.length === 12) ? iv : STANDARD_INTERVALLE;
+}
+
+function intervalleNormalisieren(roh) {
+  if (!Array.isArray(roh) || !roh.length) return null;
+  return Array.from({ length: 12 }, (_, i) =>
+    zahl(roh[i], 1, 3650, STANDARD_INTERVALLE[i]));
+}
+
+function altdatenDeuten(roh) {
+  let o = roh;
+  if (typeof o === 'string') o = jsonSanft(o);
+  if (!o || typeof o !== 'object') return null;
+
+  // Verpackungen abstreifen
+  for (const schluessel of ['data', 'storage', 'daten', 'payload']) {
+    if (o[schluessel] && typeof o[schluessel] === 'object' &&
+        Object.keys(o).some(k => !k.startsWith('lk:'))) {
+      const inner = o[schluessel];
+      if (Object.keys(inner).some(k => k.startsWith('lk:'))) { o = inner; break; }
+    }
+  }
+
+  // Eigener Export (Lernkartei 2)
+  if (Array.isArray(o.cards) && Array.isArray(o.decks)) {
+    const ivL2 = intervalleNormalisieren(o.settings?.intervalle);
+    const decks = o.decks.map(deckNormalisieren);
+    const bekannt = new Map(decks.map(d => [d.id, d.id]));
+    const auffang = { id: null };
+    const cards = o.cards.map(k => {
+      const roheId = sichereId((k && k.deckId) || '');
+      let ziel = bekannt.get(roheId);
+      if (!ziel) {                       // Karte ohne passenden Kasten auffangen
+        if (!auffang.id) {
+          const d = deckNormalisieren({ name: 'Ohne Kasten' }, decks.length);
+          auffang.id = d.id; decks.push(d);
+        }
+        ziel = auffang.id;
+      }
+      return karteNormalisieren(k, ziel, ivL2 || aktuelleIntervalle());
+    });
+    return {
+      quelle: 'Lernkartei 2',
+      decks, cards,
+      intervalle: ivL2,
+      meta: {
+        streak: zahl(o.settings?.streak, 0, 99999, 0),
+        lastLearnDate: isoOder(o.settings?.lastLearnDate, null)
+      },
+      reviews: Array.isArray(o.reviews) ? o.reviews.filter(r => r && typeof r === 'object') : []
+    };
+  }
+
+  const hol = k => jsonSanft(o[k]) ?? (typeof o[k] === 'object' ? o[k] : null);
+  const boxen = hol('lk:boxes');
+  if (!Array.isArray(boxen)) return null;
+
+  const meta = hol('lk:meta') || {};
+  const ivRoh = intervalleNormalisieren(hol('lk:intervals'));
+  const ivListe = ivRoh || aktuelleIntervalle();
+
+  const decks = [], cards = [];
+  const idKarte = new Map();     // alte deckId -> neue deckId
+
+  boxen.forEach(b => {
+    if (!b || typeof b !== 'object') return;
+    const alt = String(b.id ?? '');
+    const d = deckNormalisieren(b, decks.length);
+    idKarte.set(alt, d.id);
+    decks.push(d);
+  });
+
+  // Kartenlisten einsammeln — auch für Kästen, die in lk:boxes fehlen
+  Object.keys(o).filter(k => /^lk:cards:/.test(k)).forEach(schluessel => {
+    const altDeck = schluessel.slice('lk:cards:'.length);
+    let deckId = idKarte.get(altDeck);
+    if (!deckId) {                                    // verwaister Kartenstapel
+      const d = deckNormalisieren({ id: altDeck, name: 'Wiederhergestellt' }, decks.length);
+      deckId = d.id;
+      idKarte.set(altDeck, deckId);
+      decks.push(d);
+    }
+    const liste = hol(schluessel);
+    if (!Array.isArray(liste)) return;
+    liste.forEach(k => cards.push(karteNormalisieren(k, deckId, ivListe)));
+  });
+
+  return {
+    quelle: 'Lernkartei 1', decks, cards, reviews: [],
+    intervalle: ivRoh,
+    meta: {
+      streak: zahl(meta.streak, 0, 99999, 0),
+      lastLearnDate: isoOder(meta.lastLearnDate, null)
+    }
+  };
+}
+
+/** Deuten mit Netz und doppeltem Boden: eine kaputte Sicherungsdatei darf
+ *  nicht dazu führen, dass beim Klick einfach nichts geschieht. */
+function sicherDeuten(roh) {
+  try {
+    return altdatenDeuten(roh);
+  } catch (e) {
+    console.error('[Import]', e);
+    modal({
+      titel: 'Die Datei ließ sich nicht lesen',
+      html: `<p>Beim Auswerten der Daten ist etwas schiefgegangen. Der Bestand
+             im Konto wurde nicht angefasst.</p>
+             <p class="mini">Technische Meldung: ${esc(e?.message || String(e))}</p>
+             <p class="mini">Wenn es die JSON-Sicherung der alten App ist, hilft
+             oft der Weg über „Aus diesem Browser“ — dort werden die Daten direkt
+             gelesen statt aus der Datei.</p>`,
+      knoepfe: [{ text: 'Schließen', wert: 'ok', art: 'primary' }]
+    });
+    return null;
+  }
+}
+
+/* --- 14e. Import ausführen --- */
+
+async function importAusfuehren(geparst, quelleName) {
+  const leer = !geparst || (!geparst.decks.length && !geparst.cards.length);
+  if (leer) return toast('Keine übernehmbaren Daten gefunden.', 'fehler');
+
+  const gueltig = geparst.cards.filter(k => k.frage || k.antwort);
+  const bestand = S.cards.length;
+
+  const wahl = await modal({
+    titel: 'Import',
+    breit: true,
+    html: `
+      <p>Gefunden in <strong>${esc(quelleName)}</strong> (${esc(geparst.quelle)}):</p>
+      <div class="kennzahlen" style="margin:12px 0">
+        <div class="kennzahl"><b>${geparst.decks.length}</b><span>Kästen</span></div>
+        <div class="kennzahl"><b>${gueltig.length}</b><span>Karten</span></div>
+      </div>
+      ${bestand ? `
+        <p>In diesem Konto liegen bereits <strong>${bestand}</strong> Karten. Was soll passieren?</p>
+        <label class="karo"><input type="radio" name="konflikt" value="merge" checked>
+          <span><strong>Zusammenführen</strong> — Vorhandenes bleibt, Neues kommt dazu.
+          Karten mit gleicher Kennung werden übersprungen, gleichnamige Kästen wiederverwendet.</span></label>
+        <label class="karo"><input type="radio" name="konflikt" value="replace">
+          <span><strong>Ersetzen</strong> — alle bestehenden Kästen und Karten dieses Kontos
+          werden vorher gelöscht.</span></label>`
+        : '<p class="mini">Das Konto ist leer — es wird einfach alles angelegt.</p>'}
+      ${geparst.intervalle ? `<label class="karo" style="margin-top:8px">
+        <input type="checkbox" id="m-iv" checked>
+        <span>Intervalle aus der Sicherung übernehmen
+        (${esc(geparst.intervalle.slice(0, 6).join(' · '))} …)</span></label>` : ''}`,
+    knoepfe: [{ text: 'Abbrechen', wert: null },
+              { text: 'Übernehmen', wert: 'ok', art: 'primary' }]
+  });
+  if (wahl !== 'ok') return;
+
+  const modus = bestand ? WRadio('konflikt', 'merge') : 'merge';
+  const ivUebernehmen = letzteWerte['m-iv'] === true;
+
+  await importSchreiben(geparst, modus, ivUebernehmen);
+}
+
+async function importSchreiben(geparst, modus, ivUebernehmen) {
+  const ops = [];
+
+  if (modus === 'replace') {
+    // Nur das löschen, was nicht ohnehin gleich überschrieben wird. Sonst
+    // könnten Löschen und Neuschreiben in getrennten Stapeln in falscher
+    // Reihenfolge beim Server ankommen und die Karte wäre weg.
+    const kommtNeu = new Set(geparst.cards.map(k => k.id));
+    const deckKommtNeu = new Set(geparst.decks.map(d => d.id));
+    S.decks.forEach(d => { if (!deckKommtNeu.has(d.id)) ops.push(['del', FB.doc(colDecks(), d.id)]); });
+    S.cards.forEach(k => { if (!kommtNeu.has(k.id)) ops.push(['del', FB.doc(colCards(), k.id)]); });
+  }
+
+  // Kästen: bei Zusammenführen gleichnamige wiederverwenden
+  const deckZuordnung = new Map();
+  const vorhandenNachName = new Map(
+    modus === 'replace' ? [] : S.decks.map(d => [(d.name || '').toLowerCase(), d.id]));
+  const vorhandenIds = new Set(modus === 'replace' ? [] : S.decks.map(d => d.id));
+
+  geparst.decks.forEach(d => {
+    const gleichName = vorhandenNachName.get((d.name || '').toLowerCase());
+    if (modus === 'merge' && gleichName) { deckZuordnung.set(d.id, gleichName); return; }
+    if (modus === 'merge' && vorhandenIds.has(d.id)) { deckZuordnung.set(d.id, d.id); return; }
+    deckZuordnung.set(d.id, d.id);
+    const { id, ...rest } = d;
+    ops.push(['set', FB.doc(colDecks(), d.id), rest]);
+  });
+
+  const vorhandeneKarten = new Set(modus === 'replace' ? [] : S.cards.map(k => k.id));
+  let uebersprungen = 0, geschrieben = 0;
+
+  geparst.cards.forEach(k => {
+    if (!k.frage && !k.antwort) return;
+    if (modus === 'merge' && vorhandeneKarten.has(k.id)) { uebersprungen++; return; }
+    const { id, ...rest } = k;
+    rest.deckId = deckZuordnung.get(k.deckId) || k.deckId;
+    if (!rest.deckId) return;
+    ops.push(['set', FB.doc(colCards(), id), rest]);
+    geschrieben++;
+  });
+
+  // Beides in EINEN Schreibvorgang: zwei Änderungen am selben Dokument
+  // innerhalb eines Stapels lehnt Firestore ab.
+  const einstellungenPatch = {};
+  if (ivUebernehmen && geparst.intervalle)
+    einstellungenPatch.intervalle = geparst.intervalle.slice(0, 12);
+  if (geparst.meta && (geparst.meta.streak || geparst.meta.lastLearnDate)) {
+    einstellungenPatch.streak = geparst.meta.streak || 0;
+    einstellungenPatch.lastLearnDate = geparst.meta.lastLearnDate || null;
+  }
+  if (Object.keys(einstellungenPatch).length)
+    ops.push(['set', refEinstellungen(), einstellungenPatch, true]);
+  (geparst.reviews || []).forEach(r => {
+    const tag = String(r.datum || r.id || '').slice(0, 10);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(tag)) {
+      const { id, ...rest } = r;
+      ops.push(['set', FB.doc(colReviews(), tag), { ...rest, datum: tag }, true]);
+    }
+  });
+
+  // In Häppchen schreiben (Firestore erlaubt 500 Vorgänge pro Stapel)
+  const GROESSE = 400;
+  for (let i = 0; i < ops.length; i += GROESSE) {
+    const b = FB.writeBatch(db);
+    ops.slice(i, i + GROESSE).forEach(([art, ref, daten, merge]) => {
+      if (art === 'del') b.delete(ref);
+      else b.set(ref, daten, merge ? { merge: true } : undefined);
+    });
+    schreibe(b.commit(), 'Import-Stapel ' + (i / GROESSE + 1));
+  }
+
+  S.reviewsGeladen = false;
+  await modal({
+    titel: 'Import abgeschlossen',
+    html: `<p><strong>${geschrieben}</strong> Karten und
+      <strong>${geparst.decks.length}</strong> Kästen übernommen.
+      ${uebersprungen ? `<br>${uebersprungen} Karten waren schon vorhanden und wurden übersprungen.` : ''}</p>
+      <p class="mini">Die Daten sind sofort nutzbar. Die Übertragung zu Firestore läuft im
+      Hintergrund weiter — der Punkt oben rechts wird grün, sobald alles angekommen ist.</p>`,
+    knoepfe: [{ text: 'Gut', wert: 'ok', art: 'primary' }]
+  });
+  seiteZeigen('kaesten');
+}
+
+/* ---------- 15. Aktionen verdrahten ------------------------------------ */
+
+function aktionsFehler(e) {
+  console.error('[Aktion]', e);
+  toast('Das hat nicht geklappt: ' + (e?.message || e), 'fehler');
+}
+
+function verdrahten(wurzel) {
+  $$('[data-tu]', wurzel).forEach(el => {
+    if (el._verdrahtet) return;
+    el._verdrahtet = true;
+    el.addEventListener('click', () => {
+      // Ohne diesen Mantel würde ein Fehler in einer Aktion stumm in der
+      // Konsole verschwinden — der Nutzer sähe nur, dass nichts passiert.
+      try {
+        const r = AKTION[el.dataset.tu]?.(el.dataset.id, el);
+        if (r && typeof r.then === 'function') r.catch(aktionsFehler);
+      } catch (e) { aktionsFehler(e); }
+    });
+  });
+}
+
+const AKTION = {
+  /* Lernen */
+  alleAn:  () => { lernAuswahl = new Set(S.decks.map(d => d.id)); malLernen(); },
+  alleAus: () => { lernAuswahl = new Set(); malLernen(); },
+  starten: () => sitzungStarten(),
+  umdrehen: () => umdrehen(),
+  abbrechen: () => sitzungBeenden(false),
+  nochmal: () => { sitzung = null; letzteSitzung = null; malLernen(); },
+  zuStatistik: () => seiteZeigen('statistik'),
+  zuEinstellungen: () => seiteZeigen('einstellungen'),
+  ersterKasten: () => AKTION.neuerKasten(),
+
+  /* Kästen */
+  neuerKasten: () => deckAnlegen(),
+  deckBearbeiten: async id => {
+    const d = S.decks.find(x => x.id === id); if (!d) return;
+    const r = await modal({
+      titel: 'Kasten bearbeiten',
+      html: `<label class="feld"><span>Name</span>
+               <input id="m-name" maxlength="120" value="${esc(d.name)}"></label>
+             ${farbwahlHtml(d.farbe)}
+             <p class="mini">${kartenVon(id).length} Karten in diesem Kasten.</p>`,
+      knoepfe: [{ text: 'Abbrechen', wert: null }, {
+        text: 'Speichern', wert: 'ok', art: 'primary',
+        pruefen: () => {
+          if (!$('#m-name').value.trim()) { toast('Bitte einen Namen eingeben.'); return false; }
+        }
+      }],
+      beimOeffnen: m => farbwahlVerdrahten(m, d.farbe)
+    });
+    if (r !== 'ok') return;
+    schreibe(FB.updateDoc(FB.doc(colDecks(), id), {
+      name: String(W('m-name', d.name)).trim().slice(0, 120),
+      farbe: W('farbe', d.farbe)
+    }), 'Kasten ändern');
+    toast('Gespeichert.');
   },
-  async set(k,v){
-    if(window.storage){try{return await window.storage.set(k,v)}catch(e){}}
-    localStorage.setItem(k,v);
+  deckLoeschen: async id => {
+    const d = S.decks.find(x => x.id === id); if (!d) return;
+    const anzahl = kartenVon(id).length;
+    if (!await frage('Kasten löschen',
+      `„${esc(d.name)}“ mit <strong>${anzahl}</strong> ${anzahl === 1 ? 'Karte' : 'Karten'}
+       endgültig löschen? Das lässt sich nicht rückgängig machen.`,
+      'Endgültig löschen', 'gefahr')) return;
+    // Erst die Karten, dann der Kasten. Bricht etwas dazwischen ab, bleibt der
+    // Kasten stehen — besser als Karten, die zu nichts mehr gehören.
+    const ops = [...kartenVon(id).map(k => FB.doc(colCards(), k.id)), FB.doc(colDecks(), id)];
+    for (let i = 0; i < ops.length; i += 400) {
+      const b = FB.writeBatch(db);
+      ops.slice(i, i + 400).forEach(r => b.delete(r));
+      schreibe(b.commit(), 'Kasten löschen');
+    }
+    lernAuswahl?.delete(id);
+    toast('Kasten gelöscht.');
   },
-  async delete(k){
-    if(window.storage){try{return await window.storage.delete(k)}catch(e){}}
-    localStorage.removeItem(k);
+  deckCsv: id => {
+    const karten = kartenVon(id);
+    if (!karten.length) return toast('Dieser Kasten ist leer.');
+    dateiHerunterladen(`lernkartei-${dateiTeil(deckName(id))}-${heute()}.csv`,
+      csvBauen(karten), 'text/csv');
+    toast('CSV heruntergeladen.');
   },
-  async list(prefix){
-    if(window.storage){try{return await window.storage.list(prefix)}catch(e){}}
-    return {keys: Object.keys(localStorage).filter(k=>k.startsWith(prefix))};
+
+  /* Karten */
+  neueKarte: () => karteBearbeiten(null),
+  karteBearbeiten: id => karteBearbeiten(id),
+  karteLoeschen: async id => {
+    const k = S.cards.find(x => x.id === id); if (!k) return;
+    if (!await frage('Karte löschen', `„${esc((k.frage || '').slice(0, 80))}“ löschen?`,
+      'Löschen', 'gefahr')) return;
+    S.auswahl.delete(id);
+    schreibe(FB.deleteDoc(FB.doc(colCards(), id)), 'Karte löschen');
+    toast('Karte gelöscht.');
+  },
+  mehrKarten: () => { S.kartenLimit += 60; malKarten(); },
+  massAus: () => { S.auswahl.clear(); malKarten(); },
+  massLoeschen: async () => {
+    const n = S.auswahl.size;
+    if (!await frage('Karten löschen', `<strong>${n}</strong> ausgewählte Karten löschen?`,
+      'Löschen', 'gefahr')) return;
+    const ids = Array.from(S.auswahl);
+    for (let i = 0; i < ids.length; i += 400) {
+      const b = FB.writeBatch(db);
+      ids.slice(i, i + 400).forEach(x => b.delete(FB.doc(colCards(), x)));
+      schreibe(b.commit(), 'Karten löschen');
+    }
+    S.auswahl.clear();
+    toast(n + ' Karten gelöscht.');
+  },
+  massVerschieben: async () => {
+    if (!S.decks.length) return;
+    const r = await modal({
+      titel: 'Karten verschieben',
+      html: `<p>${S.auswahl.size} Karten in welchen Kasten?</p>
+        <label class="feld"><span>Ziel</span><select id="m-deck">${S.decks.map(d =>
+          `<option value="${esc(d.id)}">${esc(d.name)}</option>`).join('')}</select></label>`,
+      knoepfe: [{ text: 'Abbrechen', wert: null }, { text: 'Verschieben', wert: 'ok', art: 'primary' }]
+    });
+    if (r !== 'ok') return;
+    const ziel = W('m-deck', S.decks[0].id);
+    // Nur vorhandene Karten: ein update auf ein gelöschtes Dokument ließe den
+    // gesamten Stapel scheitern, nicht nur die eine Karte.
+    const vorhanden = new Set(S.cards.map(k => k.id));
+    const ids = Array.from(S.auswahl).filter(x => vorhanden.has(x));
+    if (!ids.length) { S.auswahl.clear(); return toast('Keine der Karten ist noch vorhanden.'); }
+    for (let i = 0; i < ids.length; i += 400) {
+      const b = FB.writeBatch(db);
+      ids.slice(i, i + 400).forEach(x => b.update(FB.doc(colCards(), x), { deckId: ziel }));
+      schreibe(b.commit(), 'Karten verschieben');
+    }
+    S.auswahl.clear();
+    toast('Verschoben.');
+  },
+
+  /* Einstellungen */
+  abmelden: async () => {
+    if (!await frage('Abmelden', 'Wirklich abmelden? Die Daten bleiben in Firestore.', 'Abmelden')) return;
+    try { await FB.signOut(auth); } catch (e) { toast(authFehler(e), 'fehler'); }
+  },
+  pwMail: async () => {
+    if (!S.email) return;
+    if (!await frage('Passwort ändern',
+      `An <strong>${esc(S.email)}</strong> eine E-Mail zum Setzen eines neuen Passworts schicken?`,
+      'E-Mail senden')) return;
+    try { await FB.sendPasswordResetEmail(auth, S.email); toast('E-Mail ist unterwegs.'); }
+    catch (e) { toast(authFehler(e), 'fehler'); }
+  },
+  ivSpeichern: () => {
+    const werte = $$('.s-iv').map((el, i) => zahl(el.value, 1, 3650, STANDARD_INTERVALLE[i]));
+    for (let i = 1; i < werte.length; i++) {
+      if (werte[i] < werte[i - 1]) {
+        return toast(`Fach ${i + 1} darf nicht kürzer sein als Fach ${i}.`, 'fehler');
+      }
+    }
+    S.einstellungen.intervalle = werte;
+    schreibe(FB.setDoc(refEinstellungen(), { intervalle: werte }, { merge: true }), 'Intervalle');
+    toast('Intervalle gespeichert.');
+    malEinstellungen();
+  },
+  ivZuruecksetzen: async () => {
+    if (!await frage('Zurücksetzen',
+      'Intervalle auf die Voreinstellung 1 · 3 · 7 · 14 · 21 · 30 · 45 · 60 · 90 · 120 · 180 · 365 zurücksetzen?',
+      'Zurücksetzen')) return;
+    S.einstellungen.intervalle = STANDARD_INTERVALLE.slice();
+    schreibe(FB.setDoc(refEinstellungen(),
+      { intervalle: STANDARD_INTERVALLE.slice() }, { merge: true }), 'Intervalle');
+    malEinstellungen();
+  },
+
+  /* Import / Export */
+  altBrowser: async () => {
+    const roh = altdatenImBrowser();
+    if (!roh) return modal({
+      titel: 'Nichts gefunden',
+      html: `<p>In diesem Browser liegen unter dieser Web-Adresse keine Daten der
+        Vorgängerversion.</p>
+        <p class="mini">Das ist normal, wenn du gerade an einem anderen Gerät oder in einem
+        anderen Browser sitzt oder die Browserdaten gelöscht wurden. Nimm dann den Weg
+        über die JSON-Datei.</p>`,
+      knoepfe: [{ text: 'Verstanden', wert: 'ok', art: 'primary' }]
+    });
+    const geparst = sicherDeuten(roh);
+    if (!geparst) return toast('Die gefundenen Daten sind nicht lesbar.', 'fehler');
+    await importAusfuehren(geparst, 'diesem Browser');
+  },
+  altDatei: () => AKTION.impJson(),
+  impJson: async () => {
+    const d = await dateiWaehlen('.json,application/json');
+    if (!d) return;
+    const roh = jsonSanft(d.text);
+    if (!roh) return toast('Die Datei ist kein gültiges JSON.', 'fehler');
+    const geparst = sicherDeuten(roh);
+    if (!geparst) return modal({
+      titel: 'Format nicht erkannt',
+      html: `<p>Die Datei <code>${esc(d.name)}</code> passt zu keinem bekannten Format.</p>
+        <p class="mini">Erwartet wird der JSON-Export von Lernkartei 1
+        (Schlüssel <code>lk:boxes</code>, <code>lk:cards:…</code>) oder eine Sicherung
+        von Lernkartei 2.</p>
+        <pre class="code">${esc(d.text.slice(0, 400))}</pre>`,
+      knoepfe: [{ text: 'Schließen', wert: 'ok', art: 'primary' }]
+    });
+    await importAusfuehren(geparst, d.name);
+  },
+  expJson: () => exportJson(),
+  expCsv: async () => {
+    if (!S.decks.length) return toast('Keine Kästen vorhanden.');
+    const r = await modal({
+      titel: 'Als CSV sichern',
+      html: `<label class="feld"><span>Kasten</span><select id="m-deck">
+        <option value="alle">Alle Kästen zusammen (${S.cards.length} Karten)</option>
+        ${S.decks.map(d => `<option value="${esc(d.id)}">${esc(d.name)} (${kartenVon(d.id).length})</option>`).join('')}
+        </select></label><p class="mini">Format: Frage;Antwort;Kasten</p>`,
+      knoepfe: [{ text: 'Abbrechen', wert: null }, { text: 'Herunterladen', wert: 'ok', art: 'primary' }]
+    });
+    if (r !== 'ok') return;
+    const wahl = W('m-deck', 'alle');
+    const karten = wahl === 'alle' ? S.cards : kartenVon(wahl);
+    if (!karten.length) return toast('Keine Karten zum Sichern.');
+    dateiHerunterladen(
+      `lernkartei-${wahl === 'alle' ? 'alle' : dateiTeil(deckName(wahl))}-${heute()}.csv`,
+      csvBauen(karten), 'text/csv');
+    toast('CSV heruntergeladen.');
+  },
+  impCsv: async () => {
+    const d = await dateiWaehlen('.csv,.txt,text/csv');
+    if (!d) return;
+    let zeilen = csvZerlegen(d.text);
+    if (!zeilen.length) return toast('Die Datei ist leer.', 'fehler');
+    const kopf = zeilen[0].map(x => x.trim().toLowerCase());
+    if (kopf[0] === 'frage' && (kopf[1] || '') === 'antwort') zeilen = zeilen.slice(1);
+
+    const decksNeu = new Map(S.decks.map(d2 => [(d2.name || '').toLowerCase(), d2.id]));
+    const anzulegen = [];
+    const karten = [];
+    let fehler = 0;
+
+    zeilen.forEach(z => {
+      const frage = (z[0] || '').trim(), antwort = (z[1] || '').trim();
+      if (!frage || !antwort) { fehler++; return; }
+      const kastenName = (z[2] || 'Import').trim() || 'Import';
+      let deckId = decksNeu.get(kastenName.toLowerCase());
+      if (!deckId) {
+        deckId = neueId();
+        decksNeu.set(kastenName.toLowerCase(), deckId);
+        anzulegen.push({ id: deckId, ...neuesDeck(kastenName) });
+      }
+      karten.push({ id: neueId(), ...neueKarte({ deckId, frage, antwort, notiz: (z[3] || '').trim() }) });
+    });
+
+    if (!karten.length) return toast('Keine gültigen Zeilen gefunden.', 'fehler');
+
+    const ok = await frage('CSV einlesen',
+      `<strong>${karten.length}</strong> Karten in
+       <strong>${anzulegen.length ? anzulegen.length + ' neue' : 'bestehende'}</strong> Kästen einlesen?
+       ${fehler ? `<br><span class="mini">${fehler} Zeilen ohne Frage oder Antwort werden übersprungen.</span>` : ''}`,
+      'Einlesen');
+    if (!ok) return;
+
+    const ops = [
+      ...anzulegen.map(d2 => { const { id, ...rest } = d2; return ['set', FB.doc(colDecks(), id), rest]; }),
+      ...karten.map(k => { const { id, ...rest } = k; return ['set', FB.doc(colCards(), id), rest]; })
+    ];
+    for (let i = 0; i < ops.length; i += 400) {
+      const b = FB.writeBatch(db);
+      ops.slice(i, i + 400).forEach(([, ref, daten]) => b.set(ref, daten));
+      schreibe(b.commit(), 'CSV-Import');
+    }
+    toast(karten.length + ' Karten eingelesen.');
+    seiteZeigen('karten');
+  },
+
+  verwaisteEinsammeln: async () => {
+    const verwaist = verwaisteKarten();
+    if (!verwaist.length) return toast('Es gibt keine Karten ohne Kasten.');
+    const r = await modal({
+      titel: 'Karten ohne Kasten einsammeln',
+      html: `<p><strong>${verwaist.length}</strong> Karten gehören zu keinem
+             vorhandenen Kasten. Wohin damit?</p>
+             <label class="feld"><span>Ziel</span><select id="m-deck">
+               <option value="neu">Neuer Kasten „Wiederhergestellt“</option>
+               ${S.decks.map(x => `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('')}
+             </select></label>`,
+      knoepfe: [{ text: 'Abbrechen', wert: null },
+                { text: 'Einsammeln', wert: 'ok', art: 'primary' }]
+    });
+    if (r !== 'ok') return;
+    let ziel = W('m-deck', 'neu');
+    if (ziel === 'neu') {
+      ziel = neueId();
+      schreibe(FB.setDoc(FB.doc(colDecks(), ziel), neuesDeck('Wiederhergestellt')), 'Kasten anlegen');
+      lernAuswahl?.add(ziel);
+    }
+    for (let i = 0; i < verwaist.length; i += 400) {
+      const b = FB.writeBatch(db);
+      verwaist.slice(i, i + 400).forEach(k => b.update(FB.doc(colCards(), k.id), { deckId: ziel }));
+      schreibe(b.commit(), 'Verwaiste einsammeln');
+    }
+    toast(verwaist.length + ' Karten eingesammelt.');
+    seiteZeigen('karten');
+  },
+
+  allesLoeschen: async () => {
+    if (!await frage('Alles löschen',
+      `Sämtliche <strong>${S.cards.length} Karten</strong> und
+       <strong>${S.decks.length} Kästen</strong> dieses Kontos werden gelöscht — auf allen Geräten.
+       <br><br>Vorher sichern? Dann jetzt abbrechen und „Alles als JSON sichern“ nutzen.`,
+      'Weiter', 'gefahr')) return;
+    const bestaetigt = await modal({
+      titel: 'Wirklich alles löschen?',
+      html: `<p>Zum Bestätigen bitte <strong>LÖSCHEN</strong> eintippen.</p>
+             <input id="m-conf" placeholder="LÖSCHEN" autocapitalize="characters">`,
+      knoepfe: [{ text: 'Abbrechen', wert: null },
+        { text: 'Endgültig löschen', wert: 'ok', art: 'gefahr',
+          pruefen: () => { if ($('#m-conf').value.trim().toUpperCase() !== 'LÖSCHEN') {
+            toast('Bitte LÖSCHEN eintippen.'); return false; } } }]
+    });
+    if (bestaetigt !== 'ok') return;
+
+    await reviewsLaden(true);      // alle Tagesstatistiken, nicht nur die letzten 70 Tage
+    const ops = [
+      ...S.cards.map(k => FB.doc(colCards(), k.id)),
+      ...S.decks.map(d => FB.doc(colDecks(), d.id)),
+      ...S.reviews.map(r => FB.doc(colReviews(), r.id || r.datum))
+    ];
+    for (let i = 0; i < ops.length; i += 400) {
+      const b = FB.writeBatch(db);
+      ops.slice(i, i + 400).forEach(r => b.delete(r));
+      schreibe(b.commit(), 'Alles löschen');
+    }
+    schreibe(FB.setDoc(refEinstellungen(),
+      Object.assign(STANDARD_EINSTELLUNGEN(), { theme: S.einstellungen.theme })), 'Zurücksetzen');
+    S.auswahl.clear(); S.reviewsGeladen = false;
+    toast('Alle Daten gelöscht.');
+    seiteZeigen('lernen');
   }
 };
 
-async function loadAll(){
-  const m=await STORE.get('lk:meta'); meta=m?JSON.parse(m.value):{version:1,streak:0,lastLearnDate:''};
-  const b=await STORE.get('lk:boxes'); boxes=b?JSON.parse(b.value):[];
-  allCards={};
-  for(const box of boxes){const c=await STORE.get('lk:cards:'+box.id); allCards[box.id]=c?JSON.parse(c.value):[];}
-  const iv=await STORE.get('lk:intervals'); if(iv) intervals=JSON.parse(iv.value);
-  const cid=await STORE.get('lk:gdrive-clientid'); if(cid) {
-    const el=document.getElementById('goog-client-id'); if(el) el.value=cid.value;
-  }
-  const as=await STORE.get('lk:gdrive-autosync'); gAutoSync=as?JSON.parse(as.value):false;
-  const fi=await STORE.get('lk:gdrive-fileid'); if(fi) gFileId=fi.value;
-  const ls=await STORE.get('lk:gdrive-lastsync'); if(ls) updateLastSyncInfo(ls.value);
-  updateAutoSyncBtn();
-}
 
-async function saveBoxes(){await STORE.set('lk:boxes',JSON.stringify(boxes))}
-async function saveCards(id){await STORE.set('lk:cards:'+id,JSON.stringify(allCards[id]||[]))}
-async function saveMeta(){await STORE.set('lk:meta',JSON.stringify(meta))}
-async function saveIntervalsSt(){await STORE.set('lk:intervals',JSON.stringify(intervals))}
+/* ---------- 16. Tastatur ------------------------------------------------ */
 
-function today(){return new Date().toISOString().slice(0,10)}
-function addDays(date,n){const d=new Date(date);d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
-function isDue(card){return !card.faellig||card.faellig<=today()}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+document.addEventListener('keydown', e => {
+  if (!S.uid) return;
+  const t = e.target;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+  if (!$('#modal-bg').hidden) return;
 
-function renderAntwort(text){
-  if(!text)return '';
-  const lines=text.split('\n');
-  let html='',inUl=false,inOl=false;
-  for(let line of lines){
-    const ulM=line.match(/^[-*•]\s+(.*)/);
-    const olM=line.match(/^\d+\.\s+(.*)/);
-    if(ulM){if(!inUl){if(inOl){html+='</ol>';inOl=false;}html+='<ul>';inUl=true;}html+=`<li>${escHtml(ulM[1])}</li>`;}
-    else if(olM){if(!inOl){if(inUl){html+='</ul>';inUl=false;}html+='<ol>';inOl=true;}html+=`<li>${escHtml(olM[1])}</li>`;}
-    else{if(inUl){html+='</ul>';inUl=false;}if(inOl){html+='</ol>';inOl=false;}html+=line?`<p style="margin:0 0 2px">${escHtml(line)}</p>`:'<br>';}
-  }
-  if(inUl)html+='</ul>';if(inOl)html+='</ol>';
-  return html;
-}
-function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-
-// ─── NAVIGATION ───
-function showPage(p){
-  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
-  document.getElementById('page-'+p).classList.add('active');
-  document.querySelectorAll('nav button[data-page]').forEach(b=>b.classList.remove('active'));
-  document.querySelector(`nav button[data-page="${p}"]`).classList.add('active');
-  if(p==='lernen')renderLernen();
-  if(p==='kaesten')renderBoxes();
-  if(p==='karten')renderCards();
-  if(p==='statistik')renderStats();
-  if(p==='einstellungen')renderIntervals();
-}
-
-function toast(msg,dur=2500){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),dur);
-}
-
-// ─── GOOGLE DRIVE AUTH ───
-async function saveClientId(){
-  const val=document.getElementById('goog-client-id')?.value.trim()||'';
-  await STORE.set('lk:gdrive-clientid',val);
-}
-
-function getClientId(){
-  if(GOOGLE_CLIENT_ID) return GOOGLE_CLIENT_ID;
-  return (document.getElementById('goog-client-id')?.value||'').trim();
-}
-
-function gdriveLogin(){
-  const clientId=getClientId();
-  if(!clientId){
-    document.getElementById('gdrive-setup-hint').style.display='block';
-    toast('Bitte zuerst Client-ID eintragen',3000);return;
-  }
-  document.getElementById('gdrive-setup-hint').style.display='none';
-  const redirectUri=window.location.origin+window.location.pathname;
-  const params=new URLSearchParams({
-    client_id:clientId,
-    redirect_uri:redirectUri,
-    response_type:'token',
-    scope:GDRIVE_SCOPE,
-    include_granted_scopes:'true',
-    prompt:'select_account'
-  });
-  window.location.href='https://accounts.google.com/o/oauth2/v2/auth?'+params.toString();
-}
-
-function gdriveLogout(){
-  gAccessToken=null;gUserName='';gFileId=null;
-  STORE.delete('lk:gdrive-fileid');
-  updateDriveUI();toast('Von Google abgemeldet');
-}
-
-function handleOAuthCallback(){
-  const hash=window.location.hash;
-  if(!hash)return;
-  const params=new URLSearchParams(hash.slice(1));
-  const token=params.get('access_token');
-  if(!token)return;
-  gAccessToken=token;
-  history.replaceState(null,'',window.location.pathname);
-  fetchUserInfo();
-  toast('Mit Google Drive verbunden ✓',3000);
-  if(gAutoSync)gdrivePull();
-}
-
-async function fetchUserInfo(){
-  if(!gAccessToken)return;
-  try{
-    const r=await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+gAccessToken}});
-    const d=await r.json();
-    gUserName=d.name||d.email||'Google-Nutzer';
-    updateDriveUI();
-  }catch(e){updateDriveUI();}
-}
-
-function updateDriveUI(){
-  const connected=!!gAccessToken;
-  const statusEl=document.getElementById('gdrive-status');
-  const labelEl=document.getElementById('gdrive-label');
-  const loginBtn=document.getElementById('btn-gdrive-login');
-  const logoutBtn=document.getElementById('btn-gdrive-logout');
-  const syncBtns=document.getElementById('gdrive-sync-btns');
-  const userInfo=document.getElementById('gdrive-user-info');
-  if(statusEl){statusEl.className='';statusEl.classList.add(connected?'connected':'');}
-  if(labelEl)labelEl.textContent=connected?'Drive verbunden':'Nicht verbunden';
-  if(loginBtn)loginBtn.style.display=connected?'none':'inline-flex';
-  if(logoutBtn)logoutBtn.style.display=connected?'inline-flex':'none';
-  if(syncBtns)syncBtns.style.display=connected?'flex':'none';
-  if(userInfo)userInfo.textContent=connected?'Angemeldet als: '+gUserName:'';
-}
-
-// ─── GOOGLE DRIVE API ───
-async function gdriveFindFile(){
-  if(!gAccessToken)return null;
-  const q=encodeURIComponent(`name='${GDRIVE_FILE_NAME}' and trashed=false`);
-  const r=await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,modifiedTime)`,
-    {headers:{Authorization:'Bearer '+gAccessToken}});
-  const d=await r.json();
-  if(d.files&&d.files.length>0){gFileId=d.files[0].id;await STORE.set('lk:gdrive-fileid',gFileId);return gFileId;}
-  return null;
-}
-
-async function gdrivePush(){
-  if(!gAccessToken){toast('Bitte zuerst mit Google anmelden');return;}
-  toast('Wird hochgeladen…');
-  try{
-    const data=buildExportData();
-    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-    if(!gFileId)gFileId=await gdriveFindFile();
-    let r;
-    if(gFileId){
-      r=await fetch(`https://www.googleapis.com/upload/drive/v3/files/${gFileId}?uploadType=media`,
-        {method:'PATCH',headers:{Authorization:'Bearer '+gAccessToken,'Content-Type':'application/json'},body:blob});
-    } else {
-      const meta=JSON.stringify({name:GDRIVE_FILE_NAME,mimeType:'application/json'});
-      const form=new FormData();
-      form.append('metadata',new Blob([meta],{type:'application/json'}));
-      form.append('file',blob);
-      r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
-        {method:'POST',headers:{Authorization:'Bearer '+gAccessToken},body:form});
-      const d=await r.json();gFileId=d.id;
-      await STORE.set('lk:gdrive-fileid',gFileId);
+  if (sitzung?.aktiv) {
+    if (e.code === 'Space' || e.key === ' ') {
+      e.preventDefault();
+      sitzung.aufgedeckt ? null : umdrehen();
+      return;
     }
-    if(r.ok){
-      const now=new Date().toLocaleString('de-DE');
-      await STORE.set('lk:gdrive-lastsync',now);
-      updateLastSyncInfo(now);
-      toast('✓ Erfolgreich zu Google Drive hochgeladen',3000);
-    } else {toast('Fehler beim Hochladen ('+r.status+')',4000);}
-  }catch(e){toast('Fehler: '+e.message,4000);}
-}
-
-async function gdrivePull(){
-  if(!gAccessToken){toast('Bitte zuerst mit Google anmelden');return;}
-  toast('Wird geladen…');
-  try{
-    if(!gFileId)gFileId=await gdriveFindFile();
-    if(!gFileId){toast('Keine Datei in Drive gefunden. Zuerst hochladen.',4000);return;}
-    const r=await fetch(`https://www.googleapis.com/drive/v3/files/${gFileId}?alt=media`,
-      {headers:{Authorization:'Bearer '+gAccessToken}});
-    if(!r.ok){toast('Fehler beim Laden ('+r.status+')',4000);return;}
-    const data=await r.json();
-    await restoreFromData(data);
-    const now=new Date().toLocaleString('de-DE');
-    await STORE.set('lk:gdrive-lastsync',now);
-    updateLastSyncInfo(now);
-    toast('✓ Daten von Google Drive geladen',3000);
-    renderBoxes();renderCards();renderLernen();
-  }catch(e){toast('Fehler: '+e.message,4000);}
-}
-
-async function gdriveAutoSync(){
-  gAutoSync=!gAutoSync;
-  await STORE.set('lk:gdrive-autosync',JSON.stringify(gAutoSync));
-  updateAutoSyncBtn();
-  toast('Auto-Sync: '+(gAutoSync?'AN':'AUS'));
-}
-
-function updateAutoSyncBtn(){
-  const btn=document.getElementById('btn-autosync');
-  if(btn)btn.textContent='🔄 Auto-Sync: '+(gAutoSync?'AN':'AUS');
-}
-
-function updateLastSyncInfo(ts){
-  const el=document.getElementById('last-sync-info');
-  if(el&&ts)el.textContent='Letzte Synchronisation: '+ts;
-}
-
-async function autoSyncIfEnabled(){
-  if(gAutoSync&&gAccessToken)await gdrivePush();
-}
-
-// ─── LERNEN ───
-function renderLernen(){
-  const el=document.getElementById('box-checkboxes');el.innerHTML='';
-  if(!boxes.length){el.innerHTML='<span style="font-size:14px;color:var(--txt3)">Keine Kästen vorhanden.</span>';return;}
-  boxes.forEach(box=>{
-    const total=(allCards[box.id]||[]).length;
-    const due=(allCards[box.id]||[]).filter(isDue).length;
-    const label=document.createElement('label');
-    label.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 12px;border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:6px;cursor:pointer;font-size:14px';
-    label.innerHTML=`<input type="checkbox" value="${box.id}" checked style="width:auto">
-      <span class="box-color-dot" style="background:${box.color}"></span>
-      <span style="flex:1">${escHtml(box.name)}</span>
-      <span style="font-size:12px;color:var(--txt3)">${due} fällig / ${total}</span>`;
-    el.appendChild(label);
-  });
-  const totalDue=Object.values(allCards).flat().filter(isDue).length;
-  document.getElementById('due-summary').textContent=`Gesamt fällig: ${totalDue} Karte${totalDue!==1?'n':''}`;
-  const{streak}=meta;
-  document.getElementById('streak-display').innerHTML=streak>0?`<span style="font-size:14px">🔥 Streak: <b>${streak}</b> Tag${streak!==1?'e':''}</span>`:'';
-}
-
-function startSession(){
-  const boxIds=[...(document.querySelectorAll('#box-checkboxes input:checked'))].map(i=>i.value);
-  if(!boxIds.length){toast('Bitte mindestens einen Kasten wählen');return;}
-  let cards=[];
-  boxIds.forEach(bid=>{(allCards[bid]||[]).forEach(c=>{if(isDue(c))cards.push({...c,_boxId:bid});});});
-  if(!cards.length){toast('Keine fälligen Karten!');return;}
-  cards.sort(()=>Math.random()-.5);
-  session={cards,idx:0,results:[]};
-  document.getElementById('lernen-start').style.display='none';
-  document.getElementById('lernen-done').style.display='none';
-  document.getElementById('lernen-session').style.display='block';
-  showSessionCard();
-}
-
-function showSessionCard(){
-  if(!session||session.idx>=session.cards.length){finishSession();return;}
-  currentFlipped=false;
-  const card=session.cards[session.idx];
-  const box=boxes.find(b=>b.id===card._boxId)||{name:'?',color:'#888'};
-  const total=session.cards.length,done=session.idx;
-  document.getElementById('session-counter').textContent=`${done+1} / ${total}`;
-  document.getElementById('session-progress').style.width=`${Math.round(done/total*100)}%`;
-  document.getElementById('rating-area').style.display='none';
-  document.getElementById('karte-wrap').innerHTML=`
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-      <span class="box-color-dot" style="background:${box.color}"></span>
-      <span style="font-size:13px;color:var(--txt2)">${escHtml(box.name)}</span>
-      <span class="fach-chip" style="margin-left:auto">Fach ${card.fach||1}</span>
-    </div>
-    <div class="flip-scene" onclick="flipCard()">
-      <div class="flip-card" id="flip-card">
-        <div class="flip-face flip-front">
-          <div class="frage">${escHtml(card.frage)}</div>
-          <div class="hint" style="margin-top:16px">Klicken oder <span class="kbd">Leertaste</span></div>
-        </div>
-        <div class="flip-face flip-back">
-          <div class="antwort">${renderAntwort(card.antwort)}</div>
-          ${card.notiz?`<div class="notiz">💡 ${escHtml(card.notiz)}</div>`:''}
-        </div>
-      </div>
-    </div>`;
-}
-
-function flipCard(){
-  const fc=document.getElementById('flip-card');if(!fc)return;
-  currentFlipped=!currentFlipped;fc.classList.toggle('flipped',currentFlipped);
-  if(currentFlipped)document.getElementById('rating-area').style.display='block';
-}
-
-async function bewerten(rating){
-  if(!session)return;
-  const card=session.cards[session.idx];
-  const real=allCards[card._boxId].find(c=>c.id===card.id);
-  if(!real)return;
-  let fach=real.fach||1;
-  if(rating===1)fach=1;
-  else if(rating===2)fach=Math.max(1,fach);
-  else if(rating===3)fach=Math.min(intervals.length,fach+1);
-  else if(rating===4)fach=Math.min(intervals.length,fach+2);
-  real.fach=fach;real.faellig=addDays(today(),intervals[fach-1]||1);
-  real.history=real.history||[];real.history.push({date:today(),rating,fach});
-  await saveCards(card._boxId);
-  session.results.push({rating});session.idx++;
-  updateStreak();showSessionCard();
-}
-
-async function updateStreak(){
-  const t=today();
-  if(meta.lastLearnDate!==t){
-    const y=addDays(t,-1);
-    meta.streak=(meta.lastLearnDate===y)?(meta.streak||0)+1:1;
-    meta.lastLearnDate=t;await saveMeta();
-  }
-}
-
-function endSession(){
-  if(confirm('Abbrechen? Bisheriger Fortschritt wird gespeichert.')){
-    session=null;showLernenStart();autoSyncIfEnabled();
-  }
-}
-
-function finishSession(){
-  document.getElementById('lernen-session').style.display='none';
-  document.getElementById('lernen-done').style.display='block';
-  const res=session?.results||[];
-  document.getElementById('session-result').innerHTML=
-    `${res.length} Karten &nbsp;|&nbsp; ✅ ${res.filter(r=>r.rating===4).length} sehr leicht &nbsp;|&nbsp; ❌ ${res.filter(r=>r.rating===1).length} nicht gewusst`;
-  session=null;autoSyncIfEnabled();
-}
-
-function showLernenStart(){
-  document.getElementById('lernen-session').style.display='none';
-  document.getElementById('lernen-done').style.display='none';
-  document.getElementById('lernen-start').style.display='block';
-  renderLernen();
-}
-
-// ─── KÄSTEN ───
-function renderBoxes(){
-  const el=document.getElementById('box-list');el.innerHTML='';
-  if(!boxes.length){el.innerHTML='<div class="empty">Noch keine Kästen.</div>';return;}
-  boxes.forEach(box=>{
-    const cards=allCards[box.id]||[];const due=cards.filter(isDue).length;
-    const div=document.createElement('div');div.className='box-item';
-    div.innerHTML=`
-      <span class="box-color-dot" style="background:${box.color};width:14px;height:14px"></span>
-      <div class="box-info">
-        <div class="box-name">${escHtml(box.name)}</div>
-        <div class="box-meta">${cards.length} Karte${cards.length!==1?'n':''} · ${due} fällig</div>
-      </div>
-      <div style="display:flex;gap:4px">
-        <button class="btn btn-sm" onclick="event.stopPropagation();openBoxModal('${box.id}')">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteBox('${box.id}')">🗑</button>
-      </div>`;
-    el.appendChild(div);
-  });
-}
-
-function openBoxModal(boxId){
-  const box=boxId?boxes.find(b=>b.id===boxId):null;
-  const colorOpts=BOX_COLORS.map(c=>`<div class="color-dot-pick${(box?box.color===c:c===BOX_COLORS[0])?' selected':''}" style="background:${c}" data-color="${c}" onclick="selectColor(this)"></div>`).join('');
-  showModal(`
-    <h3>${box?'Kasten bearbeiten':'Neuer Kasten'}</h3>
-    <label>Name</label><input type="text" id="box-name" value="${box?escHtml(box.name):''}">
-    <label>Farbe</label><div class="color-picker-row">${colorOpts}</div>
-    <div style="display:flex;gap:8px;margin-top:20px">
-      <button class="btn btn-primary" onclick="saveBox('${boxId||''}')">Speichern</button>
-      <button class="btn" onclick="closeModal()">Abbrechen</button>
-    </div>`);
-}
-
-function selectColor(el){
-  document.querySelectorAll('.color-dot-pick').forEach(d=>d.classList.remove('selected'));el.classList.add('selected');
-}
-
-async function saveBox(boxId){
-  const name=document.getElementById('box-name').value.trim();
-  if(!name){toast('Name eingeben');return;}
-  const color=document.querySelector('.color-dot-pick.selected')?.dataset.color||BOX_COLORS[0];
-  if(boxId){const box=boxes.find(b=>b.id===boxId);if(box){box.name=name;box.color=color;}}
-  else{const id=uid();boxes.push({id,name,color,createdAt:today()});allCards[id]=[];}
-  await saveBoxes();closeModal();renderBoxes();autoSyncIfEnabled();toast('Kasten gespeichert');
-}
-
-async function deleteBox(boxId){
-  if(!confirm('Kasten und alle Karten löschen?'))return;
-  boxes=boxes.filter(b=>b.id!==boxId);delete allCards[boxId];
-  await STORE.delete('lk:cards:'+boxId);await saveBoxes();
-  renderBoxes();autoSyncIfEnabled();toast('Kasten gelöscht');
-}
-
-// ─── KARTEN ───
-function renderCards(){
-  const q=(document.getElementById('search-input')?.value||'').toLowerCase();
-  const bf=document.getElementById('filter-box')?.value||'';
-  const sel=document.getElementById('filter-box');
-  if(sel){const prev=sel.value;sel.innerHTML='<option value="">Alle Kästen</option>';
-    boxes.forEach(b=>{sel.innerHTML+=`<option value="${b.id}"${b.id===prev?' selected':''}>${escHtml(b.name)}</option>`;});}
-  const el=document.getElementById('card-list');el.innerHTML='';let shown=0;
-  boxes.forEach(box=>{
-    if(bf&&box.id!==bf)return;
-    (allCards[box.id]||[]).forEach(card=>{
-      if(q&&!card.frage.toLowerCase().includes(q)&&!card.antwort.toLowerCase().includes(q))return;
-      shown++;
-      const div=document.createElement('div');div.className='card-list-item';
-      div.innerHTML=`
-        <div style="flex:1;min-width:0">
-          <div class="q">${escHtml(card.frage)}</div>
-          <div class="a">${escHtml(card.antwort.length>100?card.antwort.slice(0,100)+'…':card.antwort)}</div>
-          <div style="margin-top:4px;display:flex;gap:6px;align-items:center">
-            <span class="badge" style="background:${box.color}22;color:${box.color};font-size:11px">${escHtml(box.name)}</span>
-            <span class="fach-chip">Fach ${card.fach||1}</span>
-            <span style="font-size:11px;color:var(--txt3)">${card.faellig?'fällig '+card.faellig:'neu'}</span>
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn btn-sm" onclick="openCardModal('${box.id}','${card.id}')">✏️</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteCard('${box.id}','${card.id}')">🗑</button>
-        </div>`;
-      el.appendChild(div);
-    });
-  });
-  if(!shown)el.innerHTML='<div class="empty">Keine Karten gefunden.</div>';
-}
-
-function openCardModal(boxId,cardId){
-  const card=cardId&&boxId?(allCards[boxId]||[]).find(c=>c.id===cardId):null;
-  const boxOpts=boxes.map(b=>`<option value="${b.id}"${boxId&&b.id===boxId?' selected':''}>${escHtml(b.name)}</option>`).join('');
-  showModal(`
-    <h3>${card?'Karte bearbeiten':'Neue Karte'}</h3>
-    <label>Kasten</label><select id="card-box">${boxOpts}</select>
-    <label>Frage</label><textarea id="card-frage" rows="3">${card?escHtml(card.frage):''}</textarea>
-    <label>Antwort <span style="font-size:11px;color:var(--txt3)">(Enter = neue Zeile, - oder 1. = Aufzählung)</span></label>
-    <textarea id="card-antwort" rows="5" placeholder="- Punkt 1&#10;- Punkt 2&#10;oder normaler Text">${card?escHtml(card.antwort):''}</textarea>
-    <label>Notiz (optional)</label><textarea id="card-notiz" rows="2">${card?escHtml(card.notiz||''):''}</textarea>
-    ${card?`<label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-top:12px"><input type="checkbox" id="card-reset" style="width:auto"> Auf Fach 1 zurücksetzen</label>`:''}
-    <div style="display:flex;gap:8px;margin-top:20px">
-      <button class="btn btn-primary" onclick="saveCard('${boxId||''}','${cardId||''}')">Speichern</button>
-      <button class="btn" onclick="closeModal()">Abbrechen</button>
-    </div>`);
-}
-
-async function saveCard(oldBoxId,cardId){
-  const frage=document.getElementById('card-frage').value.trim();
-  const antwort=document.getElementById('card-antwort').value.trim();
-  const notiz=document.getElementById('card-notiz').value.trim();
-  const newBoxId=document.getElementById('card-box').value;
-  if(!frage||!antwort){toast('Frage und Antwort ausfüllen');return;}
-  if(!allCards[newBoxId])allCards[newBoxId]=[];
-  if(cardId&&oldBoxId){
-    const resetFach=document.getElementById('card-reset')?.checked;
-    if(oldBoxId!==newBoxId){
-      allCards[oldBoxId]=allCards[oldBoxId].filter(c=>c.id!==cardId);
-      await saveCards(oldBoxId);
-      allCards[newBoxId].push({id:cardId,frage,antwort,notiz,fach:1,faellig:today(),history:[]});
-    } else {
-      const card=allCards[oldBoxId].find(c=>c.id===cardId);
-      if(card){card.frage=frage;card.antwort=antwort;card.notiz=notiz;if(resetFach){card.fach=1;card.faellig=today();}}
+    if (['1', '2', '3', '4'].includes(e.key) && sitzung.aufgedeckt) {
+      e.preventDefault();
+      bewerten(Number(e.key));
+      return;
     }
-    await saveCards(newBoxId);
-  } else {
-    allCards[newBoxId].push({id:uid(),frage,antwort,notiz,fach:1,faellig:today(),history:[]});
-    await saveCards(newBoxId);
+    if (e.key === 'Escape') { e.preventDefault(); sitzungBeenden(false); return; }
   }
-  closeModal();renderCards();autoSyncIfEnabled();toast('Karte gespeichert');
-}
-
-async function deleteCard(boxId,cardId){
-  if(!confirm('Karte löschen?'))return;
-  allCards[boxId]=(allCards[boxId]||[]).filter(c=>c.id!==cardId);
-  await saveCards(boxId);renderCards();autoSyncIfEnabled();toast('Karte gelöscht');
-}
-
-// ─── STATISTIK ───
-function renderStats(){
-  const el=document.getElementById('stat-content');
-  const allC=Object.values(allCards).flat();
-  const totalDue=allC.filter(isDue).length;
-  const fachDist={};for(let i=1;i<=intervals.length;i++)fachDist[i]=0;
-  allC.forEach(c=>{const f=Math.min(c.fach||1,intervals.length);fachDist[f]=(fachDist[f]||0)+1;});
-  const maxFach=Math.max(...Object.values(fachDist),1);
-  const histAll=allC.flatMap(c=>(c.history||[]));
-  const dayMap={};histAll.forEach(h=>{dayMap[h.date]=(dayMap[h.date]||0)+1;});
-  const days=Object.entries(dayMap).sort((a,b)=>a[0]<b[0]?-1:1).slice(-14);
-  el.innerHTML=`
-    <div class="grid2" style="margin-bottom:16px">
-      <div class="card" style="text-align:center"><div class="stat-num">${allC.length}</div><div class="stat-label">Karten gesamt</div></div>
-      <div class="card" style="text-align:center"><div class="stat-num" style="color:var(--blue)">${totalDue}</div><div class="stat-label">Heute fällig</div></div>
-    </div>
-    <div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:12px">Karten pro Fach</h3>
-      ${Object.entries(fachDist).map(([f,n])=>`<div class="bar-wrap">
-        <div class="bar-label"><span>Fach ${f}</span><span>${n}</span></div>
-        <div class="bar"><div class="bar-fill" style="width:${Math.round(n/maxFach*100)}%"></div></div>
-      </div>`).join('')}
-    </div>
-    ${days.length?`<div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:12px">Aktivität (letzte 14 Tage)</h3>
-      ${days.map(([d,n])=>`<div class="bar-wrap">
-        <div class="bar-label"><span>${d}</span><span>${n}</span></div>
-        <div class="bar"><div class="bar-fill" style="width:${Math.round(n/Math.max(...days.map(x=>x[1]))*100)}%;background:var(--green)"></div></div>
-      </div>`).join('')}</div>`:''}
-    <div class="card"><h3 style="margin-bottom:12px">Pro Kasten</h3>
-      ${boxes.map(b=>{const bc=allCards[b.id]||[];return`
-        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border)">
-          <span class="box-color-dot" style="background:${b.color}"></span>
-          <span style="flex:1">${escHtml(b.name)}</span>
-          <span style="font-size:13px;color:var(--txt2)">${bc.length} Karten</span>
-          <span class="fach-chip">${bc.filter(isDue).length} fällig</span>
-        </div>`}).join('')||'<span style="color:var(--txt3);font-size:14px">Keine Kästen</span>'}
-    </div>`;
-}
-
-// ─── EINSTELLUNGEN ───
-function renderIntervals(){
-  const grid=document.getElementById('interval-grid');grid.innerHTML='';
-  for(let i=0;i<12;i++){
-    const div=document.createElement('div');div.className='interval-item';
-    div.innerHTML=`<label>Fach ${i+1}</label><input type="number" min="1" max="3650" value="${intervals[i]}" id="iv-${i}">`;
-    grid.appendChild(div);
-  }
-  updateDriveUI();
-}
-
-async function saveIntervals(){
-  intervals=[];for(let i=0;i<12;i++)intervals.push(parseInt(document.getElementById('iv-'+i)?.value)||DEFAULT_INTERVALS[i]);
-  await saveIntervalsSt();toast('Intervalle gespeichert');
-}
-
-async function resetIntervals(){
-  intervals=[...DEFAULT_INTERVALS];await saveIntervalsSt();renderIntervals();toast('Zurückgesetzt');
-}
-
-// ─── IMPORT / EXPORT ───
-function buildExportData(){
-  const data={'lk:meta':meta,'lk:boxes':boxes,'lk:intervals':intervals};
-  boxes.forEach(b=>{data['lk:cards:'+b.id]=allCards[b.id]||[];});
-  return data;
-}
-
-async function restoreFromData(data){
-  if(!data['lk:boxes'])return;
-  const merge=confirm('Zusammenführen mit lokalen Daten? (OK=Ja / Abbrechen=Ersetzen)');
-  if(!merge){for(const b of boxes)await STORE.delete('lk:cards:'+b.id);boxes=[];allCards={};}
-  for(const iBox of data['lk:boxes']){
-    let box=boxes.find(b=>b.name===iBox.name);
-    if(!box){box={...iBox,id:uid()};boxes.push(box);allCards[box.id]=[];}
-    const iCards=data['lk:cards:'+iBox.id]||[];
-    const exist=new Set((allCards[box.id]||[]).map(c=>c.frage));
-    iCards.forEach(c=>{if(!exist.has(c.frage))allCards[box.id].push({...c,id:uid()});});
-    await saveCards(box.id);
-  }
-  if(data['lk:intervals'])intervals=data['lk:intervals'];
-  await saveBoxes();await saveIntervalsSt();
-}
-
-function triggerCSVImport(){document.getElementById('csv-import').click()}
-function triggerJSONImport(){document.getElementById('json-import').click()}
-
-async function importCSV(e){
-  const file=e.target.files[0];if(!file)return;
-  const lines=(await file.text()).split('\n').filter(l=>l.trim());
-  let imported=0,errors=0;
-  for(const line of lines){
-    const parts=line.split(';');if(parts.length<2){errors++;continue;}
-    const frage=parts[0].trim().replace(/^"|"$/g,'');
-    const antwort=parts[1].trim().replace(/^"|"$/g,'');
-    const boxName=(parts[2]||'Import').trim().replace(/^"|"$/g,'');
-    if(!frage||!antwort){errors++;continue;}
-    let box=boxes.find(b=>b.name.toLowerCase()===boxName.toLowerCase());
-    if(!box){const id=uid();box={id,name:boxName,color:BOX_COLORS[boxes.length%BOX_COLORS.length],createdAt:today()};boxes.push(box);allCards[id]=[];await saveBoxes();}
-    allCards[box.id].push({id:uid(),frage,antwort,notiz:'',fach:1,faellig:today(),history:[]});imported++;
-  }
-  for(const box of boxes)await saveCards(box.id);
-  e.target.value='';renderCards();autoSyncIfEnabled();
-  toast(`${imported} Karten importiert${errors?`, ${errors} Fehler`:''}`,3500);
-}
-
-async function importJSON(e){
-  const file=e.target.files[0];if(!file)return;
-  try{
-    await restoreFromData(JSON.parse(await file.text()));
-    e.target.value='';renderCards();renderBoxes();autoSyncIfEnabled();toast('JSON importiert',3000);
-  }catch(err){toast('Fehler: '+err.message,4000);}
-}
-
-function exportJSON(){
-  dl(new Blob([JSON.stringify(buildExportData(),null,2)],{type:'application/json'}),'lernkartei-export.json');
-  toast('JSON exportiert');
-}
-
-function exportCSV(){
-  let csv='Frage;Antwort;Kasten\n';
-  boxes.forEach(box=>{(allCards[box.id]||[]).forEach(c=>{
-    csv+=`"${c.frage.replace(/"/g,'""')}";"${c.antwort.replace(/"/g,'""')}";"${box.name.replace(/"/g,'""')}"\n`;
-  });});
-  dl(new Blob([csv],{type:'text/csv;charset=utf-8'}),'lernkartei-export.csv');toast('CSV exportiert');
-}
-
-function dl(blob,name){
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-}
-
-async function copyRefDump(){
-  try{
-    const keys=await STORE.list('lk:');
-    const dump={};
-    const keyList=keys?.keys||[];
-    for(const key of keyList){const v=await STORE.get(key);if(v)try{dump[key]=JSON.parse(v.value)}catch{dump[key]=v.value;}}
-    await navigator.clipboard.writeText(JSON.stringify(dump,null,2));
-    toast('Referenz-Dump kopiert!',3000);
-  }catch(e){toast('Fehler: '+e.message,4000);}
-}
-
-async function deleteAllData(){
-  if(!confirm('Wirklich ALLE Daten löschen?'))return;
-  if(!confirm('Nicht rückgängig machbar — fortfahren?'))return;
-  for(const box of boxes)await STORE.delete('lk:cards:'+box.id);
-  await STORE.delete('lk:boxes');await STORE.delete('lk:meta');await STORE.delete('lk:intervals');
-  boxes=[];allCards={};meta={version:1,streak:0,lastLearnDate:''};intervals=[...DEFAULT_INTERVALS];
-  toast('Alle Daten gelöscht');showPage('kaesten');
-}
-
-// ─── MODAL ───
-function showModal(html){document.getElementById('modal-content').innerHTML=html;document.getElementById('modal-bg').style.display='flex';}
-function closeModal(){document.getElementById('modal-bg').style.display='none';}
-function closeModalOnBg(e){if(e.target===document.getElementById('modal-bg'))closeModal();}
-
-// ─── KEYBOARD ───
-document.addEventListener('keydown',e=>{
-  if(document.getElementById('modal-bg').style.display!=='none')return;
-  if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;
-  if(e.code==='Space'){e.preventDefault();flipCard();}
-  if(e.key==='1')bewerten(1);if(e.key==='2')bewerten(2);
-  if(e.key==='3')bewerten(3);if(e.key==='4')bewerten(4);
+  if (e.key === 'Escape' && S.seite !== 'lernen') seiteZeigen('lernen');
 });
 
-// ─── INIT ───
-async function init(){
-  document.getElementById('loading-sub').textContent='Lokale Daten werden geladen…';
-  await loadAll();
-  document.getElementById('loading-sub').textContent='Google-Authentifizierung wird geprüft…';
-  handleOAuthCallback();
-  if(!boxes.length){
-    const id=uid();
-    boxes.push({id,name:'Beispiel Deutsch',color:BOX_COLORS[0],createdAt:today()});
-    allCards[id]=[
-      {id:uid(),frage:'Was ist die Hauptstadt von Deutschland?',antwort:'Berlin\n- Größte Stadt Deutschlands\n- Hauptstadt seit 1990',notiz:'Wiedervereinigung 1990',fach:1,faellig:today(),history:[]},
-      {id:uid(),frage:'Erkläre den Begriff "Spaced Repetition"',antwort:'Lernmethode mit zunehmenden Wiederholungsintervallen:\n1. Neue Karte: heute\n2. Danach: 1 Tag\n3. Danach: 3 Tage\n\nBasiert auf der Ebbinghaus-Vergessenskurve.',notiz:'Wissenschaftlich belegt',fach:1,faellig:today(),history:[]},
-      {id:uid(),frage:'Bewertungsstufen beim Lernen',antwort:'- 1 = Nicht gewusst → Fach 1\n- 2 = Schwer → Fach bleibt\n- 3 = Gewusst → Fach +1\n- 4 = Sehr leicht → Fach +2',notiz:'Leertaste = umdrehen, 1–4 = bewerten',fach:1,faellig:today(),history:[]},
-    ];
-    await saveBoxes();await saveCards(id);
-  }
-  document.getElementById('loading').style.display='none';
-  document.getElementById('app').style.display='block';
-  showPage('lernen');
-  if(gAccessToken&&gAutoSync)gdrivePull();
-}
-init();
+/* Beim Verlassen der Seite laufende Sitzung sauber beenden (Daten sind
+   ohnehin nach jeder Bewertung geschrieben). */
+window.addEventListener('pagehide', () => { if (sitzung) sitzung.aktiv = false; });
+
+/* ---------- 17. Los ----------------------------------------------------- */
+
+start().catch(e => {
+  console.error(e);
+  fatal(`<div class="hinweis rot">Unerwarteter Fehler beim Start.</div>
+    <pre class="code">${esc(e?.stack || e?.message || String(e))}</pre>`);
+});
 </script>
 </body>
 </html>
