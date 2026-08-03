@@ -96,7 +96,8 @@ input,textarea,select{
   font:inherit;font-size:14px;background:var(--bg);color:var(--txt);
   border:1px solid var(--border2);border-radius:var(--radius);padding:9px 11px;width:100%;
 }
-input[type=checkbox],input[type=radio]{width:auto;accent-color:var(--blue)}
+input[type=checkbox],input[type=radio],input[type=range]{width:auto;accent-color:var(--akzent)}
+input[type=range]{width:100%;padding:0}
 textarea{resize:vertical;min-height:76px;line-height:1.45}
 label.feld{display:block;margin-bottom:12px}
 label.feld > span{display:block;font-size:13px;font-weight:600;color:var(--txt2);margin-bottom:4px}
@@ -262,7 +263,10 @@ table.daten td.num,table.daten th.num{text-align:right;font-variant-numeric:tabu
 #modal h2{margin-bottom:14px}
 .modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
 #toast{
-  position:fixed;left:50%;bottom:26px;transform:translate(-50%,140%);
+  /* Versteckt = eigene Höhe + 120px nach unten: garantiert außerhalb des
+     Bildes, egal ob bottom 26px (Desktop) oder 74px (über der Bottom-Bar
+     auf Mobil) — mit festen 140% lugte oben ein Streifen hervor. */
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,calc(100% + 120px));
   background:var(--txt);color:var(--bg);padding:11px 18px;border-radius:99px;
   font-size:14px;font-weight:500;z-index:200;transition:transform .25s;
   max-width:calc(100vw - 32px);text-align:center;box-shadow:var(--schatten);
@@ -1418,12 +1422,32 @@ function fsrsMotor() {
   }));
 }
 
-/** App-Karte in das von ts-fsrs erwartete Card-Objekt übersetzen. */
+/** App-Karte in das von ts-fsrs erwartete Card-Objekt übersetzen.
+ *
+ *  ts-fsrs akzeptiert als Gedächtniszustand nur zwei Formen: exakt
+ *  (stability:0, difficulty:0) = „noch kein Zustand, aus der ersten
+ *  Bewertung initialisieren" — oder difficulty ≥ 1 UND stability > 0.
+ *  Alles dazwischen wirft FSRSValidationError („Invalid memory state").
+ *  Der Stufe-1-Altbestand enthält genau so einen Zwischenzustand: nie
+ *  gelernte Karten wurden dort mit difficulty:5 bei stability:0 angelegt.
+ *  Ohne die Normalisierung hier wären diese Karten im FSRS-Modus für
+ *  immer unlernbar (jede Bewertung würde abgefangen und übersprungen). */
 function fsrsKarteAus(k) {
+  let stability = Number(k.stability) || 0;
+  let difficulty = Number(k.difficulty) || 0;
+  if (!(difficulty >= 1 && stability > 0)) {
+    if (Number(k.reps) > 0 && stability > 0) {
+      // gelernt, aber difficulty fehlt/kaputt → reparieren statt verwerfen
+      difficulty = Math.min(10, Math.max(1, difficulty || 5));
+    } else {
+      // nie gelernt (oder ohne brauchbare Stabilität) → frischer Zustand
+      stability = 0; difficulty = 0;
+    }
+  }
   return {
     due: isoZuDatum(k.due),
-    stability: Number(k.stability) || 0,
-    difficulty: Number(k.difficulty) || 0,
+    stability,
+    difficulty,
     elapsed_days: 0,          // wird von ts-fsrs aus last_review + jetzt neu berechnet
     scheduled_days: 0,
     learning_steps: Number(k.learningSteps) || 0,
