@@ -46,3 +46,32 @@ export const KONTEN_HINWEIS = [];
 /* Tagesgrenze in Stunden (KONZEPT §2: lokal 04:00 Uhr).
    Wer um 01:30 Uhr lernt, lernt damit noch den Vortag zu Ende. */
 export const TAGESGRENZE_STUNDE = 4;
+
+/* ---------------------------------------------------------------------------
+   Optional: Abzeichen für ALLE Konten.
+
+   Diese Datei ist die einzige Stelle, die sich alle drei Konten teilen — sie
+   wird von allen aus demselben Repository geladen. Damit lässt sich ein
+   gemeinsamer Abzeichensatz vorgeben, ohne die Firestore-Sicherheitsregeln
+   anzufassen. Wird der Eintrag hier gesetzt, gilt er überall und hat Vorrang
+   vor dem Satz im einzelnen Konto.
+
+   Nicht von Hand tippen: In der App unter
+     Einstellungen → Abzeichen → „Textblock für alle Konten"
+   den fertigen Block erzeugen und hier einsetzen.
+
+   Bleibt der Eintrag weg (so wie jetzt), benutzt jedes Konto seinen eigenen
+   Satz — voreingestellt ist ein eingebauter Standard.
+
+   Aufbau je Abzeichen:
+     art      'streak' (Tage in Folge) | 'wiederholungen' | 'karten' | 'fach'
+     schwelle ab welchem Wert es erreicht ist
+     icon     ein Emoji
+     farbe    Hex-Farbe
+
+   Beispiel:
+   export const ABZEICHEN = [
+     { id: "s7",  art: "streak", schwelle: 7,  name: "Eine Woche", icon: "🔥", farbe: "#F2994A" },
+     { id: "s30", art: "streak", schwelle: 30, name: "Ein Monat",  icon: "🏅", farbe: "#2D7FF9" }
+   ];
+   --------------------------------------------------------------------------- */

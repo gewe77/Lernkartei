@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<title>Lernkartei 2</title>
+<title>HAN CROCO</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231B9AAA'/><rect x='22' y='30' width='56' height='40' rx='6' fill='white'/><rect x='30' y='22' width='56' height='40' rx='6' fill='white' opacity='.55'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -115,7 +115,8 @@ label.feld > span{display:block;font-size:13px;font-weight:600;color:var(--txt2)
   width:220px;flex:none;display:flex;flex-direction:column;gap:4px;
   padding:20px 14px;border-right:1px solid var(--border);background:var(--bg);
 }
-.sl-marke{font-weight:800;font-size:17px;padding:0 10px 14px;white-space:nowrap}
+.sl-marke{font-weight:800;font-size:17px;padding:0 10px 14px;white-space:nowrap;letter-spacing:.3px}
+.sl-version{font-weight:600;font-size:11px;color:var(--txt3);margin-left:6px;letter-spacing:0}
 .marke{font-weight:700;font-size:15px;white-space:nowrap}
 nav{display:flex;flex-direction:column;gap:2px;flex:1}
 nav button{
@@ -288,6 +289,37 @@ kbd{
 .modus-chip input{flex:none;margin:0}
 .modus-chip.an{border-color:var(--akzent);background:var(--akzent-bg);color:var(--akzent);font-weight:700}
 
+/* ===== Abzeichen ======================================================== */
+.abzeichen{
+  display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--ab);
+  background:color-mix(in srgb, var(--ab) 12%, transparent);
+  color:var(--ab);border-radius:99px;padding:5px 12px 5px 8px;font-size:13px;font-weight:700;
+}
+.abzeichen .ab-icon{font-size:16px;line-height:1}
+.abzeichen.klein{padding:3px 5px;border-width:1px}
+.abzeichen.klein .ab-icon{font-size:15px}
+.abzeichen.offen{border-color:var(--border2);background:transparent;color:var(--txt3);font-weight:500}
+.abzeichen.offen .ab-icon{filter:grayscale(1);opacity:.5}
+.abzeichen-reihe{display:flex;flex-wrap:wrap;gap:8px}
+.abzeichen .ab-text{display:flex;flex-direction:column;line-height:1.25}
+/* Der Fortschritt stand nur im title-Attribut — auf dem Handy also nirgends. */
+.ab-rest{font-size:10.5px;opacity:.75;font-weight:500}
+.ab-fortschritt{font-size:11.5px;color:var(--txt3);margin-top:4px}
+.dash-deckwahl>summary{cursor:pointer;padding:6px 0;color:var(--txt2)}
+.ab-zeile{display:flex;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)}
+.ab-zeile:last-child{border-bottom:0}
+.ab-zeile .ab-haupt{flex:1;min-width:0}
+.dash-gruss{font-size:22px;font-weight:800;margin:0 0 4px;line-height:1.25}
+.dash-unter{color:var(--txt2);font-size:14px;margin:0 0 16px}
+
+/* ===== CSV-Vorschau ===================================================== */
+.csv-vorschau{overflow-x:auto;border:1px solid var(--border);border-radius:10px;max-height:190px}
+.csv-vorschau table{font-size:12.5px;margin:0}
+.csv-vorschau th,.csv-vorschau td{white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis;padding:5px 8px}
+.csv-vorschau th{position:sticky;top:0;background:var(--bg2);font-size:11px}
+.csv-vorschau .rolle{color:var(--akzent)}
+.csv-vorschau th.rolle{font-weight:700}
+
 /* ===== Statistik ======================================================== */
 .kennzahlen{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
 .kennzahl{border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;background:var(--bg)}
@@ -306,6 +338,9 @@ kbd{
 .tage .saeule.null{background:var(--bg3)}
 .tage .tag{font-size:10px;color:var(--txt3);white-space:nowrap}
 table.daten{width:100%;border-collapse:collapse;font-size:14px}
+/* Auf schmalen Bildschirmen lieber die Tabelle scrollen lassen als die ganze
+   Seite über den Rand schieben — sonst zoomt das Handy alles heraus. */
+.box{overflow-x:auto}
 table.daten th,table.daten td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--border)}
 table.daten th{font-size:12px;color:var(--txt2);font-weight:600}
 table.daten td.num,table.daten th.num{text-align:right;font-variant-numeric:tabular-nums}
@@ -320,7 +355,15 @@ table.daten td.num,table.daten th.num{text-align:right;font-variant-numeric:tabu
   max-height:88vh;overflow:auto;padding:20px;box-shadow:0 12px 48px rgba(0,0,0,.3);
 }
 #modal h2{margin-bottom:14px}
-.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+/* Die Knopfleiste klebt am unteren Rand des Dialogs. Auf dem Handy war der
+   Dialog sonst höher als der Bildschirm: Die Knöpfe lagen halb hinter der
+   Navileiste, und ein Tipp knapp daneben traf den Hintergrund — der Dialog
+   schloss sich kommentarlos samt aller Eingaben. */
+.modal-btns{
+  display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;
+  position:sticky;bottom:-20px;background:var(--bg);padding:12px 0 4px;
+  box-shadow:0 -10px 12px -10px rgba(0,0,0,.18);
+}
 #toast{
   /* Versteckt = eigene Höhe + 120px nach unten: garantiert außerhalb des
      Bildes, egal ob bottom 26px (Desktop) oder 74px (über der Bottom-Bar
@@ -381,6 +424,12 @@ pre.code{
   .bew span{font-size:10.5px}
   .bew small{display:none}
   .flip-text{font-size:18px}
+  /* Über der Navileiste Platz lassen, sonst liegt die Knopfleiste des Dialogs
+     dahinter und lässt sich nicht mehr sicher treffen. */
+  #modal-bg{align-items:flex-start;padding:12px 12px 78px}
+  #modal{max-height:calc(100vh - 96px);margin-top:12px}
+  table.daten{font-size:12.5px}
+  table.daten th,table.daten td{padding:6px 5px}
 }
 @media(prefers-reduced-motion:reduce){
   *{transition:none !important;animation-duration:.01ms !important}
@@ -393,19 +442,19 @@ pre.code{
 <!-- ===== Ladeindikator ================================================= -->
 <div id="boot">
   <div class="spinner"></div>
-  <div id="boot-text">Lernkartei wird geladen …</div>
+  <div id="boot-text">HAN CROCO wird geladen …</div>
 </div>
 
 <!-- ===== Harter Fehler (Konfiguration/SDK) ============================= -->
 <div id="fatal" hidden><div class="mittig">
-  <h1>Lernkartei 2 startet nicht</h1>
+  <h1>HAN CROCO startet nicht</h1>
   <div id="fatal-text"></div>
 </div></div>
 
 <!-- ===== Anmeldung ==================================================== -->
 <div id="login" hidden><div class="mittig">
-  <h1 style="margin-bottom:4px">Lernkartei 2</h1>
-  <p class="mini" style="margin-bottom:22px">Anmeldung mit E-Mail und Passwort</p>
+  <h1 style="margin-bottom:4px">HAN CROCO</h1>
+  <p class="mini" style="margin-bottom:22px">Digitale Lernkartei · Version <span id="login-version"></span></p>
   <form id="login-form" autocomplete="on">
     <label class="feld"><span>E-Mail</span>
       <input type="email" id="login-mail" required autocomplete="username" inputmode="email" autocapitalize="off" spellcheck="false">
@@ -428,10 +477,10 @@ pre.code{
 
 <!-- ===== App ========================================================== -->
 <div id="app" hidden>
-  <header id="topbar-mobil"><span class="marke">Lernkartei&nbsp;2</span></header>
+  <header id="topbar-mobil"><span class="marke">HAN&nbsp;CROCO</span></header>
 
   <div id="seitenleiste">
-    <div class="sl-marke">Lernkartei&nbsp;2</div>
+    <div class="sl-marke">HAN&nbsp;CROCO<span class="sl-version" id="sl-version"></span></div>
     <nav id="nav">
       <button data-seite="lernen" class="aktiv"><span class="nav-ico" aria-hidden="true">🎯</span><span class="nav-txt">Lernen</span></button>
       <button data-seite="kaesten"><span class="nav-ico" aria-hidden="true">🗂️</span><span class="nav-txt">Kästen</span></button>
@@ -458,7 +507,7 @@ pre.code{
 
 <script type="module">
 /* =========================================================================
-   Lernkartei 2 — Stufe 1
+   HAN CROCO — digitale Lernkartei
    Fundament: Firebase Auth (E-Mail/Passwort), Firestore mit Offline-Cache,
    Datenmodell nach KONZEPT §3, Import des Altbestands.
    Funktionsumfang entspricht der Vorgängerversion; Scheduler (FSRS) und die
@@ -466,6 +515,11 @@ pre.code{
    ========================================================================= */
 
 /* ---------- 0. Kleine Helfer, die schon vor dem Start gebraucht werden ---- */
+
+/* Programmversion. Bei jeder ausgelieferten Änderung hochzählen — sie steht
+   in der Seitenleiste, auf dem Anmeldebildschirm und in der Diagnose, damit
+   sich Rückfragen einem Stand zuordnen lassen. */
+const VERSION = '4.2';
 
 const $  = (s, w = document) => w.querySelector(s);
 const $$ = (s, w = document) => Array.from(w.querySelectorAll(s));
@@ -484,6 +538,13 @@ function fatal(titelHtml) {
 }
 
 function bootText(t) { const e = $('#boot-text'); if (e) e.textContent = t; }
+
+/* Version überall dort eintragen, wo sie hingehört — gleich beim Start,
+   damit sie auch auf dem Anmeldebildschirm schon steht. */
+['#sl-version', '#login-version'].forEach(sel => {
+  const e = document.querySelector(sel);
+  if (e) e.textContent = VERSION;
+});
 
 /* Theme so früh wie möglich setzen, damit es nicht weiß aufblitzt.
    localStorage dient hier ausschließlich als Anzeige-Zwischenspeicher —
@@ -504,6 +565,10 @@ window.matchMedia?.('(prefers-color-scheme: dark)')
 /* ---------- 1. Konfiguration und SDK laden ------------------------------ */
 
 let CFG, SDK_VERSION, KONTEN_HINWEIS = [], TAGESGRENZE = 4;
+/* Optionaler, für alle Konten gemeinsamer Abzeichensatz aus
+   firebase-config.js — die Verwaltungsebene ohne Eingriff in die
+   Sicherheitsregeln (siehe README, Abschnitt „Abzeichen“). */
+let ABZEICHEN_ZENTRAL = null;
 let FB = null;   // gebündelte Firebase-Funktionen
 let FSRS = null; // gebündeltes ts-fsrs-Modul (Stufe 2)
 
@@ -526,6 +591,7 @@ async function start() {
   SDK_VERSION = cfgModul.SDK_VERSION || '12.15.0';
   KONTEN_HINWEIS = cfgModul.KONTEN_HINWEIS || [];
   TAGESGRENZE = Number.isFinite(cfgModul.TAGESGRENZE_STUNDE) ? cfgModul.TAGESGRENZE_STUNDE : 4;
+  ABZEICHEN_ZENTRAL = Array.isArray(cfgModul.ABZEICHEN) ? cfgModul.ABZEICHEN : null;
 
   // 1b. Platzhalter erkennen, bevor Firebase mit kryptischen Fehlern um sich wirft
   const fehlend = ['apiKey', 'authDomain', 'projectId', 'appId']
@@ -612,6 +678,8 @@ const STANDARD_EINSTELLUNGEN = () => ({
   zielKarten: 30,
   zielEinheit: 'minuten', // 'minuten' | 'karten'
   leechGrenze: 7,         // Stufe 4: ab so vielen Aussetzern gilt eine Karte als Problemkarte
+  name: '',               // Anzeigename für die Begrüßung
+  abzeichenGesehen: [],   // schon gefeierte Abzeichen
   theme: 'auto',
   modi: ['aufdecken'],    // Stufe 3
   streak: 0,
@@ -631,6 +699,7 @@ const S = {
   kartenSuche: '',
   kartenLimit: 60,
   auswahl: new Set(),
+  letzterImport: null,     // nur für „Import zurücknehmen“, nicht gespeichert
   statDeck: 'alle',
   reviewsGeladen: false,
   heutigeNeu: 0,           // Stufe 2: heute bereits eingeführte neue Karten (Tagesdeckel)
@@ -772,12 +841,23 @@ function modal(opt) {
       if (k.pruefen && k.pruefen() === false) return;
       schliesse(k.wert);
     }));
-    function beiHintergrund(e) { if (e.target === bg) schliesse(null); }
+    /* Ein Klick daneben schließt nur Dialoge ohne Eingaben. Sonst wäre bei
+       einem Fehlgriff neben die Knopfleiste alles weg, was gerade eingetragen
+       wurde — auf dem Handy passiert genau das ständig. */
+    function beiHintergrund(e) {
+      if (e.target !== bg) return;
+      if (m.querySelector('input,textarea,select')) return;
+      schliesse(null);
+    }
     bg.addEventListener('click', beiHintergrund);
 
     function beiTaste(e) {
       if (e.key === 'Escape') { e.stopPropagation(); schliesse(null); }
-      if (e.key === 'Enter' && !e.shiftKey && e.target.tagName !== 'TEXTAREA') {
+      /* Dialoge, in denen erst etwas eingestellt und geprüft werden soll,
+         dürfen nicht auf Enter losschreiben: Wer den Kastennamen tippt und
+         gewohnheitsmäßig Enter drückt, hätte den Import ausgelöst, ohne
+         Vorschau und Bilanz je angesehen zu haben. */
+      if (e.key === 'Enter' && !e.shiftKey && e.target.tagName !== 'TEXTAREA' && !opt.ohneEnter) {
         const prim = opt.knoepfe?.findIndex(k => k.art === 'primary');
         if (prim >= 0) {
           e.preventDefault();
@@ -1913,6 +1993,217 @@ function zeitfresser(karten, anzahl = 8) {
     .slice(0, anzahl);
 }
 
+/* ---------- 7d. Begrüßung und Abzeichen -------------------------------- */
+
+/** Anzeigename. Ohne eigenen Eintrag wird der vordere Teil der E-Mail
+ *  genommen — besser als gar keine Ansprache, aber jederzeit überschreibbar. */
+function anzeigeName() {
+  const eigen = String(S.einstellungen.name || '').trim();
+  if (eigen) return eigen.slice(0, 30);
+  const vorn = String(S.email || '').split('@')[0] || '';
+  const teil = vorn.split(/[._-]/)[0] || '';
+  return teil ? teil.charAt(0).toUpperCase() + teil.slice(1) : '';
+}
+
+/** Tagesabschnitt nach der Uhr — bewusst nicht nach der Lern-Tagesgrenze:
+ *  Wer um 2 Uhr lernt, lernt für die Statistik noch den Vortag, soll aber
+ *  trotzdem nicht mit „Guten Morgen“ begrüßt werden. */
+function tagesabschnitt(stunde) {
+  const h = Number.isFinite(stunde) ? stunde : new Date().getHours();
+  if (h < 5) return 'nacht';
+  if (h < 11) return 'morgen';
+  if (h < 14) return 'mittag';
+  if (h < 18) return 'nachmittag';
+  if (h < 22) return 'abend';
+  return 'nacht';
+}
+
+const BEGRUESSUNG = {
+  morgen:     ['Guten Morgen{N}', 'Früh dran{N}', 'Ein paar Karten zum Wachwerden{N}?'],
+  mittag:     ['Guten Tag{N}', 'Mittagsrunde{N}?', 'Schön, dass du da bist{N}'],
+  nachmittag: ['Guten Nachmittag{N}', 'Nachmittagsrunde{N}?', 'Weiter geht’s{N}'],
+  abend:      ['Bereit für eine Abendschicht{N}?', 'Guten Abend{N}', 'Noch eine Runde zum Feierabend{N}?'],
+  nacht:      ['Späte Runde{N}?', 'Noch wach{N}?', 'Die Nachtschicht{N}?']
+};
+
+/** Begrüßung passend zu Tageszeit und Lage. Die Auswahl hängt an Datum und
+ *  Tagesabschnitt, nicht am Zufall — sonst spränge der Text bei jeder
+ *  Firestore-Aktualisierung um. */
+function begruessung(faellig, ueberfaellig) {
+  const name = anzeigeName();
+  const anrede = name ? ', ' + name : '';
+  const abschnitt = tagesabschnitt();
+  const streak = Number(S.einstellungen.streak) || 0;
+  const rueckstand = Number(ueberfaellig) || 0;
+  const kandidaten = BEGRUESSUNG[abschnitt].slice();
+  /* „Alles erledigt“ darf nur dastehen, wenn wirklich nichts mehr offen ist.
+     Zählt man nur die heute fälligen Karten, meldete die App Feierabend,
+     während direkt darunter „400 überfällige Karten“ stand. */
+  if (!faellig && !rueckstand) kandidaten.push('Alles erledigt{N}', 'Heute nichts fällig{N}');
+  else if (rueckstand > 20) {
+    kandidaten.length = 0;
+    kandidaten.push('Da hat sich etwas angesammelt{N}', 'Zeit zum Aufholen{N}?',
+      `${rueckstand} Karten warten schon länger{N}`);
+  } else {
+    if (streak >= 7) kandidaten.push(`Tag ${streak} in Folge{N}`);
+  }
+  const lage = (faellig ? 'f' : 'l') + (rueckstand > 20 ? 'r' : '');
+  const i = textHash(heute() + ':' + abschnitt + ':' + lage) % kandidaten.length;
+  return kandidaten[i].replace('{N}', anrede);
+}
+
+/* --- Abzeichen ---------------------------------------------------------- */
+
+const ABZEICHEN_ARTEN = {
+  streak:          'Tage in Folge',
+  wiederholungen:  'Abfragen insgesamt',
+  karten:          'Karten insgesamt',
+  fach:            'Karten im höchsten Fach'
+};
+/* Einzahl und Mehrzahl getrennt, sonst steht überall „noch 1 karten“. */
+const ABZEICHEN_EINHEIT = {
+  streak:         ['Tag in Folge', 'Tage in Folge'],
+  wiederholungen: ['Abfrage', 'Abfragen'],
+  karten:         ['Karte', 'Karten'],
+  fach:           ['Karte im höchsten Fach', 'Karten im höchsten Fach']
+};
+const abzeichenEinheit = (art, n) => (ABZEICHEN_EINHEIT[art] || ['', ''])[n === 1 ? 0 : 1];
+/* Beim ersten Ziel zählt, was erreichbar ist: die Reihenfolge der Arten
+   entscheidet, wenn noch bei allem der Fortschritt 0 ist. Vorher gewann
+   alphabetisch „fach“ — die App schlug einem leeren Konto als Erstes
+   „Langzeitgedächtnis“ vor, ein Ziel etwa ein Jahr entfernt. */
+const ABZEICHEN_RANG = { streak: 0, wiederholungen: 1, karten: 2, fach: 3 };
+
+const ABZEICHEN_STANDARD = [
+  { id: 's3',    art: 'streak',         schwelle: 3,    name: 'Angefangen',       icon: '🌱', farbe: '#27AE60' },
+  { id: 's7',    art: 'streak',         schwelle: 7,    name: 'Eine Woche',       icon: '🔥', farbe: '#F2994A' },
+  { id: 's14',   art: 'streak',         schwelle: 14,   name: 'Zwei Wochen',      icon: '⚡', farbe: '#F2C94C' },
+  { id: 's30',   art: 'streak',         schwelle: 30,   name: 'Ein Monat',        icon: '🏅', farbe: '#2D7FF9' },
+  { id: 's60',   art: 'streak',         schwelle: 60,   name: 'Zwei Monate',      icon: '💎', farbe: '#1B9AAA' },
+  { id: 's100',  art: 'streak',         schwelle: 100,  name: 'Hundert Tage',     icon: '👑', farbe: '#8e6bd6' },
+  { id: 's180',  art: 'streak',         schwelle: 180,  name: 'Ein halbes Jahr',  icon: '🚀', farbe: '#d6538e' },
+  { id: 's365',  art: 'streak',         schwelle: 365,  name: 'Ein ganzes Jahr',  icon: '🏆', farbe: '#E2584D' },
+  { id: 'w100',  art: 'wiederholungen', schwelle: 100,  name: '100 Abfragen',     icon: '📚', farbe: '#639922' },
+  { id: 'w500',  art: 'wiederholungen', schwelle: 500,  name: '500 Abfragen',     icon: '📗', farbe: '#27AE60' },
+  { id: 'w2000', art: 'wiederholungen', schwelle: 2000, name: '2000 Abfragen',    icon: '🎓', farbe: '#2D7FF9' },
+  { id: 'k100',  art: 'karten',         schwelle: 100,  name: '100 Karten',       icon: '🗂️', farbe: '#5b7083' },
+  { id: 'f1',    art: 'fach',           schwelle: 1,    name: 'Langzeitgedächtnis', icon: '🧠', farbe: '#8e6bd6' }
+];
+
+/** Ein Abzeichen auf Form bringen. Kaputte Einträge (aus der Konfiguration
+ *  oder einer Sicherung) werden ausgesiebt, nicht repariert — ein Abzeichen
+ *  ohne Schwelle ergibt keinen Sinn. */
+function abzeichenNormalisieren(a, i) {
+  if (!a || typeof a !== 'object') return null;
+  const art = ABZEICHEN_ARTEN[a.art] ? a.art : 'streak';
+  const schwelle = zahl(a.schwelle, 1, 1000000, 0);
+  if (!schwelle) return null;
+  const farbe = String(a.farbe ?? '').trim();
+  return {
+    id: String(a.id ?? ('a' + i)).slice(0, 40) || ('a' + i),
+    art, schwelle,
+    name: String(a.name ?? '').trim().slice(0, 40) || (schwelle + ' ' + ABZEICHEN_ARTEN[art]),
+    icon: Array.from(String(a.icon ?? '⭐').trim()).slice(0, 2).join('') || '⭐',
+    farbe: /^#[0-9a-fA-F]{3,8}$/.test(farbe) ? farbe : '#1B9AAA'
+  };
+}
+function abzeichenPruefen(liste) {
+  if (!Array.isArray(liste)) return null;
+  const sauber = liste.map(abzeichenNormalisieren).filter(Boolean);
+  return sauber.length ? sauber : null;
+}
+
+/** Rangfolge: zentral vorgegebener Satz aus firebase-config.js, sonst der
+ *  eigene aus den Einstellungen, sonst der eingebaute Standard. */
+function abzeichenSatz() {
+  const zentral = abzeichenPruefen(ABZEICHEN_ZENTRAL);
+  if (zentral) return zentral;
+  /* Dieselbe Unterscheidung wie in der Verwaltung: Eine ausdrücklich geleerte
+     Liste bedeutet „keine Abzeichen“ und darf nicht zum Standardsatz
+     zurückfallen — sonst zeigt die Verwaltung nichts und der Startbildschirm
+     doch wieder dreizehn. */
+  if (Array.isArray(S.einstellungen.abzeichen))
+    return abzeichenPruefen(S.einstellungen.abzeichen) || [];
+  return ABZEICHEN_STANDARD;
+}
+const abzeichenZentralVorhanden = () => !!abzeichenPruefen(ABZEICHEN_ZENTRAL);
+/** Der Satz, den die Verwaltungsseite bearbeitet — immer der des Kontos.
+ *  Eine ausdrücklich geleerte Liste bleibt leer: Wer das letzte Abzeichen
+ *  löscht, will keins mehr und nicht den kompletten Standardsatz zurück. */
+const eigenerAbzeichensatz = () => Array.isArray(S.einstellungen.abzeichen)
+  ? (abzeichenPruefen(S.einstellungen.abzeichen) || [])
+  : ABZEICHEN_STANDARD;
+function abzeichensatzSchreiben(liste) {
+  const sauber = liste.map(abzeichenNormalisieren).filter(Boolean);
+  S.einstellungen.abzeichen = sauber;
+  schreibe(FB.setDoc(refEinstellungen(), { abzeichen: sauber }, { merge: true }), 'Abzeichen');
+  return sauber;
+}
+
+function abzeichenStand() {
+  return {
+    streak: Number(S.einstellungen.streak) || 0,
+    wiederholungen: S.cards.reduce((a, k) => a + (Number(k.reps) || 0), 0),
+    karten: S.cards.filter(istQuellkarte).length,
+    fach: S.cards.filter(k => !k.suspendiert && fachVon(k) >= 12).length
+  };
+}
+function abzeichenListe() {
+  const stand = abzeichenStand();
+  return abzeichenSatz()
+    .map(a => {
+      const wert = Number(stand[a.art]) || 0;
+      return { ...a, wert, erreicht: wert >= a.schwelle,
+               anteil: Math.max(0, Math.min(1, wert / a.schwelle)) };
+    })
+    .sort((a, b) => (a.art === b.art ? a.schwelle - b.schwelle
+      : (ABZEICHEN_RANG[a.art] ?? 9) - (ABZEICHEN_RANG[b.art] ?? 9)));
+}
+/** Das zuletzt erreichte Abzeichen und das nächste Ziel — für die kleine
+ *  Anzeige neben dem Streak. */
+function abzeichenAktuell() {
+  const alle = abzeichenListe();
+  /* „Zuletzt erreicht“ heißt: am knappsten geschafft. Vorher war es schlicht
+     der letzte Eintrag der sortierten Liste — bei Streak 8 und 120 Karten
+     stand dort „100 Abfragen“ statt der gerade erreichten Wochenmarke. */
+  const erreicht = alle.filter(a => a.erreicht);
+  const juengstes = erreicht.slice().sort((a, b) =>
+    (a.wert / a.schwelle) - (b.wert / b.schwelle))[0] || null;
+  /* Nächstes Ziel: das am weitesten fortgeschrittene. Steht alles bei null,
+     entscheidet die Rangfolge der Arten, nicht der Zufall der Sortierung. */
+  const offen = alle.filter(a => !a.erreicht)
+    .sort((a, b) => (b.anteil - a.anteil)
+      || ((ABZEICHEN_RANG[a.art] ?? 9) - (ABZEICHEN_RANG[b.art] ?? 9))
+      || (a.schwelle - b.schwelle));
+  return { erreicht, letztes: juengstes, naechstes: offen[0] || null, alle };
+}
+function abzeichenHtml(a, klein) {
+  /* Der Fortschritt stand nur im title-Attribut — auf dem Handy also nirgends.
+     Bei offenen Abzeichen gehört er sichtbar dazu. */
+  const rest = Math.max(0, a.schwelle - (Number(a.wert) || 0));
+  return `<span class="abzeichen${a.erreicht ? '' : ' offen'}${klein ? ' klein' : ''}"
+    style="--ab:${esc(a.farbe)}" title="${esc(a.name)} — ${a.schwelle} ${esc(ABZEICHEN_ARTEN[a.art])}">
+    <span class="ab-icon">${esc(a.icon)}</span>${klein ? '' : `<span class="ab-text">${esc(a.name)}${
+      a.erreicht ? '' : `<span class="ab-rest">noch ${rest} ${esc(abzeichenEinheit(a.art, rest))}</span>`
+    }</span>`}</span>`;
+}
+
+/** Neu erreichte Abzeichen einmalig feiern. */
+function abzeichenFeiern() {
+  const gesehen = Array.isArray(S.einstellungen.abzeichenGesehen) ? S.einstellungen.abzeichenGesehen : [];
+  const liste = abzeichenListe();
+  const neu = liste.filter(a => a.erreicht && !gesehen.includes(a.id));
+  if (!neu.length) return [];
+  /* Nur behalten, was im aktuellen Satz überhaupt vorkommt. Ein hartes
+     slice(-200) ließ bei mehr als 200 Abzeichen jede Sitzung dieselben
+     Abzeichen erneut feiern, weil die ältesten IDs immer wieder herausfielen. */
+  const imSatz = new Set(liste.map(a => a.id));
+  const alle = Array.from(new Set(gesehen.filter(id => imSatz.has(id)).concat(neu.map(a => a.id))));
+  S.einstellungen.abzeichenGesehen = alle;
+  schreibe(FB.setDoc(refEinstellungen(), { abzeichenGesehen: alle }, { merge: true }), 'Abzeichen');
+  return neu;
+}
+
 /* ---------- 8. Navigation ---------------------------------------------- */
 
 const SEITEN = ['lernen', 'kaesten', 'karten', 'statistik', 'einstellungen'];
@@ -1994,8 +2285,50 @@ function malLernen() {
     gewaehlt.filter(k => !k.suspendiert && fachVon(k) === i + 1).length);
   const fachGesamt = proFach.reduce((a, b) => a + b, 0);
 
+  const ueberfaellig = Math.max(0, alleN - heuteN);
+  const ab = abzeichenAktuell();
+
+  /* Wie viele Karten kommen in der Sitzung wirklich dran? Der Knopf versprach
+     „200 Karten“, die Sitzung zeigte 20 — weil neue Karten gedeckelt und
+     Geschwisterabfragen zurückgestellt werden. Beides hier vorwegnehmen,
+     damit die Ankündigung stimmt. */
+  const sitzungsVorschau = wahl => {
+    const roh = gewaehlt.filter(wahl === 'heute' ? istHeuteGenau : istFaellig);
+    const familien = new Set();
+    /* Dieselbe Reihenfolge wie in sitzungStarten: Wer die Familie vertritt,
+       entscheidet darüber, ob sie als „neu“ zählt — und damit, ob der
+       Tagesdeckel greift. Ohne die Sortierung verspricht der Knopf eine
+       andere Zahl, als die Sitzung dann zeigt. */
+    const ohneGeschwister = roh.slice()
+      .sort((a, b) => String(a.due || '').localeCompare(String(b.due || '')))
+      .filter(k => {
+        const f = k.quelleId || k.id;
+        if (familien.has(f)) return false;
+        familien.add(f); return true;
+      });
+    const deckel = zahl(S.einstellungen.neuProTag, 5, 50, 20);
+    const frei = Math.max(0, deckel - (S.heutigeNeu || 0));
+    const neue = ohneGeschwister.filter(istNeu).length;
+    return {
+      gesamt: ohneGeschwister.length - Math.max(0, neue - frei),
+      neueZurueck: Math.max(0, neue - frei),
+      geschwister: roh.length - ohneGeschwister.length,
+      deckel
+    };
+  };
+  const vorschau = sitzungsVorschau(modus);
+  const dranEcht = vorschau.gesamt;
+
   ziel.innerHTML = `
-    <h1>Lernen</h1>
+    <h1 class="dash-gruss">${esc(begruessung(dran, ueberfaellig))}</h1>
+    <p class="dash-unter">${dranEcht
+      ? `${dranEcht} ${dranEcht === 1 ? 'Karte wartet' : 'Karten warten'} auf dich.`
+      : alleN ? `Heute planmäßig nichts — ${alleN} überfällige ${alleN === 1 ? 'Karte' : 'Karten'} liegen noch da.`
+      : `Nichts fällig. Nächste Fälligkeit: ${esc(naechsteFaelligkeitText())}.`}${
+      vorschau.neueZurueck ? ` <span class="mini">Von ${dran} fälligen sind
+        ${vorschau.neueZurueck} neue Karten für heute zurückgestellt — es kommen höchstens
+        ${vorschau.deckel} neue pro Tag dran, damit die Wiederholungen später nicht auf einmal
+        anfallen. Ändern lässt sich das unter Einstellungen → Tagespensum.</span>` : ''}</p>
 
     <div class="dash-kopf">
       <div class="dash-ring">
@@ -2011,6 +2344,12 @@ function malLernen() {
         <div class="dash-kennzahl"><b>${e.streak || 0}</b><span>Tage Streak</span></div>
         <div class="dash-kennzahl"><b>${gewaehlt.length}</b><span>Karten gewählt</span></div>
       </div>
+      ${ab.letztes || ab.naechstes ? `<div style="flex:none">
+        ${ab.letztes ? abzeichenHtml(ab.letztes) : ''}
+        ${ab.naechstes ? `<div class="ab-fortschritt">Nächstes: ${esc(ab.naechstes.icon)}
+          ${esc(ab.naechstes.name)} — noch ${Math.max(0, ab.naechstes.schwelle - ab.naechstes.wert)}
+          ${esc(abzeichenEinheit(ab.naechstes.art, ab.naechstes.schwelle - ab.naechstes.wert))}</div>` : ''}
+      </div>` : ''}
     </div>
 
     ${anstehendePruefungen(lernAuswahl).slice(0, 3).map(({ deck, lage }) => {
@@ -2057,6 +2396,12 @@ function malLernen() {
         <button class="btn klein" data-tu="alleAus">Keiner</button>
       </span>
     </div>
+    <!-- Ab einer gewissen Zahl wird die Kachelwand unbedienbar: Bei 180 Kästen
+         lag „Sitzung starten“ rund 4600 Pixel unterhalb des Bildrandes. Dann
+         bleibt die Auswahl eingeklappt, bis jemand sie wirklich braucht. -->
+    <details class="dash-deckwahl" ${S.decks.length > 12 ? '' : 'open'}>
+      ${S.decks.length > 12 ? `<summary class="mini">${lernAuswahl.size} von ${S.decks.length}
+        Kästen gewählt — Auswahl ändern</summary>` : ''}
     <div class="dash-decks">
       ${S.decks.map(d => {
         const k = kartenVon(d.id);
@@ -2068,6 +2413,7 @@ function malLernen() {
         </button>`;
       }).join('')}
     </div>
+    </details>
 
     <div class="box mt">
       <h2>Umfang</h2>
@@ -2079,8 +2425,9 @@ function malLernen() {
 
     <button class="btn primary gross breit"
       data-tu="${!dran && alleN ? 'startenAlle' : 'starten'}" ${dran || alleN ? '' : 'disabled'}>
-      ${dran ? `Sitzung starten — ${dran} ${dran === 1 ? 'Karte' : 'Karten'}`
-        : alleN ? `Überfällige lernen — ${alleN} ${alleN === 1 ? 'Karte' : 'Karten'}`
+      ${dran ? `Sitzung starten — ${dranEcht} ${dranEcht === 1 ? 'Karte' : 'Karten'}`
+        : alleN ? `Überfällige lernen — ${sitzungsVorschau('alle').gesamt} ${
+            sitzungsVorschau('alle').gesamt === 1 ? 'Karte' : 'Karten'}`
         : 'Nichts fällig'}
     </button>
     ${!dran && alleN ? `<p class="mini mt" style="text-align:center">
@@ -2750,6 +3097,10 @@ function malAbschluss() {
   letzteSitzung = s;
   sitzung = null;
   heutigeStatistikLaden();   // im Hintergrund auffrischen, für den Ring auf dem Startbildschirm
+  // Einmal ermitteln und an der Sitzung merken: malAbschluss() wird beim
+  // Stehenbleiben des Bildschirms erneut aufgerufen, und abzeichenFeiern()
+  // liefert beim zweiten Mal nichts mehr.
+  if (!s.neueAbzeichen) s.neueAbzeichen = abzeichenFeiern();
   const min = Math.max(1, Math.round(s.sekunden / 60));
   const proKarte = s.bewertet ? (s.sekunden / s.bewertet).toFixed(1) : '0';
   const offenN = s.gesamt - s.bewertet;
@@ -2760,6 +3111,11 @@ function malAbschluss() {
       <h1 style="margin-top:12px">${offenN ? 'Sitzung beendet' : 'Sitzung abgeschlossen!'}</h1>
       <p class="muted">${s.bewertet} von ${s.gesamt} Karten bewertet${offenN ? ` · ${offenN} offen` : ''}</p>
     </div>
+    ${s.neueAbzeichen?.length ? `<div class="box" style="text-align:center">
+      <h2 style="margin-bottom:10px">${s.neueAbzeichen.length === 1 ? 'Neues Abzeichen' : 'Neue Abzeichen'}</h2>
+      <div class="abzeichen-reihe" style="justify-content:center">
+        ${s.neueAbzeichen.map(a => abzeichenHtml(a)).join('')}</div>
+    </div>` : ''}
     <div class="kennzahlen">
       <div class="kennzahl"><b>${s.bewertet}</b><span>Karten</span></div>
       <div class="kennzahl"><b>${min}</b><span>Minuten</span></div>
@@ -2844,9 +3200,9 @@ function malKaesten() {
   verdrahten(ziel);
 }
 
-function farbwahlHtml(aktiv) {
+function farbwahlHtml(aktiv, palette) {
   return `<label class="feld"><span>Farbe</span><div class="row" id="m-farben">${
-    DECK_FARBEN.map(f => `<button type="button" class="btn klein" data-farbe="${f}"
+    (palette || DECK_FARBEN).map(f => `<button type="button" class="btn klein" data-farbe="${f}"
       aria-label="Farbe ${f}" style="background:${f};border-color:${f};width:34px;height:30px;${
       f === aktiv ? 'outline:2px solid var(--txt);outline-offset:1px' : ''}"></button>`).join('')
   }</div></label>`;
@@ -2954,8 +3310,21 @@ function malKarten() {
       verwechselt sich mit einer anderen. Formuliere sie um oder teile sie auf und nimm sie
       dann über „Bearbeiten“ wieder auf.</div>` : ''}
 
+    ${S.letzterImport ? `<div class="hinweis blau mt row" style="justify-content:space-between;gap:10px">
+      <span>Gerade eingelesen: <strong>${S.letzterImport.anzahl}</strong> Karten${
+        S.letzterImport.kasten ? ` in „${esc(S.letzterImport.kasten)}“` : ''}.</span>
+      <button class="btn klein" data-tu="importZurueck">Import zurücknehmen</button></div>` : ''}
+
     ${ausw ? `<div class="box flach mt row" style="justify-content:space-between">
-      <span><strong>${ausw}</strong> ausgewählt</span>
+      <span><strong>${ausw}</strong> ausgewählt${(() => {
+        /* Die Auswahl kann Karten enthalten, die gerade nicht in der Liste
+           stehen. Dann muss dabeistehen, worum es geht — sonst löscht man
+           auf gut Glück eine Zahl. */
+        const k = Array.from(S.auswahl).map(id => S.cards.find(c => c.id === id)).filter(Boolean);
+        const namen = Array.from(new Set(k.map(c => deckName(c.deckId))));
+        return namen.length === 1 ? ` aus „${esc(namen[0])}“`
+          : namen.length ? ` aus ${namen.length} Kästen` : '';
+      })()}</span>
       <span class="row">
         ${Array.from(S.auswahl).some(id => { const c = S.cards.find(x => x.id === id); return c && istProblemkarte(c); })
           ? `<button class="btn klein" data-tu="massAufnehmen">Wieder aufnehmen</button>` : ''}
@@ -2964,8 +3333,17 @@ function malKarten() {
         <button class="btn klein" data-tu="massAus">Aufheben</button>
       </span></div>` : ''}
 
-    <p class="mini mt">${alle.length} ${alle.length === 1 ? 'Karte' : 'Karten'}${
-      S.kartenSuche ? ' gefunden' : ''}${alle.length > zeigen.length ? ` · ${zeigen.length} angezeigt` : ''}</p>
+    <div class="spread mt" style="gap:8px">
+      <p class="mini" style="margin:0">${alle.length} ${alle.length === 1 ? 'Karte' : 'Karten'}${
+        S.kartenSuche ? ' gefunden' : ''}${alle.length > zeigen.length ? ` · ${zeigen.length} angezeigt` : ''}</p>
+      ${alle.length ? (() => {
+        // „Auswahl aufheben“ nur, wenn wirklich jede sichtbare Karte gewählt ist.
+        // Ein Zahlenvergleich griff daneben, sobald die Suche die Liste kürzte.
+        const allesGewaehlt = alle.every(k => S.auswahl.has(k.id));
+        return `<button class="btn klein" data-tu="${allesGewaehlt ? 'massAus' : 'alleWaehlen'}">
+          ${allesGewaehlt ? 'Auswahl aufheben' : `Alle ${alle.length} auswählen`}</button>`;
+      })() : ''}
+    </div>
 
     <div>${zeigen.length ? zeigen.map(k => {
       const f = istFaellig(k);
@@ -3008,11 +3386,14 @@ function malKarten() {
       const neu = $('#k-suche'); neu.focus(); neu.setSelectionRange(pos, pos);
     }, 220);
   });
+  /* Beim Wechsel des Ausschnitts die Auswahl verwerfen. Sonst sammelt sich
+     unsichtbar an, was in anderen Kästen angehakt war, und „Löschen“ trifft
+     Karten, die der Nutzer beim Klicken gar nicht vor Augen hat. */
   $('#k-deck').addEventListener('change', e => {
-    S.kartenFilterDeck = e.target.value; S.kartenLimit = 60; malKarten();
+    S.kartenFilterDeck = e.target.value; S.kartenLimit = 60; S.auswahl.clear(); malKarten();
   });
   $('#k-filter').addEventListener('change', e => {
-    S.kartenFilter = e.target.value; S.kartenLimit = 60; malKarten();
+    S.kartenFilter = e.target.value; S.kartenLimit = 60; S.auswahl.clear(); malKarten();
   });
   $$('#seite-karten input[data-sel]').forEach(cb => cb.addEventListener('change', () => {
     cb.checked ? S.auswahl.add(cb.dataset.sel) : S.auswahl.delete(cb.dataset.sel);
@@ -3296,6 +3677,54 @@ async function kartenCheckAnbieten(k) {
   return bilanz;
 }
 
+/** Ein Abzeichen anlegen oder ändern. */
+async function abzeichenBearbeiten(id) {
+  const satz = eigenerAbzeichensatz();
+  const a = id ? satz.find(x => x.id === id) : null;
+  if (id && !a) return;
+  const FARBEN = ['#27AE60', '#F2994A', '#F2C94C', '#2D7FF9', '#1B9AAA', '#8e6bd6', '#d6538e', '#E2584D'];
+  const r = await modal({
+    titel: a ? 'Abzeichen ändern' : 'Neues Abzeichen',
+    html: `
+      <div class="row" style="gap:10px">
+        <label class="feld" style="flex:0 0 90px"><span>Zeichen</span>
+          <input id="m-ab-icon" maxlength="4" value="${esc(a?.icon || '⭐')}"
+                 style="font-size:22px;text-align:center"></label>
+        <label class="feld" style="flex:1"><span>Name</span>
+          <input id="m-ab-name" maxlength="40" value="${esc(a?.name || '')}" placeholder="z. B. Eine Woche"></label>
+      </div>
+      <label class="feld"><span>Wofür?</span>
+        <select id="m-ab-art">${Object.entries(ABZEICHEN_ARTEN).map(([k, n]) =>
+          `<option value="${k}" ${(a?.art || 'streak') === k ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></label>
+      <label class="feld"><span>Ab welchem Wert?</span>
+        <input type="number" id="m-ab-schwelle" min="1" max="1000000" value="${a?.schwelle || 7}"></label>
+      ${farbwahlHtml(a?.farbe || FARBEN[0], FARBEN)}
+      <p class="mini">Als Zeichen eignet sich ein Emoji — auf dem Handy über die Emoji-Tastatur,
+        am Rechner mit <kbd>Windows</kbd>+<kbd>.</kbd> bzw. <kbd>Ctrl</kbd>+<kbd>Cmd</kbd>+<kbd>Leer</kbd>.</p>`,
+    knoepfe: [{ text: 'Abbrechen', wert: null }, {
+      text: a ? 'Speichern' : 'Anlegen', wert: 'ok', art: 'primary',
+      pruefen: () => {
+        if (!$('#m-ab-name').value.trim()) { toast('Bitte einen Namen eingeben.'); return false; }
+        if (!zahl($('#m-ab-schwelle').value, 1, 1000000, 0)) { toast('Bitte einen Wert ab 1 eingeben.'); return false; }
+      }
+    }],
+    beimOeffnen: m => farbwahlVerdrahten(m, a?.farbe || FARBEN[0])
+  });
+  if (r !== 'ok') return;
+  const neu = abzeichenNormalisieren({
+    id: a?.id || 'e' + neueId(),
+    art: W('m-ab-art', 'streak'),
+    schwelle: zahl(W('m-ab-schwelle', 7), 1, 1000000, 7),
+    name: W('m-ab-name', ''),
+    icon: W('m-ab-icon', '⭐'),
+    farbe: W('farbe', FARBEN[0])
+  }, satz.length);
+  if (!neu) return toast('Das Abzeichen war unvollständig.', 'fehler');
+  abzeichensatzSchreiben(a ? satz.map(x => x.id === a.id ? neu : x) : satz.concat([neu]));
+  toast(a ? 'Abzeichen geändert.' : 'Abzeichen angelegt.');
+  malEinstellungen();
+}
+
 /* ---------- 12. Statistik ----------------------------------------------- */
 
 async function reviewsLaden(alles) {
@@ -3440,6 +3869,17 @@ function malStatistik() {
       </p>` : `<p class="muted" style="margin:0">In den letzten sieben Tagen wurde nichts gelernt.</p>`}
     </div>
 
+    ${S.statDeck === 'alle' ? `<div class="box">
+      <h2>Abzeichen</h2>
+      <p class="mini">${(() => { const a = abzeichenAktuell();
+        return `${a.erreicht.length} von ${a.alle.length} erreicht`
+          + (a.naechstes ? ` · als Nächstes ${esc(a.naechstes.name)}: noch
+             ${Math.max(0, a.naechstes.schwelle - a.naechstes.wert)}
+             ${esc(abzeichenEinheit(a.naechstes.art, a.naechstes.schwelle - a.naechstes.wert))}`
+          : (a.alle.length ? ' — alle geschafft' : '')); })()}</p>
+      <div class="abzeichen-reihe mt">${abzeichenListe().map(a => abzeichenHtml(a)).join('')}</div>
+    </div>` : ''}
+
     ${pruefungen.length ? `<div class="box">
       <h2>Anstehende Prüfungen</h2>
       <table class="daten"><thead><tr>
@@ -3556,6 +3996,11 @@ function malEinstellungen() {
       <h2>Konto</h2>
       <p class="mini" style="margin:0">Angemeldet als <strong>${esc(S.email || '')}</strong></p>
       <p class="mini" style="word-break:break-all">Konto-Kennung: <code>${esc(S.uid || '')}</code></p>
+      <label class="feld mt"><span>Anzeigename</span>
+        <input id="s-name" maxlength="30" placeholder="${esc(anzeigeName() || 'z. B. Glen')}"
+               value="${esc(e.name || '')}"></label>
+      <p class="mini" style="margin-top:-8px">Damit begrüßt dich die App auf dem Startbildschirm.
+        Ohne Eintrag wird der vordere Teil der E-Mail-Adresse verwendet.</p>
       <div class="row mt">
         <button class="btn" data-tu="abmelden">Abmelden</button>
         <button class="btn klein" data-tu="pwMail">Passwort ändern (E-Mail)</button>
@@ -3639,6 +4084,40 @@ function malEinstellungen() {
     </div>
 
     <div class="box">
+      <h2>Abzeichen</h2>
+      ${abzeichenZentralVorhanden() ? `<div class="hinweis blau">
+        Es gilt der <strong>gemeinsame Satz aus <code>firebase-config.js</code></strong> — er ist
+        für alle Konten gleich. Was du hier änderst, wirkt erst, wenn du den Textblock unten in
+        die Datei überträgst (oder den Eintrag <code>ABZEICHEN</code> dort entfernst).</div>`
+        : `<p class="mini">Abzeichen erscheinen auf dem Startbildschirm und in der Statistik.
+           Sollen alle Konten dieselben bekommen, überträgst du den Textblock unten einmal in
+           <code>firebase-config.js</code> — dann gilt er für alle.</p>`}
+      ${abzeichenZentralVorhanden() ? `<div class="mt">
+        <div class="mini" style="margin-bottom:6px">Aktuell gültig (aus der Konfiguration):</div>
+        <div class="abzeichen-reihe">${abzeichenSatz().map(a =>
+          abzeichenHtml({ ...a, erreicht: true }, true)).join('')}</div>
+      </div>` : ''}
+      <details class="mt" id="abz-eigene" ${abzeichenZentralVorhanden() ? '' : 'open'}>
+        <summary class="mini">${abzeichenZentralVorhanden()
+          ? 'Eigenen Satz bearbeiten (wirkt erst über den Textblock)' : 'Abzeichen bearbeiten'}</summary>
+      <div class="mt">${eigenerAbzeichensatz().map(a => `<div class="ab-zeile">
+        ${abzeichenHtml({ ...a, erreicht: true }, true)}
+        <div class="ab-haupt">
+          <div style="font-weight:600">${esc(a.name)}</div>
+          <div class="mini">${esc(ABZEICHEN_ARTEN[a.art])} ab ${a.schwelle}</div>
+        </div>
+        <button class="btn klein" data-tu="abzBearbeiten" data-id="${esc(a.id)}">Ändern</button>
+        <button class="btn klein gefahr" data-tu="abzLoeschen" data-id="${esc(a.id)}">×</button>
+      </div>`).join('') || '<p class="mini">Kein eigenes Abzeichen angelegt.</p>'}</div>
+      <div class="row mt">
+        <button class="btn primary" data-tu="abzAnlegen">+ Abzeichen</button>
+        <button class="btn" data-tu="abzBlock">Textblock für alle Konten</button>
+        <button class="btn" data-tu="abzStandard">Auf Standard zurücksetzen</button>
+      </div>
+      </details>
+    </div>
+
+    <div class="box">
       <h2>Altbestand übernehmen</h2>
       <p class="mini">Einmalig — holt Kästen, Karten, Fächer und Fälligkeiten aus der
         Vorgängerversion. Bestehende Karten bleiben dabei unberührt, sofern
@@ -3661,11 +4140,14 @@ function malEinstellungen() {
       </div>
       <hr>
       <div class="row">
-        <button class="btn" data-tu="expCsv">Kasten als CSV</button>
+        <button class="btn" data-tu="expCsv">Karten als CSV</button>
         <button class="btn" data-tu="impCsv">CSV einlesen</button>
       </div>
-      <p class="mini mt">CSV-Format: <code>Frage;Antwort;Kasten</code> — Semikolon als Trenner,
-        eine Karte pro Zeile.</p>
+      <p class="mini mt">Beim Einlesen zeigt ein Vorschau-Fenster, welche Spalte Frage, Antwort
+        und Notiz ist und in welchen Kasten alles kommt — nichts wird geschrieben, bevor die
+        Zuordnung stimmt. Semikolon, Komma und Tabulator werden erkannt. Erscheinen in der
+        Vorschau statt Umlauten Fragezeichen, die Datei in Excel als <em>CSV UTF-8</em>
+        speichern.</p>
     </div>
 
     <div class="box">
@@ -3688,6 +4170,14 @@ function malEinstellungen() {
     themeAnwenden(themeWunsch);
     try { localStorage.setItem('lk2:theme', themeWunsch); } catch (_) {}
     schreibe(FB.setDoc(refEinstellungen(), { theme: themeWunsch }, { merge: true }), 'Theme');
+  });
+
+  const nameFeld = $('#s-name');
+  if (nameFeld) nameFeld.addEventListener('change', ev => {
+    const neu = String(ev.target.value || '').trim().slice(0, 30);
+    S.einstellungen.name = neu;
+    schreibe(FB.setDoc(refEinstellungen(), { name: neu }, { merge: true }), 'Anzeigename');
+    toast(neu ? `Alles klar, ${neu}.` : 'Anzeigename entfernt.');
   });
 
   $('#s-klassik').addEventListener('change', ev => {
@@ -3734,7 +4224,7 @@ function diagnoseMalen() {
   const zusatz = S.cards.length - quellen;
   const bedarf = variantenBedarf();
   d.innerHTML = `
-    Projekt: <code>${esc(CFG.projectId)}</code><br>
+    HAN CROCO <code>${esc(VERSION)}</code> · Projekt: <code>${esc(CFG.projectId)}</code><br>
     Firebase-SDK: <code>${esc(SDK_VERSION)}</code> · FSRS: <code>${esc(FSRS?.FSRSVersion || 'ts-fsrs')}</code><br>
     Sprachausgabe: ${sprachAusgabeDa() ? 'verfügbar' : 'in diesem Browser nicht verfügbar'}<br>
     Verbindung: ${statusZustand.offen ? 'Änderungen unterwegs'
@@ -3748,6 +4238,29 @@ function diagnoseMalen() {
       Sie tauchen in keiner Lernsitzung auf, werden aber in der Statistik mitgezählt.
       <div style="margin-top:8px"><button class="btn klein" data-tu="verwaisteEinsammeln">
         In einen Kasten einsammeln</button></div></div>` : ''}
+    ${(() => {
+      /* Der Zustand nach einem verunglückten Import: viele Kästen mit je einer
+         Karte. Vorher meldete die Diagnose dazu nichts — der Hinweis auf leere
+         Kästen kam erst, wenn man den schweren Teil schon allein gefunden
+         hatte. Hier steht er, bevor es weh tut, samt Knopf, der alles in einem
+         Zug einsammelt. */
+      const winzig = S.decks.filter(d => kartenVon(d.id).filter(istQuellkarte).length === 1);
+      return winzig.length >= 8 ? `<div class="hinweis" style="margin-top:10px">
+        <strong>${winzig.length} Kästen enthalten nur eine einzige Karte.</strong>
+        Das sieht nach einem verunglückten Import aus — meist stand in der CSV-Datei eine
+        Spalte mit Notizen dort, wo der Kastenname erwartet wurde.
+        <div style="margin-top:8px"><button class="btn klein" data-tu="importEinsammeln">
+          Karten in einen Kasten zusammenführen</button></div></div>` : '';
+    })()}
+    ${(() => {
+      const leer = S.decks.filter(d => !kartenVon(d.id).length).length;
+      return leer ? `<div class="hinweis" style="margin-top:10px">
+        <strong>${leer} ${leer === 1 ? 'Kasten ist' : 'Kästen sind'} leer.</strong>
+        Das passiert etwa, wenn ein Import aus Versehen viele Kästen angelegt hat und die
+        Karten anschließend zusammengeführt wurden.
+        <div style="margin-top:8px"><button class="btn klein" data-tu="leereKaesten">
+          Leere Kästen entfernen</button></div></div>` : '';
+    })()}
     ${(bedarf.karten || bedarf.verwaist) ? `<div class="hinweis" style="margin-top:10px">
       <strong>${bedarf.karten} Karten haben nicht die Abfragen, die ihr Kasten vorsieht.</strong>
       ${bedarf.verwaist ? `Dazu ${bedarf.verwaist} Abfragen ohne Quellkarte.` : ''}
@@ -3779,9 +4292,39 @@ function dateiWaehlen(endung) {
       const f = i.files?.[0];
       if (!f) return fertig(null);
       const r = new FileReader();
-      r.onload = () => fertig({ name: f.name, text: String(r.result || '') });
+      /* Erst UTF-8 versuchen, und zwar streng. Deutsches Excel schreibt beim
+         Speichern als „CSV (Trennzeichen-getrennt)“ Windows-1252 — als UTF-8
+         gelesen wird daraus Gr��e und Fu�. Schlägt die strenge Prüfung fehl,
+         wird die Datei als Windows-1252 gelesen; das ist bei uns der einzige
+         realistische Zweitfall. */
+      r.onload = () => {
+        const roh = r.result;
+        let text = '';
+        if (roh instanceof ArrayBuffer) {
+          /* UTF-16 zuerst an seiner Bytefolge erkennen. Sonst scheitert die
+             strenge UTF-8-Prüfung, und windows-1252 nimmt anschließend jedes
+             Byte an — aus „Frage“ würde „ÿþF\u0000r\u0000a\u0000…“, ohne dass
+             irgendwo ein Ersatzzeichen auftaucht, an dem man es merkt. */
+          const b0 = new Uint8Array(roh, 0, Math.min(2, roh.byteLength));
+          const kodierung = (b0[0] === 0xFF && b0[1] === 0xFE) ? 'utf-16le'
+            : (b0[0] === 0xFE && b0[1] === 0xFF) ? 'utf-16be' : null;
+          if (kodierung) text = new TextDecoder(kodierung).decode(roh);
+          else {
+            try { text = new TextDecoder('utf-8', { fatal: true }).decode(roh); }
+            catch (e) {
+              try { text = new TextDecoder('windows-1252').decode(roh); }
+              catch (e2) { text = new TextDecoder('utf-8').decode(roh); }
+            }
+          }
+          // UTF-16 ohne Kennzeichnung: viele Nullbytes, sonst kaum welche.
+          if (!kodierung && /\u0000/.test(text.slice(0, 4000)))
+            text = new TextDecoder(text.charCodeAt(0) === 0 ? 'utf-16be' : 'utf-16le').decode(roh);
+          text = text.replace(/\u0000/g, '');
+        } else text = String(roh || '');
+        fertig({ name: f.name, text });
+      };
       r.onerror = () => fertig(null);
-      r.readAsText(f, 'utf-8');
+      r.readAsArrayBuffer(f);
     });
     i.click();
   });
@@ -3792,7 +4335,7 @@ function dateiWaehlen(endung) {
 async function exportJson() {
   await reviewsLaden();          // sonst wäre der Verlauf in der Sicherung leer
   const daten = {
-    app: 'Lernkartei 2', version: 2,
+    app: 'HAN CROCO', appAlt: 'Lernkartei 2', version: 2, programmVersion: VERSION,
     exportiertAm: new Date().toISOString(),
     konto: S.email,
     settings: S.einstellungen,
@@ -3800,7 +4343,7 @@ async function exportJson() {
     cards: S.cards,
     reviews: S.reviews
   };
-  const name = `lernkartei2-${heute()}.json`;
+  const name = `han-croco-${heute()}.json`;
   dateiHerunterladen(name, JSON.stringify(daten, null, 2));
   toast('Sicherung heruntergeladen: ' + name);
 }
@@ -3813,7 +4356,11 @@ function csvBauen(karten) {
   // Nur Quellkarten: die zus\u00E4tzlichen Abfragen (R\u00FCckw\u00E4rtsrichtung, einzelne
   // Cloze-L\u00FCcken) tragen denselben Inhalt und st\u00FCnden sonst doppelt in der
   // Datei \u2014 beim Wiedereinlesen entst\u00FCnden Dubletten.
-  return '\uFEFF' + karten.filter(istQuellkarte).map(k =>
+  /* Mit Kopfzeile, damit die eigene Sicherung auch wieder eingelesen werden
+     kann: ohne sie erkennt der Import-Dialog die dritte Spalte nicht als
+     Kasten und wirft alle K\u00E4sten in einen einzigen zusammen. */
+  return '\uFEFF' + ['Frage', 'Antwort', 'Kasten'].map(csvFeld).join(';') + '\r\n'
+    + karten.filter(istQuellkarte).map(k =>
     // Bei L\u00FCckentexten steht die L\u00F6sung in der Frage-Spalte; ohne Ersatz in
     // der Antwort-Spalte w\u00FCrde die Zeile beim Wiedereinlesen verworfen.
     [k.frage,
@@ -3827,24 +4374,488 @@ function dateiTeil(s) {
 
 /* --- 14b. CSV lesen --- */
 
-function csvZerlegen(text) {
-  text = text.replace(/^\uFEFF/, '');
+/* Ein Anf\u00FChrungszeichen gilt nur dann als Feldbegrenzer, wenn das Feld noch
+   leer ist \u2014 also direkt nach Zeilenanfang oder Trennzeichen. Sonst ist es
+   ein ganz normales Zeichen. Vorher schaltete jedes " mitten im Text den
+   Zitatmodus um: aus  Zoll;5" (L\u00E4nge)  wurde eine einzige Karte, die den
+   ganzen Rest der Datei verschluckte, und aus  Er sagte "hallo"  wurde
+   klammheimlich  Er sagte hallo. */
+function csvZerlegen(text, trenner) {
+  text = String(text ?? '').replace(/^\uFEFF/, '');
+  const trenn = trenner || ';';
   const zeilen = [];
-  let feld = '', zeile = [], inQ = false;
+  csvZerlegen.offenesZitat = false;
+  let feld = '', zeile = [], inQ = false, offen = true;
   for (let i = 0; i < text.length; i++) {
     const c = text[i], n = text[i + 1];
     if (inQ) {
       if (c === '"' && n === '"') { feld += '"'; i++; }
-      else if (c === '"') inQ = false;
+      else if (c === '"') { inQ = false; offen = false; }
       else feld += c;
-    } else if (c === '"') inQ = true;
-    else if (c === ';' || c === '\t') { zeile.push(feld); feld = ''; }
+    } else if (c === '"' && offen && feld === '') { inQ = true; }
+    else if (c === trenn) { zeile.push(feld); feld = ''; offen = true; }
     else if (c === '\r') { /* ignorieren */ }
-    else if (c === '\n') { zeile.push(feld); zeilen.push(zeile); zeile = []; feld = ''; }
-    else feld += c;
+    else if (c === '\n') { zeile.push(feld); zeilen.push(zeile); zeile = []; feld = ''; offen = true; }
+    else { feld += c; offen = false; }
   }
   if (feld !== '' || zeile.length) { zeile.push(feld); zeilen.push(zeile); }
+  // Endet die Datei mitten in einem Zitat, fehlt irgendwo ein Anf\u00FChrungszeichen
+  // und alles danach steckt in einem einzigen Feld. Der Dialog sagt das an.
+  csvZerlegen.offenesZitat = inQ;
   return zeilen.filter(z => z.some(f => String(f).trim() !== ''));
+}
+
+const CSV_TRENNER = [[';', 'Semikolon'], ['\t', 'Tabulator'], [',', 'Komma']];
+
+/** Trennzeichen aus der Datei erraten. Vorher kannte die App nur Semikolon und
+ *  Tabulator \u2014 eine kommagetrennte Datei landete komplett im Papierkorb, ohne
+ *  dass jemand erfuhr warum.
+ *
+ *  Entscheidend ist die Gleichm\u00E4\u00DFigkeit, nicht die Spaltenzahl: \u201ENenne die
+ *  Grundfarben;rot, gelb, blau\u201C ergibt mit Komma drei gleichm\u00E4\u00DFige Spalten und
+ *  mit Semikolon zwei \u2014 nach Spaltenzahl gew\u00E4nne das Komma und zerschnitte die
+ *  Antwort. Bei gleicher Gleichm\u00E4\u00DFigkeit entscheidet deshalb die feste
+ *  Rangfolge Semikolon \u2192 Tabulator \u2192 Komma. Das Komma steht hinten, weil es in
+ *  Antworttexten am h\u00E4ufigsten vorkommt. */
+function csvTrennerErkennen(text, dateiname) {
+  if (/\.tsv$/i.test(String(dateiname || ''))) return '\t';
+  /* F\u00FCr die Erkennung reichen die ersten Zeilen \u2014 bei 20.000 Zeilen sonst
+     dreimal die ganze Datei zerlegen, nur um 40 Zeilen anzusehen. */
+  const probe = String(text ?? '').slice(0, 120000);
+  let bester = ';', bestesMass = -1;
+  CSV_TRENNER.forEach(([t]) => {
+    const zeilen = csvZerlegen(probe, t).slice(0, 40);
+    if (zeilen.length < 1) return;
+    const zahlen = zeilen.map(z => z.length);
+    const haeufig = new Map();
+    zahlen.forEach(n => haeufig.set(n, (haeufig.get(n) || 0) + 1));
+    let modus = 0, wie = 0;
+    haeufig.forEach((anzahl, n) => { if (anzahl > wie || (anzahl === wie && n > modus)) { modus = n; wie = anzahl; } });
+    if (modus < 2) return;
+    const anteil = wie / zahlen.length;
+    if (anteil > bestesMass + 0.001) { bestesMass = anteil; bester = t; }
+  });
+  return bester;
+}
+
+/* \u00DCbliche Spalten\u00FCberschriften \u2014 auch die aus anderen Lernprogrammen. */
+const CSV_KOPFWORTE = {
+  frage:   ['frage', 'front', 'vorderseite', 'begriff', 'wort', 'vokabel', 'question', 'term', 'word'],
+  antwort: ['antwort', 'back', 'r\u00FCckseite', 'rueckseite', 'bedeutung', '\u00FCbersetzung',
+            'uebersetzung', 'answer', 'definition', 'translation', 'meaning',
+            'erkl\u00E4rung', 'erklaerung', 'erl\u00E4uterung', 'erlaeuterung',
+            'l\u00F6sung', 'loesung', 'beschreibung', 'explanation', 'solution'],
+  notiz:   ['notiz', 'note', 'notes', 'bemerkung', 'beispiel', 'hinweis', 'kommentar', 'example'],
+  kasten:  ['kasten', 'deck', 'kategorie', 'thema', 'stapel', 'category', 'topic']
+};
+/* Eine \u00DCberschrift wird nur angenommen, wenn mindestens ZWEI verschiedene
+   Rollen erkannt werden. Ein einzelnes Stichwort gen\u00FCgt nicht: Die Zeile
+   \u201EWort;word\u201C ist eine ganz normale Vokabelkarte, wurde vorher aber als
+   \u00DCberschrift gewertet und stillschweigend verschluckt. Lieber eine sichtbare
+   Karte zuviel \u2014 die kann man l\u00F6schen \u2014 als eine unsichtbar fehlende. */
+const csvIstKopfzeile = zeile => {
+  const rollen = new Set();
+  zeile.forEach(f => {
+    const w = String(f).trim().toLowerCase();
+    Object.keys(CSV_KOPFWORTE).forEach(art => { if (CSV_KOPFWORTE[art].includes(w)) rollen.add(art); });
+  });
+  return rollen.size >= 2;
+};
+/** Spaltenvorschlag: nach \u00DCberschrift, sonst Spalte 1 und 2. Keine Spalte darf
+ *  dabei zwei Rollen bekommen \u2014 sonst entst\u00FCnden Karten, deren Antwort die
+ *  Frage wiederholt, oder je Zeile ein eigener Kasten. */
+function csvSpaltenRaten(kopf, spalten) {
+  const anzahl = Math.max(1, spalten || (kopf ? kopf.length : 2));
+  const finde = art => {
+    if (!kopf) return -1;
+    const i = kopf.findIndex(f => CSV_KOPFWORTE[art].includes(String(f).trim().toLowerCase()));
+    return i < anzahl ? i : -1;
+  };
+  const notiz = finde('notiz');
+  let kasten = finde('kasten');
+  let frage = finde('frage'), antwort = finde('antwort');
+  const frei = ausser => { for (let i = 0; i < anzahl; i++) if (!ausser.includes(i)) return i; return -1; };
+  if (frage < 0)   frage   = frei([antwort, notiz, kasten]);
+  if (antwort < 0) antwort = frei([frage, notiz, kasten]);
+  /* Bleibt nichts frei, weil Notiz- und Kastenspalte alles belegen, wird deren
+     Rolle aufgegeben — eine Datei „Thema;Begriff;Beispiel“ ist einwandfrei und
+     darf nicht in einer roten Sackgasse enden. */
+  if (frage < 0)   frage   = frei([antwort]);
+  if (antwort < 0) antwort = frei([frage]);
+  if (frage < 0)   frage   = 0;
+  if (antwort < 0) antwort = anzahl > 1 ? (frage === 0 ? 1 : 0) : 0;
+  if (notiz === frage || notiz === antwort) notiz = -1;
+  /* Eine Kastenspalte, die zugleich Frage oder Antwort ist, w\u00E4re genau der
+     alte Unfall: aus jeder Zeile ein eigener Kasten. */
+  if (kasten === frage || kasten === antwort) kasten = -1;
+  return { frage, antwort, notiz, kasten };
+}
+
+/* --- 14b2. CSV einlesen mit Vorschau ------------------------------------
+   Früher galt starr: Spalte 1 = Frage, 2 = Antwort, 3 = Kasten, 4 = Notiz.
+   Steht in Spalte 3 etwas Zeilenspezifisches — eine Notiz, ein Schlagwort,
+   eine Beispielsatz-Spalte —, entstand aus jeder Zeile ein eigener Kasten:
+   180 Zeilen ergaben 180 Kästen. Kommagetrennte Dateien wurden zudem
+   vollständig verworfen, ohne dass jemand erfuhr warum. Deshalb wird jetzt
+   vor dem Schreiben gezeigt, was passieren wird, und alles ist einstellbar.
+   ------------------------------------------------------------------------ */
+
+async function csvEinlesenDialog(datei) {
+  const z = {
+    trenner: csvTrennerErkennen(datei.text, datei.name),
+    zeilen: [], spalten: 1, kopf: false, sp: null
+  };
+  const neuLesen = () => {
+    z.zeilen = csvZerlegen(datei.text, z.trenner);
+    z.kopf = z.zeilen.length ? csvIstKopfzeile(z.zeilen[0]) : false;
+    /* Maßgeblich sind die Datenzeilen. Eine Kopfzeile „Frage;Antwort;Notiz;Kasten“
+       über zweispaltigen Daten ergäbe sonst eine leere vierte Spalte — und aus
+       jeder Zeile einen Kasten namens „Ohne Kasten“. */
+    const daten = z.zeilen.slice(z.kopf ? 1 : 0);
+    z.spalten = Math.max(1, ...(daten.length ? daten : z.zeilen).map(r => r.length));
+    z.sp = csvSpaltenRaten(z.kopf ? z.zeilen[0] : null, z.spalten);
+  };
+  neuLesen();
+  if (!z.zeilen.length) return toast('In der Datei stehen keine verwertbaren Zeilen.', 'fehler');
+  const offenesZitat = () => csvZerlegen.offenesZitat;
+  /* Kaputte Umlaute fallen sonst erst auf den fertigen Karten auf. */
+  const kaputteZeichen = datei.text.includes('�');
+
+  const vorschlag = String(datei.name || '').replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ').trim().slice(0, 120) || 'Import';
+  // Nur wenn eine Spalte ausdrücklich „Kasten“/„Deck“ heißt, wird sie auch
+  // als Kasten vorgeschlagen. Sonst landet alles in einem neuen Kasten —
+  // das ist die Erwartung, wenn man eine Liste einliest.
+  const kastenSpalteGefuellt = () => {
+    if (z.sp.kasten < 0) return false;
+    const daten = z.zeilen.slice(z.kopf ? 1 : 0);
+    if (!daten.length) return false;
+    const voll = daten.filter(r => String(r[z.sp.kasten] ?? '').trim()).length;
+    return voll > daten.length / 2;
+  };
+  const zielVorgabe = kastenSpalteGefuellt() ? 'spalte' : 'neu';
+
+  const spaltenName = i => {
+    const k = z.kopf && z.zeilen[0] ? String(z.zeilen[0][i] ?? '').trim() : '';
+    return `Spalte ${i + 1}${k ? ' — ' + k.slice(0, 24) : ''}`;
+  };
+  const auswahl = (id, wert, mitKeine) => `<select id="${id}">
+      ${mitKeine ? `<option value="-1" ${wert < 0 ? 'selected' : ''}>— keine —</option>` : ''}
+      ${Array.from({ length: z.spalten }, (_, i) =>
+        `<option value="${i}" ${wert === i ? 'selected' : ''}>${esc(spaltenName(i))}</option>`).join('')}
+    </select>`;
+
+  const koerper = () => `
+    <div class="row" style="gap:10px;align-items:flex-end;margin-bottom:10px">
+      <label class="feld" style="flex:1;margin:0"><span>Trennzeichen</span>
+        <select id="m-trenner">${CSV_TRENNER.map(([t, n]) =>
+          `<option value="${t === '\t' ? 'tab' : t}" ${z.trenner === t ? 'selected' : ''}>${n}</option>`).join('')}
+        </select></label>
+      <label class="karo" style="flex:1"><input type="checkbox" id="m-kopf" ${z.kopf ? 'checked' : ''}>
+        <span>Erste Zeile ist eine Überschrift</span></label>
+    </div>
+    <div class="row" style="gap:10px">
+      <label class="feld" style="flex:1;min-width:130px"><span>Frage</span>${auswahl('m-sp-frage', z.sp.frage)}</label>
+      <label class="feld" style="flex:1;min-width:130px"><span>Antwort</span>${auswahl('m-sp-antwort', z.sp.antwort)}</label>
+      <label class="feld" style="flex:1;min-width:130px"><span>Notiz</span>${auswahl('m-sp-notiz', z.sp.notiz, true)}</label>
+    </div>
+    <label class="feld"><span>Wohin?</span>
+      <select id="m-ziel">
+        <option value="neu" ${zielVorgabe === 'neu' ? 'selected' : ''}>In einen neuen Kasten</option>
+        ${S.decks.map(d => `<option value="d:${esc(d.id)}">In den vorhandenen Kasten „${esc(d.name)}“</option>`).join('')}
+        <option value="spalte" ${zielVorgabe === 'spalte' ? 'selected' : ''}>Kastenname steht in einer Spalte</option>
+      </select></label>
+    <label class="feld" id="m-zielname-feld"><span>Name des neuen Kastens</span>
+      <input id="m-zielname" maxlength="120" value="${esc(vorschlag)}"></label>
+    <label class="feld" id="m-spkasten-feld" hidden><span>Spalte mit dem Kastennamen</span>
+      ${auswahl('m-sp-kasten', z.sp.kasten >= 0 ? z.sp.kasten : 0)}</label>
+    <label class="karo" id="m-dubletten-feld" hidden><input type="checkbox" id="m-dubletten" ${
+      z.dubletten === false ? '' : 'checked'}>
+      <span>Karten überspringen, die dort schon stehen</span></label>
+    <div id="m-csv-vorschau"></div>
+    <div id="m-csv-bilanz" class="hinweis" style="margin-top:10px"></div>`;
+
+  /** Liest die Einstellungen aus dem Dialog. */
+  const einstellungLesen = m => {
+    const t = $('#m-trenner', m)?.value;
+    return {
+      trenner: t === 'tab' ? '\t' : (t || ';'),
+      kopf: !!$('#m-kopf', m)?.checked,
+      frage: Number($('#m-sp-frage', m)?.value ?? 0),
+      antwort: Number($('#m-sp-antwort', m)?.value ?? 1),
+      notiz: Number($('#m-sp-notiz', m)?.value ?? -1),
+      kastenSpalte: Number($('#m-sp-kasten', m)?.value ?? -1),
+      ziel: $('#m-ziel', m)?.value || 'neu',
+      zielname: String($('#m-zielname', m)?.value || '').trim(),
+      ohneDubletten: $('#m-dubletten', m) ? !!$('#m-dubletten', m).checked : true
+    };
+  };
+
+  /* Was steht schon in den Kästen? Damit dieselbe Datei nicht beim zweiten
+     Einlesen alles verdoppelt — der häufigste Fehlgriff, wenn man sich beim
+     ersten Mal bei der Zuordnung vertan hat. */
+  const nameZuId = new Map(S.decks.map(d => [(d.name || '').toLowerCase(), d.id]));
+  const fragenJeDeck = new Map();
+  S.cards.filter(istQuellkarte).forEach(k => {
+    const s = fragenJeDeck.get(k.deckId) || new Set();
+    s.add(String(k.frage || '').trim().toLowerCase());
+    fragenJeDeck.set(k.deckId, s);
+  });
+  const zielIdFuer = (e, name) =>
+    e.ziel === 'spalte' ? nameZuId.get(String(name || '').toLowerCase())
+      : e.ziel === 'neu' ? nameZuId.get(String(e.zielname || vorschlag).toLowerCase())
+        : e.ziel.slice(2);
+
+  /** Wertet die Datei nach den gewählten Einstellungen aus — ohne zu schreiben. */
+  const auswerten = e => {
+    const daten = z.zeilen.slice(e.kopf ? 1 : 0);
+    const karten = [];
+    const kaesten = new Map();          // Name (klein) -> Anzeigename
+    const gesehen = new Map();          // Zielkasten -> bereits gelesene Fragen
+    let leer = 0, dubletten = 0;
+    daten.forEach(r => {
+      const frage = String(r[e.frage] ?? '').trim();
+      const antwort = String(r[e.antwort] ?? '').trim();
+      if (!frage || !antwort) { leer++; return; }
+      const name = e.ziel === 'spalte'
+        ? (String(r[e.kastenSpalte] ?? '').trim() || 'Ohne Kasten')
+        : null;
+      if (name) kaesten.set(name.toLowerCase(), name);
+      const zielId = zielIdFuer(e, name) || ('neu:' + (name || '').toLowerCase());
+      const schluessel = frage.toLowerCase();
+      const bekannt = (fragenJeDeck.get(zielId)?.has(schluessel)) || gesehen.get(zielId)?.has(schluessel);
+      if (!gesehen.has(zielId)) gesehen.set(zielId, new Set());
+      gesehen.get(zielId).add(schluessel);
+      if (bekannt) {
+        dubletten++;
+        if (e.ohneDubletten !== false) return;
+      }
+      karten.push({ frage, antwort, notiz: e.notiz >= 0 ? String(r[e.notiz] ?? '').trim() : '', name });
+    });
+    return { karten, kaesten, leer, dubletten, zeilen: daten.length };
+  };
+
+  const zeichnen = m => {
+    const e = einstellungLesen(m);
+    $('#m-zielname-feld', m).hidden = e.ziel !== 'neu';
+    $('#m-spkasten-feld', m).hidden = e.ziel !== 'spalte';
+
+    const daten = z.zeilen.slice(e.kopf ? 1 : 0).slice(0, 5);
+    const rolle = i => i === e.frage ? 'Frage' : i === e.antwort ? 'Antwort'
+      : i === e.notiz ? 'Notiz' : (e.ziel === 'spalte' && i === e.kastenSpalte) ? 'Kasten' : '';
+    $('#m-csv-vorschau', m).innerHTML = `
+      <p class="mini" style="margin-bottom:4px">Vorschau der ersten Zeilen:</p>
+      <div class="csv-vorschau"><table class="daten"><thead><tr>${
+        Array.from({ length: z.spalten }, (_, i) => {
+          const r = rolle(i);
+          return `<th${r ? ' class="rolle"' : ''}>${r || '·'}</th>`;
+        }).join('')}</tr></thead><tbody>${
+        daten.map(r => `<tr>${Array.from({ length: z.spalten }, (_, i) => {
+          const voll = String(r[i] ?? '');
+          return `<td${rolle(i) ? ' class="rolle"' : ''} title="${esc(voll.slice(0, 300))}">${
+            esc(voll.slice(0, 40))}${voll.length > 40 ? '…' : ''}</td>`;
+        }).join('')}</tr>`).join('')
+      }</tbody></table></div>`;
+
+    const b = auswerten(e);
+    const vorhanden = new Set(S.decks.map(d => (d.name || '').toLowerCase()));
+    const neueKaesten = Array.from(b.kaesten.keys()).filter(n => !vorhanden.has(n)).length;
+    const bilanz = $('#m-csv-bilanz', m);
+    let text = '';
+    /* Zeigt Frage und Antwort auf dieselbe Spalte, entstünden Karten, deren
+       Antwort die Frage wiederholt. Das ist nie gewollt und passiert vor allem
+       dann, wenn das Trennzeichen nicht passt und die Datei nur eine Spalte
+       hat. Darum hier deutlich sagen, was zu tun ist, statt eine Kartenzahl
+       zu versprechen, die es so nicht geben wird. */
+    if (e.frage === e.antwort) {
+      const tname = (CSV_TRENNER.find(([t]) => t === e.trenner) || [, 'dem gewählten Zeichen'])[1];
+      text = z.spalten < 2
+        ? `<strong>Keine verwertbaren Zeilen.</strong> Mit dem Trennzeichen „${esc(tname)}“
+           hat die Datei nur eine Spalte — Frage und Antwort lassen sich so nicht trennen.
+           Probiere ein anderes Trennzeichen.`
+        : `<strong>Keine verwertbaren Zeilen.</strong> Frage und Antwort zeigen auf dieselbe
+           Spalte. Bitte zwei verschiedene Spalten wählen.`;
+      bilanz.className = 'hinweis rot';
+      bilanz.innerHTML = text;
+      return;
+    }
+    if (!b.karten.length && !b.dubletten) {
+      text = `<strong>Keine verwertbaren Zeilen.</strong> Mit dieser Zuordnung ist bei allen
+        ${b.zeilen} Zeilen Frage oder Antwort leer. Stimmt das Trennzeichen?`;
+      bilanz.className = 'hinweis rot';
+    } else if (e.ziel === 'spalte') {
+      const viele = b.kaesten.size > 5;
+      text = `<strong>${b.karten.length} Karten</strong> in <strong>${b.kaesten.size} Kästen</strong>
+        (${neueKaesten} davon neu).`
+        + (viele ? `<br>Das sind auffällig viele Kästen. Enthält die gewählte Spalte wirklich
+             Kastennamen — oder eher Notizen und Schlagwörter? Dann besser „In einen neuen
+             Kasten“ wählen.` : '');
+      bilanz.className = viele ? 'hinweis' : 'hinweis blau';
+    } else {
+      /* „In einen neuen Kasten“ mit dem Namen eines vorhandenen Kastens legt
+         keinen zweiten an, sondern schreibt hinein. Das muss dastehen, sonst
+         stimmt die Ankündigung nicht mit dem Ergebnis überein. */
+      const zielName = e.ziel === 'neu' ? (e.zielname || vorschlag)
+        : (S.decks.find(d => 'd:' + d.id === e.ziel)?.name || '');
+      const trifftVorhandenen = e.ziel === 'neu' && vorhanden.has(String(zielName).toLowerCase());
+      const drin = trifftVorhandenen
+        ? (fragenJeDeck.get(nameZuId.get(String(zielName).toLowerCase()))?.size || 0) : 0;
+      text = `<strong>${b.karten.length} ${b.karten.length === 1 ? 'Karte' : 'Karten'}</strong> ${
+        e.ziel === 'neu' && !trifftVorhandenen
+        ? 'in den neuen Kasten' : 'in den Kasten'} „${esc(zielName)}“`
+        + (trifftVorhandenen ? ` — den gibt es schon, er enthält bereits ${drin}
+             ${drin === 1 ? 'Karte' : 'Karten'}.` : '.');
+      bilanz.className = 'hinweis blau';
+    }
+    if (b.leer) text += `<br><span class="mini">${b.leer} Zeilen ohne Frage oder Antwort werden übersprungen.</span>`;
+    if (b.dubletten) text += `<br><span class="mini">${b.dubletten} ${b.dubletten === 1
+      ? `Karte steht dort schon und wird ${e.ohneDubletten !== false ? 'übersprungen' : 'trotzdem angelegt'}`
+      : `Karten stehen dort schon und werden ${e.ohneDubletten !== false ? 'übersprungen' : 'trotzdem angelegt'}`}.</span>`;
+    /* Was nicht als Überschrift erkannt wurde, wird zur Karte. Lieber vorher
+       zeigen, was in Zeile 1 steht, als hinterher eine Karte „Deutsch → Englisch“
+       im Kasten zu finden. */
+    if (!e.kopf && z.zeilen[0] && b.karten.length) {
+      const erste = [z.zeilen[0][e.frage], z.zeilen[0][e.antwort]]
+        .map(s => String(s ?? '').trim().slice(0, 30)).filter(Boolean).join(' → ');
+      if (erste) text += `<br><span class="mini">Zeile 1 wird als Karte eingelesen: „${esc(erste)}“.
+        Ist das eine Überschrift, oben den Haken setzen.</span>`;
+    }
+    if (kaputteZeichen) text += `<br><strong>Die Umlaute sehen falsch aus.</strong> In der Datei stehen
+      unlesbare Zeichen (�). Die Datei noch einmal als „CSV UTF-8“ speichern und erneut einlesen.`;
+    if (offenesZitat()) text += `<br><strong>In der Datei fehlt ein Anf\u00FChrungszeichen.</strong>
+      Irgendwo beginnt eines, das nie geschlossen wird \u2014 alles danach steckt in einer einzigen
+      Karte. Bitte in der Datei nachsehen.`;
+    bilanz.innerHTML = text;
+    if (kaputteZeichen || offenesZitat()) bilanz.className = 'hinweis rot';
+    $('#m-dubletten-feld', m).hidden = !b.dubletten && e.ohneDubletten !== false;
+  };
+
+  const antwort = await modal({
+    titel: 'CSV einlesen — ' + (datei.name || 'Datei'),
+    breit: true,
+    ohneEnter: true,
+    html: `<div id="m-csv">${koerper()}</div>`,
+    knoepfe: [{ text: 'Abbrechen', wert: null }, {
+      text: 'Einlesen', wert: 'ok', art: 'primary',
+      pruefen: () => {
+        const m = $('#modal');
+        const e = einstellungLesen(m);
+        if (e.frage === e.antwort) { toast('Frage und Antwort dürfen nicht dieselbe Spalte sein.'); return false; }
+        if (e.ziel === 'spalte' && (e.kastenSpalte === e.frage || e.kastenSpalte === e.antwort)) {
+          toast('Die Kasten-Spalte darf nicht zugleich Frage oder Antwort sein — sonst entsteht je Zeile ein eigener Kasten.');
+          return false;
+        }
+        if (e.ziel === 'neu' && !e.zielname) { toast('Bitte einen Namen für den neuen Kasten eingeben.'); return false; }
+        if (!auswerten(e).karten.length) {
+          toast(auswerten(e).dubletten
+            ? 'Alle Karten stehen dort schon — es gibt nichts einzulesen.'
+            : 'Mit dieser Zuordnung gibt es nichts einzulesen.');
+          return false;
+        }
+      }
+    }],
+    beimOeffnen: m => {
+      const verdrahte = () => {
+        $$('#m-csv select, #m-csv input', m).forEach(el => {
+          if (el._csv) return;
+          el._csv = true;
+          el.addEventListener(el.tagName === 'INPUT' && el.type === 'text' ? 'input' : 'change', () => {
+            if (el.id === 'm-trenner') {
+              z.trenner = el.value === 'tab' ? '\t' : el.value;
+              const merken = { ziel: $('#m-ziel', m).value, name: $('#m-zielname', m).value };
+              z.dubletten = $('#m-dubletten', m) ? !!$('#m-dubletten', m).checked : true;
+              neuLesen();
+              $('#m-csv', m).innerHTML = koerper();
+              $('#m-ziel', m).value = [...$$('#m-ziel option', m)].some(o => o.value === merken.ziel)
+                ? merken.ziel : 'neu';
+              $('#m-zielname', m).value = merken.name;
+              verdrahte();
+              /* Der Dialogkörper wurde neu gebaut — ohne das hier landet der
+                 Fokus im Nichts und Tastaturbedienung fängt von vorn an. */
+              $('#m-trenner', m)?.focus();
+            }
+            zeichnen(m);
+          });
+        });
+      };
+      verdrahte();
+      zeichnen(m);
+    }
+  });
+  if (antwort !== 'ok') return;
+
+  /* --- Schreiben --- */
+  const e = {
+    trenner: letzteWerte['m-trenner'] === 'tab' ? '\t' : (letzteWerte['m-trenner'] || ';'),
+    kopf: letzteWerte['m-kopf'] === true,
+    frage: Number(W('m-sp-frage', 0)),
+    antwort: Number(W('m-sp-antwort', 1)),
+    notiz: Number(W('m-sp-notiz', -1)),
+    kastenSpalte: Number(W('m-sp-kasten', -1)),
+    ziel: W('m-ziel', 'neu'),
+    zielname: String(W('m-zielname', vorschlag)).trim() || vorschlag,
+    ohneDubletten: W('m-dubletten', true) !== false
+  };
+  z.trenner = e.trenner;
+  neuLesen();
+  const b = auswerten(e);
+  if (!b.karten.length) return toast('Keine verwertbaren Zeilen.', 'fehler');
+
+  const nachName = new Map(S.decks.map(d => [(d.name || '').toLowerCase(), d.id]));
+  const neueDecks = [];
+  const deckFuer = name => {
+    const schluessel = name.toLowerCase();
+    let id = nachName.get(schluessel);
+    if (!id) {
+      id = neueId();
+      nachName.set(schluessel, id);
+      neueDecks.push({ id, daten: neuesDeck(name) });
+    }
+    return id;
+  };
+
+  let zielId = null;
+  if (e.ziel === 'neu') zielId = deckFuer(e.zielname);
+  else if (e.ziel !== 'spalte') zielId = e.ziel.slice(2);
+  if (e.ziel !== 'spalte' && !S.decks.some(d => d.id === zielId) && !neueDecks.some(d => d.id === zielId))
+    return toast('Der gewählte Kasten gibt es nicht mehr.', 'fehler');
+
+  const karten = b.karten.map(k => {
+    const deckId = e.ziel === 'spalte' ? deckFuer(k.name) : zielId;
+    return { id: neueId(), ...neueKarte({ deckId, frage: k.frage, antwort: k.antwort, notiz: k.notiz }) };
+  });
+
+  const ops = [
+    ...neueDecks.map(d => ['set', FB.doc(colDecks(), d.id), d.daten]),
+    ...karten.map(k => { const { id, ...rest } = k; return ['set', FB.doc(colCards(), id), rest]; })
+  ];
+  for (let i = 0; i < ops.length; i += 400) {
+    const stapel = FB.writeBatch(db);
+    ops.slice(i, i + 400).forEach(([, ref, daten]) => stapel.set(ref, daten));
+    schreibe(stapel.commit(), 'CSV-Import');
+  }
+  // Sieht der Zielkasten Rückwärtsabfragen vor, fehlen sie den frisch
+  // eingelesenen Karten noch. Gleich nachziehen statt den Nutzer später
+  // über die Diagnose stolpern zu lassen.
+  neueDecks.forEach(d => { if (!S.decks.some(x => x.id === d.id)) S.decks.push({ id: d.id, ...d.daten }); });
+  const neueIds = new Set(karten.map(k => k.id));
+  karten.forEach(k => { if (!S.cards.some(c => c.id === k.id)) S.cards.push(k); });
+  const bilanz = alleVariantenAbgleichen(k => neueIds.has(k.id));
+  /* Für die Rücknahme merken. Nur im Arbeitsspeicher: Nach einem Neuladen ist
+     der Import Vergangenheit, und ein Knopf, der Wochen später noch Karten
+     löscht, wäre gefährlicher als nützlich. */
+  S.letzterImport = {
+    // Kasten je Karte mitschreiben \u2014 die R\u00FCcknahme pr\u00FCft damit, ob eine Karte
+    // seither verschoben wurde.
+    karten: karten.map(k => ({ id: k.id, deckId: k.deckId })),
+    decks: neueDecks.map(d => d.id),
+    anzahl: karten.length,
+    kasten: e.ziel === 'spalte' ? '' : (deckName(zielId) || e.zielname)
+  };
+  toast(`${karten.length} Karten eingelesen`
+    + (neueDecks.length ? `, ${neueDecks.length} ${neueDecks.length === 1 ? 'Kasten' : 'Kästen'} angelegt` : '')
+    + (bilanz.angelegt ? `, ${bilanz.angelegt} Gegenabfragen ergänzt` : '') + '.');
+  seiteZeigen('karten');
 }
 
 /* --- 14c. Altbestand aus dem Browser --- */
@@ -3869,10 +4880,10 @@ function jsonSanft(v) {
 
 /**
  * Erkennt und normalisiert:
- *  - den JSON-Export von Lernkartei 1   { "lk:boxes":[…], "lk:cards:ID":[…], … }
+ *  - den JSON-Export der Vorgängerversion   { "lk:boxes":[…], "lk:cards:ID":[…], … }
  *  - den „Referenz-Dump“ (gleiche Schlüssel, Werte als Zeichenketten)
  *  - eine Verpackung  { data: { … } }  oder { storage: { … } }
- *  - den eigenen Export von Lernkartei 2 { app:'Lernkartei 2', decks:[], cards:[] }
+ *  - den eigenen Export        { app:'HAN CROCO', decks:[], cards:[] }
  * Liefert { decks, cards, intervalle, meta, quelle } oder null.
  */
 /** Kasten aus fremden Daten auf das eigene Schema bringen. */
@@ -4014,13 +5025,41 @@ function altdatenDeuten(roh) {
       else { c.quelleId = null; c.variante = 'v'; }
     });
     return {
-      quelle: 'Lernkartei 2',
+      // Ältere Sicherungen tragen noch den alten Namen — den auch so nennen,
+      // sonst wundert man sich, warum eine Datei von 2026 als „HAN CROCO“
+      // ausgewiesen wird, obwohl sie aus der Vorgängerversion stammt.
+      quelle: o.app === 'HAN CROCO' ? 'HAN CROCO' : (o.app || o.appAlt || 'Lernkartei 2'),
+      konto: typeof o.konto === 'string' ? o.konto : '',
       decks, cards,
       intervalle: ivL2,
       meta: {
         streak: zahl(o.settings?.streak, 0, 99999, 0),
         lastLearnDate: isoOder(o.settings?.lastLearnDate, null)
       },
+      /* Die Sicherung enthält auch Anzeigename, Abzeichensatz und die
+         persönlichen Einstellungen. Die blieben beim Einspielen bisher liegen:
+         Nach einer Wiederherstellung war der von Hand gepflegte Abzeichensatz
+         weg, obwohl er in der Datei stand. */
+      einstellungen: (() => {
+        const q = o.settings || {};
+        const raus = {};
+        if (typeof q.name === 'string' && q.name.trim()) raus.name = q.name.trim().slice(0, 40);
+        if (['auto', 'hell', 'dunkel'].includes(q.theme)) raus.theme = q.theme;
+        /* zahl() rundet auf ganze Zahlen — für einen Bruchwert wie 0,88 käme
+           dabei 1 heraus und damit geklemmt 0,98. Der Scheduler rechnete danach
+           mit dem Extremwert und verkürzte alle Intervalle. */
+        if (Number.isFinite(Number(q.retention)))
+          raus.retention = Math.min(0.95, Math.max(0.80, Number(q.retention)));
+        if (typeof q.klassikModus === 'boolean') raus.klassikModus = q.klassikModus;
+        if (Number.isFinite(Number(q.neuProTag))) raus.neuProTag = zahl(q.neuProTag, 5, 50, 20);
+        if (Number.isFinite(Number(q.zielMinuten))) raus.zielMinuten = zahl(q.zielMinuten, 1, 600, 15);
+        if (Number.isFinite(Number(q.zielKarten))) raus.zielKarten = zahl(q.zielKarten, 1, 2000, 30);
+        if (['minuten', 'karten'].includes(q.zielEinheit)) raus.zielEinheit = q.zielEinheit;
+        if (Number.isFinite(Number(q.leechGrenze))) raus.leechGrenze = zahl(q.leechGrenze, 3, 20, 7);
+        const ab = abzeichenPruefen(q.abzeichen);
+        if (ab) raus.abzeichen = ab;
+        return Object.keys(raus).length ? raus : null;
+      })(),
       reviews: Array.isArray(o.reviews) ? o.reviews.filter(r => r && typeof r === 'object') : []
     };
   }
@@ -4060,7 +5099,7 @@ function altdatenDeuten(roh) {
   });
 
   return {
-    quelle: 'Lernkartei 1', decks, cards, reviews: [],
+    quelle: 'Vorgängerversion', decks, cards, reviews: [],
     intervalle: ivRoh,
     meta: {
       streak: zahl(meta.streak, 0, 99999, 0),
@@ -4098,6 +5137,10 @@ async function importAusfuehren(geparst, quelleName) {
 
   const gueltig = geparst.cards.filter(k => k.frage || k.antwort);
   const bestand = S.cards.length;
+  /* Aus dem eigenen Konto sind die Einstellungen erwünscht — aus einem fremden
+     wären sie eine stille Übernahme fremder Vorlieben, bis hin zum Umschalten
+     des Schedulers. Deshalb nur dort vorangehakt. */
+  const eigenesKonto = !geparst.konto || geparst.konto === S.email;
 
   const wahl = await modal({
     titel: 'Import',
@@ -4120,7 +5163,13 @@ async function importAusfuehren(geparst, quelleName) {
       ${geparst.intervalle ? `<label class="karo" style="margin-top:8px">
         <input type="checkbox" id="m-iv" checked>
         <span>Intervalle aus der Sicherung übernehmen
-        (${esc(geparst.intervalle.slice(0, 6).join(' · '))} …)</span></label>` : ''}`,
+        (${esc(geparst.intervalle.slice(0, 6).join(' · '))} …)</span></label>` : ''}
+      ${geparst.einstellungen ? `<label class="karo">
+        <input type="checkbox" id="m-einst" ${eigenesKonto ? 'checked' : ''}>
+        <span>Einstellungen übernehmen — Anzeigename, Abzeichen, Retention, Tagespensum.
+        ${eigenesKonto ? '' : `<br><strong>Achtung:</strong> Die Sicherung stammt aus einem
+          anderen Konto${geparst.konto ? ` (${esc(geparst.konto)})` : ''}. Deine eigenen
+          Einstellungen würden überschrieben.`}</span></label>` : ''}`,
     knoepfe: [{ text: 'Abbrechen', wert: null },
               { text: 'Übernehmen', wert: 'ok', art: 'primary' }]
   });
@@ -4128,11 +5177,12 @@ async function importAusfuehren(geparst, quelleName) {
 
   const modus = bestand ? WRadio('konflikt', 'merge') : 'merge';
   const ivUebernehmen = letzteWerte['m-iv'] === true;
+  const einstUebernehmen = letzteWerte['m-einst'] === true;
 
-  await importSchreiben(geparst, modus, ivUebernehmen);
+  await importSchreiben(geparst, modus, ivUebernehmen, einstUebernehmen);
 }
 
-async function importSchreiben(geparst, modus, ivUebernehmen) {
+async function importSchreiben(geparst, modus, ivUebernehmen, einstUebernehmen) {
   const ops = [];
 
   if (modus === 'replace') {
@@ -4181,6 +5231,10 @@ async function importSchreiben(geparst, modus, ivUebernehmen) {
   if (geparst.meta && (geparst.meta.streak || geparst.meta.lastLearnDate)) {
     einstellungenPatch.streak = geparst.meta.streak || 0;
     einstellungenPatch.lastLearnDate = geparst.meta.lastLearnDate || null;
+  }
+  if (geparst.einstellungen && einstUebernehmen) {
+    Object.assign(einstellungenPatch, geparst.einstellungen);
+    Object.assign(S.einstellungen, geparst.einstellungen);
   }
   if (Object.keys(einstellungenPatch).length)
     ops.push(['set', refEinstellungen(), einstellungenPatch, true]);
@@ -4437,7 +5491,7 @@ const AKTION = {
   deckCsv: id => {
     const karten = kartenVon(id);
     if (!karten.length) return toast('Dieser Kasten ist leer.');
-    dateiHerunterladen(`lernkartei-${dateiTeil(deckName(id))}-${heute()}.csv`,
+    dateiHerunterladen(`han-croco-${dateiTeil(deckName(id))}-${heute()}.csv`,
       csvBauen(karten), 'text/csv');
     toast('CSV heruntergeladen.');
   },
@@ -4459,15 +5513,87 @@ const AKTION = {
     toast(zusatz ? `Karte mit ${zusatz + 1} Abfragen gelöscht.` : 'Karte gelöscht.');
   },
   mehrKarten: () => { S.kartenLimit += 60; malKarten(); },
+  // Wählt alles aus, was der Filter hergibt — nicht nur die sichtbaren 60.
+  // Genau das braucht man, um einen versehentlich zerstückelten Import in
+  // einem Zug wieder einzusammeln.
+  // Vorher wurde zur bestehenden Auswahl hinzugefügt. Wer in Kasten A alles
+  // auswählte, dann zu Kasten B wechselte und dort erneut „Alle auswählen“
+  // klickte, löschte anschließend auch Kasten A — ohne ihn je zu sehen.
+  alleWaehlen: () => { S.auswahl.clear(); gefilterteKarten().forEach(k => S.auswahl.add(k.id)); malKarten(); },
   massAus: () => { S.auswahl.clear(); malKarten(); },
+  /* Nimmt genau den letzten CSV-Import zurück — samt der dabei angelegten
+     Kästen und der abgeleiteten Gegenabfragen. Wer sich bei der Zuordnung
+     vertan hat, muss nicht von Hand aufräumen. */
+  importZurueck: async () => {
+    const imp = S.letzterImport;
+    if (!imp) return;
+    /* Nur anfassen, was seither unberührt geblieben ist. Wer eine der neuen
+       Karten schon verschoben, umformuliert oder gelernt hat, will sie
+       behalten — die Rücknahme darf ihm die Arbeit nicht wegräumen. */
+    const unberuehrt = [], behalten = [];
+    imp.karten.forEach(({ id, deckId }) => {
+      const k = S.cards.find(c => c.id === id);
+      if (!k) return;
+      if (k.deckId === deckId && !(Number(k.reps) || 0) && !k.lastReview) unberuehrt.push(id);
+      else behalten.push(id);
+    });
+    if (!unberuehrt.length) {
+      S.letzterImport = null; malKarten();
+      return toast(behalten.length
+        ? 'Die eingelesenen Karten wurden seither bearbeitet — nichts zurückgenommen.'
+        : 'Die eingelesenen Karten sind nicht mehr da.');
+    }
+    const ids = mitVarianten(unberuehrt).filter(x => S.cards.some(c => c.id === x));
+    if (!await frage('Import zurücknehmen',
+      `<strong>${ids.length}</strong> gerade eingelesene ${ids.length === 1 ? 'Karte' : 'Karten'}
+       wieder löschen?${behalten.length ? `<br><span class="mini">${
+       behalten.length === 1 ? '1 Karte bleibt stehen — sie wurde'
+         : `${behalten.length} Karten bleiben stehen — sie wurden`} seither verschoben,
+       bearbeitet oder gelernt.</span>` : ''}${imp.decks.length ? `<br><span class="mini">${
+       imp.decks.length === 1 ? 'Ein dabei angelegter Kasten wird'
+         : `${imp.decks.length} dabei angelegte Kästen werden`} ebenfalls entfernt, sofern
+       sie danach leer sind.</span>` : ''}`,
+      'Zurücknehmen', 'gefahr')) return;
+    for (let i = 0; i < ids.length; i += 400) {
+      const b = FB.writeBatch(db);
+      ids.slice(i, i + 400).forEach(x => b.delete(FB.doc(colCards(), x)));
+      schreibe(b.commit(), 'Import zurücknehmen');
+    }
+    const weg = new Set(ids);
+    S.cards = S.cards.filter(c => !weg.has(c.id));
+    const leereNeue = imp.decks.filter(id => !kartenVon(id).length);
+    if (leereNeue.length) {
+      const b = FB.writeBatch(db);
+      leereNeue.forEach(id => b.delete(FB.doc(colDecks(), id)));
+      schreibe(b.commit(), 'Import zurücknehmen');
+      S.decks = S.decks.filter(d => !leereNeue.includes(d.id));
+      leereNeue.forEach(id => lernAuswahl?.delete(id));
+    }
+    S.letzterImport = null;
+    S.auswahl.clear();
+    toast(`${ids.length} Karten wieder entfernt.`);
+    malKarten();
+  },
   massLoeschen: async () => {
     const n = S.auswahl.size;
     const ids = mitVarianten(Array.from(S.auswahl));
     const zusatz = ids.length - n;
+    /* Aus welchen Kästen? Eine nackte Zahl reicht hier nicht — gelöscht wird
+       endgültig, und die Auswahl kann Karten enthalten, die gerade nicht in
+       der Liste stehen. */
+    const jeKasten = new Map();
+    Array.from(S.auswahl).forEach(id => {
+      const c = S.cards.find(x => x.id === id);
+      if (c) jeKasten.set(deckName(c.deckId), (jeKasten.get(deckName(c.deckId)) || 0) + 1);
+    });
+    const aufstellung = Array.from(jeKasten.entries()).sort((a, b) => b[1] - a[1]);
     if (!await frage('Karten löschen',
       `<strong>${n}</strong> ausgewählte Karten löschen?${zusatz > 0
         ? `<br><span class="mini">Dazu ${zusatz} weitere Abfragen derselben Karten
-           (Rückwärtsrichtung, Lückentext).</span>` : ''}`,
+           (Rückwärtsrichtung, Lückentext).</span>` : ''}`
+      + (aufstellung.length ? `<br><span class="mini">Aus: ${aufstellung.slice(0, 6)
+          .map(([name, anzahl]) => `${esc(name)} (${anzahl})`).join(', ')}${
+          aufstellung.length > 6 ? ` und ${aufstellung.length - 6} weiteren Kästen` : ''}.</span>` : ''),
       'Löschen', 'gefahr')) return;
     for (let i = 0; i < ids.length; i += 400) {
       const b = FB.writeBatch(db);
@@ -4496,15 +5622,47 @@ const AKTION = {
   },
   massVerschieben: async () => {
     if (!S.decks.length) return;
+    /* „In einen neuen Kasten“ steht ganz oben: Wer einen zerstückelten Import
+       einsammelt, hat den Sammelkasten noch gar nicht — sonst müsste er den
+       Dialog abbrechen, den Kasten anlegen und von vorn beginnen. */
     const r = await modal({
       titel: 'Karten verschieben',
       html: `<p>${S.auswahl.size} Karten in welchen Kasten?</p>
-        <label class="feld"><span>Ziel</span><select id="m-deck">${S.decks.map(d =>
-          `<option value="${esc(d.id)}">${esc(d.name)}</option>`).join('')}</select></label>`,
-      knoepfe: [{ text: 'Abbrechen', wert: null }, { text: 'Verschieben', wert: 'ok', art: 'primary' }]
+        <label class="feld"><span>Ziel</span><select id="m-deck">
+          <option value="neu">＋ In einen neuen Kasten …</option>
+          ${S.decks.map(d => `<option value="${esc(d.id)}">${esc(d.name)}</option>`).join('')}
+        </select></label>
+        <label class="feld" id="m-deck-neu-feld" hidden><span>Name des neuen Kastens</span>
+          <input id="m-deck-neu" maxlength="120" placeholder="z. B. Englisch"></label>`,
+      knoepfe: [{ text: 'Abbrechen', wert: null }, {
+        text: 'Verschieben', wert: 'ok', art: 'primary',
+        pruefen: () => {
+          const m = $('#modal');
+          if ($('#m-deck', m)?.value === 'neu' && !String($('#m-deck-neu', m)?.value || '').trim()) {
+            toast('Bitte einen Namen für den neuen Kasten eingeben.'); return false;
+          }
+        }
+      }],
+      beimOeffnen: m => {
+        const s = $('#m-deck', m);
+        const zeig = () => { $('#m-deck-neu-feld', m).hidden = s.value !== 'neu'; };
+        s.addEventListener('change', zeig); zeig();
+      }
     });
     if (r !== 'ok') return;
-    const ziel = W('m-deck', S.decks[0].id);
+    let ziel = W('m-deck', S.decks[0].id);
+    if (ziel === 'neu') {
+      const name = String(W('m-deck-neu', '')).trim();
+      if (!name) return;
+      const gleich = S.decks.find(d => (d.name || '').toLowerCase() === name.toLowerCase());
+      if (gleich) ziel = gleich.id;
+      else {
+        ziel = neueId();
+        const daten = neuesDeck(name);
+        schreibe(FB.setDoc(FB.doc(colDecks(), ziel), daten), 'Kasten anlegen');
+        if (!S.decks.some(d => d.id === ziel)) S.decks.push({ id: ziel, ...daten });
+      }
+    }
     // Nur vorhandene Karten: ein update auf ein gelöschtes Dokument ließe den
     // gesamten Stapel scheitern, nicht nur die eine Karte. Zusätzliche
     // Abfragen ziehen mit, sonst lägen sie im alten Kasten.
@@ -4621,9 +5779,9 @@ const AKTION = {
     if (!geparst) return modal({
       titel: 'Format nicht erkannt',
       html: `<p>Die Datei <code>${esc(d.name)}</code> passt zu keinem bekannten Format.</p>
-        <p class="mini">Erwartet wird der JSON-Export von Lernkartei 1
+        <p class="mini">Erwartet wird der JSON-Export der Vorgängerversion
         (Schlüssel <code>lk:boxes</code>, <code>lk:cards:…</code>) oder eine Sicherung
-        von Lernkartei 2.</p>
+        von HAN CROCO.</p>
         <pre class="code">${esc(d.text.slice(0, 400))}</pre>`,
       knoepfe: [{ text: 'Schließen', wert: 'ok', art: 'primary' }]
     });
@@ -4637,7 +5795,8 @@ const AKTION = {
       html: `<label class="feld"><span>Kasten</span><select id="m-deck">
         <option value="alle">Alle Kästen zusammen (${S.cards.length} Karten)</option>
         ${S.decks.map(d => `<option value="${esc(d.id)}">${esc(d.name)} (${kartenVon(d.id).length})</option>`).join('')}
-        </select></label><p class="mini">Format: Frage;Antwort;Kasten</p>`,
+        </select></label><p class="mini">Format: Frage;Antwort;Kasten, mit \u00DCberschriftzeile \u2014
+          so l\u00E4sst sich die Datei sp\u00E4ter wieder einlesen, ohne dass die K\u00E4sten verschmelzen.</p>`,
       knoepfe: [{ text: 'Abbrechen', wert: null }, { text: 'Herunterladen', wert: 'ok', art: 'primary' }]
     });
     if (r !== 'ok') return;
@@ -4645,64 +5804,213 @@ const AKTION = {
     const karten = wahl === 'alle' ? S.cards : kartenVon(wahl);
     if (!karten.length) return toast('Keine Karten zum Sichern.');
     dateiHerunterladen(
-      `lernkartei-${wahl === 'alle' ? 'alle' : dateiTeil(deckName(wahl))}-${heute()}.csv`,
+      `han-croco-${wahl === 'alle' ? 'alle' : dateiTeil(deckName(wahl))}-${heute()}.csv`,
       csvBauen(karten), 'text/csv');
     toast('CSV heruntergeladen.');
   },
   impCsv: async () => {
-    const d = await dateiWaehlen('.csv,.txt,text/csv');
+    const d = await dateiWaehlen('.csv,.txt,.tsv,text/csv,text/tab-separated-values');
     if (!d) return;
-    let zeilen = csvZerlegen(d.text);
-    if (!zeilen.length) return toast('Die Datei ist leer.', 'fehler');
-    const kopf = zeilen[0].map(x => x.trim().toLowerCase());
-    if (kopf[0] === 'frage' && (kopf[1] || '') === 'antwort') zeilen = zeilen.slice(1);
+    if (!String(d.text || '').trim()) return toast('Die Datei ist leer.', 'fehler');
+    await csvEinlesenDialog(d);
+  },
 
-    const decksNeu = new Map(S.decks.map(d2 => [(d2.name || '').toLowerCase(), d2.id]));
-    const anzulegen = [];
-    const karten = [];
-    let fehler = 0;
-
-    zeilen.forEach(z => {
-      const frage = (z[0] || '').trim(), antwort = (z[1] || '').trim();
-      if (!frage || !antwort) { fehler++; return; }
-      const kastenName = (z[2] || 'Import').trim() || 'Import';
-      let deckId = decksNeu.get(kastenName.toLowerCase());
-      if (!deckId) {
-        deckId = neueId();
-        decksNeu.set(kastenName.toLowerCase(), deckId);
-        anzulegen.push({ id: deckId, ...neuesDeck(kastenName) });
+  /* Abzeichen verwalten */
+  abzAnlegen: () => abzeichenBearbeiten(null),
+  abzBearbeiten: id => abzeichenBearbeiten(id),
+  abzLoeschen: async id => {
+    const satz = eigenerAbzeichensatz();
+    const a = satz.find(x => x.id === id); if (!a) return;
+    if (!await frage('Abzeichen entfernen', `„${esc(a.name)}“ entfernen?`, 'Entfernen', 'gefahr')) return;
+    abzeichensatzSchreiben(satz.filter(x => x.id !== id));
+    toast('Abzeichen entfernt.');
+    malEinstellungen();
+  },
+  abzStandard: async () => {
+    if (!await frage('Zurücksetzen',
+      'Den eingebauten Abzeichensatz wiederherstellen? Eigene Abzeichen gehen dabei verloren.',
+      'Zurücksetzen')) return;
+    abzeichensatzSchreiben(ABZEICHEN_STANDARD);
+    toast('Abzeichen zurückgesetzt.');
+    malEinstellungen();
+  },
+  abzBlock: async () => {
+    /* Gilt schon ein gemeinsamer Satz, muss der Block ihn enthalten — sonst
+       ersetzt ein „kleiner Nachtrag“ unbemerkt den Satz aller drei Konten
+       durch den eigenen. */
+    const eigene = abzeichenPruefen(S.einstellungen.abzeichen) || [];
+    const grundlage = abzeichenZentralVorhanden()
+      ? abzeichenSatz().concat(eigene.filter(a => !abzeichenSatz().some(z => z.id === a.id)))
+      : eigenerAbzeichensatz();
+    const zeilen = grundlage.map(a =>
+      `  { id: ${JSON.stringify(a.id)}, art: ${JSON.stringify(a.art)}, schwelle: ${a.schwelle},` +
+      ` name: ${JSON.stringify(a.name)}, icon: ${JSON.stringify(a.icon)}, farbe: ${JSON.stringify(a.farbe)} }`);
+    const block = 'export const ABZEICHEN = [\n' + zeilen.join(',\n') + '\n];\n';
+    await modal({
+      titel: 'Abzeichen für alle Konten',
+      breit: true,
+      html: `<p>So wird daraus ein Satz für <strong>alle Konten</strong>:</p>
+        <ol class="mini" style="margin:0 0 10px 18px;line-height:1.7">
+          <li>Unten auf <strong>Kopieren</strong> klicken (oder „Als Datei laden“).</li>
+          <li>Auf GitHub das Projekt öffnen, in dem diese Seite liegt, und dort die Datei
+              <code>firebase-config.js</code> anklicken.</li>
+          <li>Auf das Stift-Symbol („Edit this file“) klicken, ganz nach unten gehen und den
+              Block dort einfügen. Steht dort schon ein <code>export const ABZEICHEN</code>,
+              den alten Block vorher löschen.</li>
+          <li>Unten auf <strong>Commit changes</strong> klicken. Nach ein paar Minuten sehen
+              alle Konten die neuen Abzeichen.</li>
+        </ol>
+        <pre class="code" id="m-abz-block" style="max-height:240px">${esc(block)}</pre>
+        <p class="mini">Rückgängig: den Block wieder aus der Datei entfernen — dann gilt in
+          jedem Konto wieder dessen eigener Satz.</p>`,
+      knoepfe: [{ text: 'Schließen', wert: null },
+                { text: 'Als Datei laden', wert: 'datei' },
+                { text: 'Kopieren', wert: 'kopieren', art: 'primary' }]
+    }).then(async wahl => {
+      if (wahl === 'datei') {
+        dateiHerunterladen('abzeichen-fuer-firebase-config.txt', block, 'text/plain');
+        toast('Textblock heruntergeladen.');
+      } else if (wahl === 'kopieren') {
+        try { await navigator.clipboard.writeText(block); toast('In die Zwischenablage kopiert.'); }
+        catch (_) { toast('Kopieren ging nicht — nutze „Als Datei laden“.', 'fehler'); }
       }
-      karten.push({ id: neueId(), ...neueKarte({ deckId, frage, antwort, notiz: (z[3] || '').trim() }) });
     });
+  },
 
-    if (!karten.length) return toast('Keine gültigen Zeilen gefunden.', 'fehler');
+  /* Ein Klick statt elf: alle Karten aus den Ein-Karten-Kästen in einen Kasten,
+     danach die leer gewordenen Kästen weg. */
+  importEinsammeln: async () => {
+    const winzig = S.decks.filter(d => !d.archiviert
+      && kartenVon(d.id).filter(istQuellkarte).length === 1);
+    if (!winzig.length) return toast('Es gibt keine Kästen mit nur einer Karte.');
+    /* Der neue Zielkasten erbt Abfragerichtung, Modi und Sprachen der
+       Herkunftskästen. Sonst legte `neuesDeck` ihn mit „vorwärts“ an, und der
+       anschließende Abgleich löschte alle Rückwärtsabfragen mitsamt Lernstand —
+       bei einem Knopf, der Aufräumen verspricht. */
+    const haeufigste = feld => {
+      const zaehler = new Map();
+      winzig.forEach(d => {
+        const wert = JSON.stringify(d[feld] ?? null);
+        zaehler.set(wert, (zaehler.get(wert) || 0) + 1);
+      });
+      let best = 'null', wie = -1;
+      zaehler.forEach((n, wert) => { if (n > wie) { wie = n; best = wert; } });
+      try { return JSON.parse(best); } catch (_) { return null; }
+    };
+    const vorlage = {
+      richtung: haeufigste('richtung') || 'vorwaerts',
+      modi: haeufigste('modi') || ['aufdecken'],
+      sprache: haeufigste('sprache') || 'de-DE',
+      spracheAntwort: haeufigste('spracheAntwort') || 'de-DE'
+    };
+    const r = await modal({
+      titel: 'Karten zusammenführen',
+      html: `<p>Die Karten aus <strong>${winzig.length} Kästen</strong> mit je einer Karte
+        in einen gemeinsamen Kasten verschieben. Fach, Termine und Lernstand wandern mit.</p>
+        <div id="m-ziel-warnung"></div>
+        <label class="feld"><span>Ziel</span><select id="m-ziel-deck">
+          <option value="neu">＋ In einen neuen Kasten …</option>
+          ${S.decks.filter(d => !winzig.some(w => w.id === d.id))
+            .map(d => `<option value="${esc(d.id)}">${esc(d.name)}</option>`).join('')}
+        </select></label>
+        <label class="feld" id="m-ziel-neu-feld"><span>Name des neuen Kastens</span>
+          <input id="m-ziel-neu" maxlength="120" value="Gesammelt"></label>
+        <label class="karo"><input type="checkbox" id="m-ziel-leer" checked>
+          <span>Die leer gewordenen Kästen anschließend entfernen</span></label>`,
+      knoepfe: [{ text: 'Abbrechen', wert: null }, {
+        text: 'Zusammenführen', wert: 'ok', art: 'primary',
+        pruefen: () => {
+          const m = $('#modal');
+          if ($('#m-ziel-deck', m)?.value === 'neu' && !String($('#m-ziel-neu', m)?.value || '').trim()) {
+            toast('Bitte einen Namen für den neuen Kasten eingeben.'); return false;
+          }
+        }
+      }],
+      beimOeffnen: m => {
+        const s = $('#m-ziel-deck', m);
+        const index = ableitungsIndex();
+        const zeig = () => {
+          $('#m-ziel-neu-feld', m).hidden = s.value !== 'neu';
+          /* Bei einem vorhandenen Zielkasten kann die Abfragerichtung abweichen.
+             Dann entfallen Abfragen mitsamt Lernstand — das muss vorher
+             dastehen, nicht hinterher in der Diagnose. */
+          const ziel = s.value === 'neu' ? { ...neuesDeck('x'), ...vorlage } : deckVon(s.value);
+          const weg = winzig.flatMap(d => kartenVon(d.id).filter(istQuellkarte))
+            .reduce((n, q) => n + variantenPlan(q, ziel, index).entfernt, 0);
+          $('#m-ziel-warnung', m).innerHTML = weg
+            ? `<div class="hinweis rot">Der Zielkasten fragt in eine andere Richtung ab.
+                 Dadurch ${weg === 1 ? 'entfällt eine Abfrage' : `entfallen ${weg} Abfragen`}
+                 mitsamt Lernfortschritt.</div>` : '';
+        };
+        s.addEventListener('change', zeig); zeig();
+      }
+    });
+    if (r !== 'ok') return;
 
-    const ok = await frage('CSV einlesen',
-      `<strong>${karten.length}</strong> Karten in
-       <strong>${anzulegen.length ? anzulegen.length + ' neue' : 'bestehende'}</strong> Kästen einlesen?
-       ${fehler ? `<br><span class="mini">${fehler} Zeilen ohne Frage oder Antwort werden übersprungen.</span>` : ''}`,
-      'Einlesen');
-    if (!ok) return;
-
-    const ops = [
-      ...anzulegen.map(d2 => { const { id, ...rest } = d2; return ['set', FB.doc(colDecks(), id), rest]; }),
-      ...karten.map(k => { const { id, ...rest } = k; return ['set', FB.doc(colCards(), id), rest]; })
-    ];
-    for (let i = 0; i < ops.length; i += 400) {
-      const b = FB.writeBatch(db);
-      ops.slice(i, i + 400).forEach(([, ref, daten]) => b.set(ref, daten));
-      schreibe(b.commit(), 'CSV-Import');
+    let ziel = W('m-ziel-deck', 'neu');
+    if (ziel === 'neu') {
+      const name = String(W('m-ziel-neu', 'Gesammelt')).trim() || 'Gesammelt';
+      const gleich = S.decks.find(d => (d.name || '').toLowerCase() === name.toLowerCase());
+      if (gleich) ziel = gleich.id;
+      else {
+        ziel = neueId();
+        const daten = { ...neuesDeck(name), ...vorlage };
+        schreibe(FB.setDoc(FB.doc(colDecks(), ziel), daten), 'Kasten anlegen');
+        if (!S.decks.some(d => d.id === ziel)) S.decks.push({ id: ziel, ...daten });
+      }
     }
-    // Sieht der Zielkasten Rückwärtsabfragen vor, fehlen sie den frisch
-    // eingelesenen Karten noch. Gleich nachziehen statt den Nutzer später
-    // über die Diagnose stolpern zu lassen.
-    const neueIds = new Set(karten.map(k2 => k2.id));
-    karten.forEach(k2 => { if (!S.cards.some(c => c.id === k2.id)) S.cards.push(k2); });
-    const bilanz = alleVariantenAbgleichen(k2 => neueIds.has(k2.id));
-    toast(bilanz.angelegt
-      ? `${karten.length} Karten eingelesen, ${bilanz.angelegt} Gegenabfragen ergänzt.`
-      : karten.length + ' Karten eingelesen.');
-    seiteZeigen('karten');
+    const quellen = winzig.filter(d => d.id !== ziel);
+    const ids = quellen.flatMap(d => kartenVon(d.id)).map(k => k.id);
+    for (let i = 0; i < ids.length; i += 400) {
+      const b = FB.writeBatch(db);
+      ids.slice(i, i + 400).forEach(x => b.set(FB.doc(colCards(), x), { deckId: ziel }, { merge: true }));
+      schreibe(b.commit(), 'Karten zusammenführen');
+    }
+    ids.forEach(x => { const k = S.cards.find(c => c.id === x); if (k) k.deckId = ziel; });
+    if (W('m-ziel-leer', true) !== false) {
+      const weg = quellen.filter(d => !kartenVon(d.id).length).map(d => d.id);
+      for (let i = 0; i < weg.length; i += 400) {
+        const b = FB.writeBatch(db);
+        weg.slice(i, i + 400).forEach(x => b.delete(FB.doc(colDecks(), x)));
+        schreibe(b.commit(), 'Leere Kästen entfernen');
+      }
+      S.decks = S.decks.filter(d => !weg.includes(d.id));
+      weg.forEach(x => lernAuswahl?.delete(x));
+    }
+    /* Der Zielkasten kann eine andere Abfragerichtung vorsehen als die
+       Herkunftskästen — dann fehlen oder stören jetzt Gegenabfragen. */
+    const nach = new Set(ids);
+    alleVariantenAbgleichen(k => nach.has(k.id) || nach.has(k.quelleId));
+    toast(`${ids.length} Karten in „${deckName(ziel)}“ zusammengeführt.`);
+    malEinstellungen();
+  },
+
+  leereKaesten: async () => {
+    const leer = S.decks.filter(d => !kartenVon(d.id).length);
+    if (!leer.length) return toast('Es gibt keine leeren Kästen.');
+    if (!await frage('Leere Kästen entfernen',
+      `<strong>${leer.length}</strong> ${leer.length === 1 ? 'Kasten enthält' : 'Kästen enthalten'}
+       keine einzige Karte. Entfernen?<br>
+       <span class="mini">${esc(leer.slice(0, 12).map(d => d.name).join(', '))}${
+         leer.length > 12 ? ` und ${leer.length - 12} weitere` : ''}</span>`,
+      'Entfernen', 'gefahr')) return;
+    /* Während die Rückfrage offen stand, kann von einem anderen Gerät eine
+       Karte eingetroffen sein. Dann wäre der Kasten weg und die Karte
+       heimatlos — deshalb hier noch einmal frisch nachsehen. */
+    const nochLeer = leer.filter(d => S.decks.some(x => x.id === d.id) && !kartenVon(d.id).length);
+    if (!nochLeer.length) return toast('Die Kästen sind nicht mehr leer — nichts entfernt.');
+    const geblieben = leer.length - nochLeer.length;
+    const ids = nochLeer.map(d => d.id);
+    for (let i = 0; i < ids.length; i += 400) {
+      const b = FB.writeBatch(db);
+      ids.slice(i, i + 400).forEach(x => b.delete(FB.doc(colDecks(), x)));
+      schreibe(b.commit(), 'Leere Kästen entfernen');
+    }
+    ids.forEach(x => lernAuswahl?.delete(x));
+    toast(`${ids.length} ${ids.length === 1 ? 'leerer Kasten' : 'leere Kästen'} entfernt.`
+      + (geblieben ? ` ${geblieben} ${geblieben === 1 ? 'Kasten hat' : 'Kästen haben'}`
+        + ' inzwischen Karten und bleibt stehen.' : ''));
+    malEinstellungen();
   },
 
   variantenAbgleich: async () => {
