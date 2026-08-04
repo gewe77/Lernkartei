@@ -219,6 +219,7 @@ nav button.aktiv{background:var(--akzent-bg);color:var(--akzent);font-weight:700
 .bew b{font-size:17px;line-height:1.1}
 .bew span{font-size:11.5px;font-weight:600;text-align:center;line-height:1.2}
 .bew small{font-size:10.5px;color:var(--txt3);font-weight:500}
+.bew.empfohlen{outline:2px solid currentColor;outline-offset:2px}
 .bew1{color:var(--bewertung-1);border-color:var(--bewertung-1)} .bew1:hover{background:var(--bewertung-1-bg)}
 .bew2{color:var(--bewertung-2);border-color:var(--bewertung-2)} .bew2:hover{background:var(--bewertung-2-bg)}
 .bew3{color:var(--bewertung-3);border-color:var(--bewertung-3)} .bew3:hover{background:var(--bewertung-3-bg)}
@@ -228,6 +229,64 @@ kbd{
   font-family:var(--font);font-size:11px;border:1px solid var(--border2);
   border-bottom-width:2px;border-radius:5px;padding:1px 5px;color:var(--txt2);background:var(--bg2);
 }
+
+/* ===== Lernmodi (Stufe 3) =============================================== */
+.cloze-luecke{
+  display:inline-block;min-width:64px;padding:0 8px;margin:0 2px;border-radius:6px;
+  background:var(--bg3);border-bottom:2px solid var(--akzent);color:var(--txt3);
+}
+.cloze-loesung{
+  display:inline-block;padding:0 6px;margin:0 2px;border-radius:6px;
+  background:var(--akzent-bg);color:var(--akzent);font-weight:700;
+}
+.cloze-hinweis{font-size:.82em;color:var(--txt3);font-weight:400}
+
+.tipp-zeile{display:flex;gap:8px;align-items:stretch;margin-bottom:10px}
+.tipp-zeile input{flex:1;font-size:16px;padding:12px 14px}
+.urteil{
+  display:flex;gap:10px;align-items:flex-start;border-radius:var(--radius);
+  padding:11px 14px;margin-bottom:12px;font-size:14px;border:1px solid transparent;
+}
+.urteil b{display:block;margin-bottom:2px}
+.urteil.richtig{background:var(--bewertung-3-bg);color:var(--bewertung-3);border-color:var(--bewertung-3)}
+.urteil.fast{background:var(--bewertung-2-bg);color:var(--bewertung-2);border-color:var(--bewertung-2)}
+.urteil.falsch{background:var(--bewertung-1-bg);color:var(--bewertung-1);border-color:var(--bewertung-1)}
+.urteil .ihre{color:var(--txt2);font-size:13px;word-break:break-word}
+.urteil .ihre s{opacity:.75}
+
+.mc-liste{display:grid;gap:8px;margin-bottom:12px}
+.mc-option{
+  display:flex;gap:10px;align-items:center;text-align:left;font:inherit;color:inherit;
+  border:1.5px solid var(--border2);border-radius:var(--radius);background:var(--bg);
+  padding:13px 15px;cursor:pointer;transition:background .12s,border-color .12s;
+}
+.mc-option:hover:not(:disabled){background:var(--bg2);border-color:var(--akzent)}
+.mc-option:disabled{cursor:default}
+.mc-option .mc-buchstabe{
+  flex:none;width:26px;height:26px;border-radius:50%;background:var(--bg3);color:var(--txt2);
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;
+}
+.mc-option.richtig{border-color:var(--bewertung-3);background:var(--bewertung-3-bg)}
+.mc-option.richtig .mc-buchstabe{background:var(--bewertung-3);color:#fff}
+.mc-option.falsch{border-color:var(--bewertung-1);background:var(--bewertung-1-bg)}
+.mc-option.falsch .mc-buchstabe{background:var(--bewertung-1);color:#fff}
+
+.sprech-knopf{
+  flex:none;border:1px solid var(--border2);background:var(--bg);border-radius:50%;
+  width:38px;height:38px;font-size:17px;line-height:1;display:flex;align-items:center;justify-content:center;
+}
+.sprech-knopf:hover{background:var(--bg2)}
+.flip-seite .sprech-knopf{position:absolute;right:12px;bottom:12px;width:34px;height:34px;font-size:15px}
+.nur-hoeren{font-size:15px;color:var(--txt3);text-align:center}
+.nur-hoeren .gross-ico{font-size:40px;display:block;margin-bottom:8px}
+
+.modus-chips{display:flex;flex-wrap:wrap;gap:6px}
+.modus-chip{
+  display:flex;gap:7px;align-items:center;border:1px solid var(--border2);
+  border-radius:99px;padding:7px 13px;cursor:pointer;font-size:13.5px;user-select:none;
+}
+.modus-chip input{flex:none;margin:0}
+.modus-chip.an{border-color:var(--akzent);background:var(--akzent-bg);color:var(--akzent);font-weight:700}
 
 /* ===== Statistik ======================================================== */
 .kennzahlen{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
@@ -552,6 +611,7 @@ const STANDARD_EINSTELLUNGEN = () => ({
   zielMinuten: 15,
   zielKarten: 30,
   zielEinheit: 'minuten', // 'minuten' | 'karten'
+  leechGrenze: 7,         // Stufe 4: ab so vielen Aussetzern gilt eine Karte als Problemkarte
   theme: 'auto',
   modi: ['aufdecken'],    // Stufe 3
   streak: 0,
@@ -567,6 +627,7 @@ const S = {
   bereitDecks: false, bereitCards: false, bereitSettings: false,
   abmelder: [],            // aktive onSnapshot-Abmeldefunktionen
   kartenFilterDeck: 'alle',
+  kartenFilter: 'alle',    // Stufe 4: alle | faellig | neu | problem | ruht
   kartenSuche: '',
   kartenLimit: 60,
   auswahl: new Set(),
@@ -579,6 +640,7 @@ const S = {
 let sitzung = null;
 let bekannteDecks = new Set();
 let migrationshinweisAusstehend = false;
+let hoerenHinweisGezeigt = false;
 
 /* ---------- 3. Datum, Zufall, IDs -------------------------------------- */
 
@@ -794,6 +856,7 @@ function authFehler(err) {
 async function benutzerGewechselt(user) {
   S.abmelder.forEach(f => { try { f(); } catch (_) {} });
   S.abmelder = [];
+  sprechenStoppen();
   sitzung = null;
 
   if (!user) {
@@ -842,6 +905,10 @@ function firestoreFehler(e) {
     return 'Firestore ist gerade nicht erreichbar. Die App arbeitet mit den lokal gespeicherten Daten weiter.';
   if (c === 'failed-precondition')
     return 'Der Offline-Zwischenspeicher konnte nicht angelegt werden (privates Fenster oder mehrere Tabs?).';
+  if (c === 'not-found')
+    return 'Diese Karte gibt es nicht mehr — vermutlich auf einem anderen Gerät gelöscht.';
+  if (c === 'resource-exhausted')
+    return 'Das Tageskontingent von Firestore ist aufgebraucht. Morgen geht es weiter; bis dahin wird lokal gespeichert.';
   return (e?.message || String(e)) + (c ? ` (${c})` : '');
 }
 
@@ -1014,7 +1081,10 @@ function neuesDeck(name, farbe) {
   return {
     name: String(name || 'Neuer Kasten').slice(0, 120),
     farbe: farbe || DECK_FARBEN[Math.floor(Math.random() * DECK_FARBEN.length)],
-    richtung: 'vorwaerts',      // Stufe 3
+    modi: ['aufdecken'],        // Stufe 3: aufdecken | tippen | mc | hoeren
+    richtung: 'vorwaerts',      // vorwaerts | rueckwaerts | beide
+    sprache: 'de-DE',           // Hörmodus: Sprache der Frageseite
+    spracheAntwort: 'de-DE',    // Hörmodus: Sprache der Antwortseite
     pruefungsdatum: null,       // Stufe 4
     createdAt: heute(),
     archiviert: false
@@ -1022,14 +1092,19 @@ function neuesDeck(name, farbe) {
 }
 const DECK_FARBEN = ['#378add', '#639922', '#ef9f27', '#e24b4a', '#8e6bd6', '#1B9AAA', '#d6538e', '#5b7083'];
 
-function neueKarte({ deckId, frage, antwort, notiz }) {
+function neueKarte({ deckId, frage, antwort, notiz, typ, quelleId, variante }) {
   return {
     deckId,
     frage: String(frage || '').trim(),
     antwort: String(antwort || '').trim(),
     notiz: String(notiz || '').trim(),
     tags: [],
-    typ: 'standard',            // Stufe 3: cloze | bild
+    typ: KARTEN_TYPEN.includes(typ) ? typ : 'standard',   // standard | cloze
+    // Stufe 3: Eine Quellkarte kann mehrere eigenständig terminierte
+    // Abfragen erzeugen (Cloze-Lücken, Rückwärtsrichtung). Die Quellkarte
+    // selbst trägt quelleId:null; abgeleitete Karten zeigen darauf.
+    quelleId: quelleId || null,
+    variante: variante || 'v',  // 'v' | 'r' | 'c1', 'c2', …
     fach: 1,
     stability: 0,
     // difficulty MUSS bei einer noch nie gelernten Karte zusammen mit
@@ -1044,6 +1119,10 @@ function neueKarte({ deckId, frage, antwort, notiz }) {
     lapses: 0,
     state: 0,                   // 0 neu, 1 lernen, 2 Wiederholung, 3 erneut lernen
     suspendiert: false,
+    leech: false,               // Stufe 4: als Problemkarte erkannt
+    leechBasis: 0,              // Aussetzer-Stand beim letzten Wiederaufnehmen
+    zeitGesamt: 0,              // Stufe 4: aufsummierte Lernzeit in Sekunden
+    zeitReps: 0,                // dazugehörige Anzahl gemessener Abfragen
     createdAt: heute()
   };
 }
@@ -1056,7 +1135,16 @@ function verwaisteKarten() {
 }
 
 const istFaellig    = k => !k.suspendiert && (k.due || heute()) <= heute();
-const istHeuteGenau = k => !k.suspendiert && (k.due || heute()) === heute();
+/** Umfang „Nur heute“: heute fällig — und zusätzlich alles, was noch nie
+ *  dran war. Eine neue Karte hat kein Intervall verpasst; mit reiner
+ *  Gleichheit wäre sie ab dem Tag nach dem Anlegen aus diesem Umfang
+ *  verschwunden und nur noch unter „alle fälligen“ auffindbar gewesen. */
+const istHeuteGenau = k => !k.suspendiert &&
+  ((k.due || heute()) === heute() || (istNeu(k) && (k.due || heute()) <= heute())
+   // Vor einer Prüfung zählt auch alles Liegengebliebene: Die vorgezogenen
+   // Termine liegen auf bestimmten Tagen, und ein verpasster Tag darf die
+   // Karten nicht bis nach der Prüfung aus dem Blick nehmen.
+   || (!!deckPruefungAktiv(k.deckId) && (k.due || heute()) <= heute()));
 const istNeu        = k => !k.reps;
 const deckName      = id => S.decks.find(d => d.id === id)?.name || 'Ohne Kasten';
 const deckFarbe     = id => S.decks.find(d => d.id === id)?.farbe || 'var(--txt3)';
@@ -1075,6 +1163,756 @@ function fachVon(k) {
   return Math.max(1, Math.min(12, schwellen + 1));
 }
 
+/* ---------- 7b. Lernmodi und Varianten (Stufe 3, KONZEPT §5) ------------ */
+
+const MODI_ALLE   = ['aufdecken', 'tippen', 'mc', 'hoeren'];
+const MODUS_NAME  = { aufdecken: 'Aufdecken', tippen: 'Tippen', mc: 'Multiple Choice', hoeren: 'Hören' };
+const MODUS_HILFE = {
+  aufdecken: 'Frage lesen, Antwort aufdecken, selbst bewerten.',
+  tippen:    'Antwort eintippen, automatische Auswertung mit Tippfehlertoleranz.',
+  mc:        'Vier Vorgaben — nur bei Karten, die noch nie gelernt wurden.',
+  hoeren:    'Frage und Antwort werden vorgelesen.'
+};
+const KARTEN_TYPEN = ['standard', 'cloze'];
+const RICHTUNGEN   = ['vorwaerts', 'rueckwaerts', 'beide'];
+const RICHTUNG_NAME = {
+  vorwaerts:   'Vorwärts — Frage → Antwort',
+  rueckwaerts: 'Rückwärts — Antwort → Frage',
+  beide:       'Beide Richtungen — zwei getrennt terminierte Karten'
+};
+const SPRACHEN = [
+  ['de-DE', 'Deutsch'], ['en-US', 'Englisch (US)'], ['en-GB', 'Englisch (UK)'],
+  ['fr-FR', 'Französisch'], ['es-ES', 'Spanisch'], ['it-IT', 'Italienisch'],
+  ['nl-NL', 'Niederländisch'], ['pt-PT', 'Portugiesisch'], ['pl-PL', 'Polnisch'],
+  ['ru-RU', 'Russisch'], ['tr-TR', 'Türkisch'], ['sv-SE', 'Schwedisch']
+];
+
+const deckVon = id => S.decks.find(d => d.id === id) || null;
+function deckModi(deckId) {
+  const m = deckVon(deckId)?.modi;
+  const gefiltert = Array.isArray(m) ? m.filter(x => MODI_ALLE.includes(x)) : [];
+  return gefiltert.length ? gefiltert : ['aufdecken'];
+}
+function deckRichtung(deckId) {
+  const r = deckVon(deckId)?.richtung;
+  return RICHTUNGEN.includes(r) ? r : 'vorwaerts';
+}
+function deckSprache(deckId) {
+  const s = deckVon(deckId)?.sprache;
+  return typeof s === 'string' && s ? s : 'de-DE';
+}
+function deckSpracheAntwort(deckId) {
+  const s = deckVon(deckId)?.spracheAntwort;
+  return typeof s === 'string' && s ? s : deckSprache(deckId);
+}
+/** Welche Stimme gehört zu welcher Seite? Die Sprache hängt am Feld, nicht
+ *  an der Abfragerichtung: Bei einer Rückwärtsabfrage steht vorne die
+ *  Antwort, die also in der Antwortsprache zu lesen ist. Ohne diese
+ *  Unterscheidung läse eine englische Stimme die deutschen Vokabeln — im
+ *  Hörmodus ausgerechnet das, worauf es ankommt. */
+function spracheFuer(k, seite) {
+  if (istClozeVariante(k)) return deckSprache(k.deckId);   // beides derselbe Text
+  const zeigtAntwortFeld = (seite === 'frage') === (varianteVon(k) === 'r');
+  return zeigtAntwortFeld ? deckSpracheAntwort(k.deckId) : deckSprache(k.deckId);
+}
+
+/* --- Cloze: {{c1::Lösung}} oder {{c1::Lösung::Hinweis}} ------------------ */
+
+/* Bewusst als Funktion: ein geteiltes globales RegExp mit /g-Flag würde
+   seinen lastIndex zwischen den Aufrufern verschleppen. */
+/* Die Längenbegrenzung ist kein Schönheitsfehler: mit unbegrenzten faulen
+   Quantoren braucht ein Text mit vielen offenen „{{c1::“ ohne Abschluss
+   quadratisch bis kubisch viel Zeit. 600 Zeichen je Lücke sind reichlich. */
+const clozeRegex = () => /\{\{c(\d{1,2})::([\s\S]{0,600}?)(?:::([\s\S]{0,600}?))?\}\}/g;
+
+function clozeTeile(text) {
+  const out = [];
+  const re = clozeRegex();
+  let m;
+  while ((m = re.exec(String(text ?? ''))) !== null) {
+    out.push({ nr: Number(m[1]), loesung: m[2], hinweis: m[3] == null ? null : m[3] });
+    if (m.index === re.lastIndex) re.lastIndex++;   // Endlosschleife bei Leertreffer verhindern
+  }
+  return out;
+}
+function clozeNummern(text) {
+  return Array.from(new Set(clozeTeile(text).map(t => t.nr)))
+    .filter(n => Number.isFinite(n) && n >= 1 && n <= 20).sort((a, b) => a - b);
+}
+function clozeLoesung(text, nr) {
+  const t = clozeTeile(text).filter(x => x.nr === nr).map(x => x.loesung.trim()).filter(Boolean);
+  return Array.from(new Set(t)).join(' / ');
+}
+/** Cloze-Text als HTML. aufgedeckt=false zeigt die abgefragte Lücke als
+ *  Platzhalter (oder Hinweis), alle anderen Lücken im Klartext. */
+function clozeHtml(text, zielNr, aufgedeckt) {
+  const s = String(text ?? '');
+  const re = clozeRegex();
+  let out = '', letzte = 0, m;
+  while ((m = re.exec(s)) !== null) {
+    out += esc(s.slice(letzte, m.index));
+    const nr = Number(m[1]), loesung = m[2], hinweis = m[3];
+    if (nr === zielNr) {
+      out += aufgedeckt
+        ? `<span class="cloze-loesung">${esc(loesung)}</span>`
+        : `<span class="cloze-luecke">${hinweis ? esc(hinweis) : '&nbsp;…&nbsp;'}</span>`;
+    } else {
+      out += esc(loesung);
+    }
+    letzte = m.index + m[0].length;
+    if (m.index === re.lastIndex) re.lastIndex++;
+  }
+  return out + esc(s.slice(letzte));
+}
+
+/* --- Varianten: eigenständig terminierte Abfragen einer Quellkarte ------- */
+
+const istQuellkarte    = k => !k.quelleId;
+const varianteVon      = k => (typeof k.variante === 'string' && k.variante) ? k.variante : 'v';
+const istClozeVariante = k => /^c\d+$/.test(varianteVon(k));
+function clozeNrVon(k) { const m = /^c(\d+)$/.exec(varianteVon(k)); return m ? Number(m[1]) : 0; }
+const abgeleiteteVon   = quelleId => S.cards.filter(k => k.quelleId === quelleId);
+
+/** Welche eigenständig terminierten Abfragen soll diese Quellkarte erzeugen?
+ *  Cloze und Abfragerichtung schließen sich aus: bei einem Lückentext ergibt
+ *  die Rückwärtsfrage keinen Sinn, dort zählen die Lücken. */
+function gewuenschteVarianten(quelle, deck) {
+  if (quelle.typ === 'cloze') {
+    const nummern = clozeNummern(quelle.frage);
+    if (nummern.length) return nummern.map(n => 'c' + n);
+    return ['v'];    // als Lückentext markiert, aber (noch) ohne Lücke
+  }
+  const r = RICHTUNGEN.includes(deck?.richtung) ? deck.richtung : 'vorwaerts';
+  if (r === 'beide') return ['v', 'r'];
+  if (r === 'rueckwaerts') return ['r'];
+  return ['v'];
+}
+
+/** Soll-Ist-Abgleich der Varianten einer Quellkarte. Schreibt nichts, liefert
+ *  nur die nötigen Schritte — so lässt sich derselbe Plan einzeln ausführen
+ *  oder für viele Karten zu einem Stapel zusammenfassen.
+ *
+ *  Grundregel: Die Quellkarte behält ihre Variante, solange diese gebraucht
+ *  wird, sonst übernimmt sie die erste offene. Ihr Lernfortschritt geht damit
+ *  nie verloren — anders als bei abgeleiteten Karten, die beim Abwählen einer
+ *  Richtung tatsächlich verschwinden (dann ist die Abfrage ja nicht mehr
+ *  gewollt). */
+/* Felder, die zum Lernstand einer einzelnen Abfrage gehören. */
+const TERMIN_FELDER = ['due', 'stability', 'difficulty', 'reps', 'lapses', 'state', 'fach',
+  'lastReview', 'zeitGesamt', 'zeitReps', 'leech', 'leechBasis'];
+
+/** Weicht der gespiegelte Inhalt ab? Nur dann muss geschrieben werden —
+ *  sonst würde jeder Abgleich Dokumente anfassen, obwohl alles stimmt, und
+ *  die Diagnose meldete dauerhaft Handlungsbedarf. */
+function inhaltAbweicht(k, inhalt) {
+  return String(k.deckId ?? '')  !== String(inhalt.deckId ?? '')
+      || String(k.frage ?? '')   !== String(inhalt.frage ?? '')
+      || String(k.antwort ?? '') !== String(inhalt.antwort ?? '')
+      || String(k.notiz ?? '')   !== String(inhalt.notiz ?? '')
+      || String(k.typ ?? 'standard') !== String(inhalt.typ ?? 'standard')
+      || !!k.suspendiert !== !!inhalt.suspendiert
+      || JSON.stringify(Array.isArray(k.tags) ? k.tags : []) !== JSON.stringify(inhalt.tags || []);
+}
+
+function variantenPlan(quelle, deck, index) {
+  const soll = gewuenschteVarianten(quelle, deck);
+  const ops = [];
+  // Bei Massenabgleichen wird der Index einmal gebaut statt je Karte den
+  // gesamten Bestand zu durchsuchen — sonst wäre das quadratisch.
+  const vorhanden = index ? (index.get(quelle.id) || []) : abgeleiteteVon(quelle.id);
+
+  // 1. Jede vorhandene Abfrage behält ihre Variante, solange sie gebraucht
+  //    wird. Die Quellkarte hat dabei Vorrang vor gleichnamigen Ableitungen.
+  const quellAlt = varianteVon(quelle);
+  const belegt = new Map();     // variante -> abgeleitete Karte
+  const weg = [];
+  vorhanden.forEach(a => {
+    const v = varianteVon(a);
+    if (soll.includes(v) && v !== quellAlt && !belegt.has(v)) belegt.set(v, a);
+    else weg.push(a);
+  });
+
+  // 2. Wird die Variante der Quellkarte nicht mehr gebraucht, übernimmt sie
+  //    eine offene. Ist keine offen, liegt der gesuchte Lernstand bei einer
+  //    abgeleiteten Abfrage — der wird dann auf die Quellkarte übertragen.
+  //    Ohne diesen Schritt würde beim Wechsel „beide → rückwärts“ genau die
+  //    Karte gelöscht, deren Fortschritt zur verbleibenden Frage gehört.
+  let quellVariante = quellAlt;
+  const quellPatch = {};
+  if (!soll.includes(quellAlt)) {
+    const offen = soll.find(v => !belegt.has(v));
+    if (offen !== undefined) {
+      quellVariante = offen;
+    } else {
+      const spender = belegt.get(soll[0]);
+      quellVariante = soll[0];
+      TERMIN_FELDER.forEach(f => { if (spender[f] !== undefined) quellPatch[f] = spender[f]; });
+      belegt.delete(soll[0]);
+      weg.push(spender);
+    }
+    quellPatch.variante = quellVariante;
+  }
+
+  const inhalt = {
+    deckId: quelle.deckId,
+    frage: quelle.frage, antwort: quelle.antwort, notiz: quelle.notiz || '',
+    typ: KARTEN_TYPEN.includes(quelle.typ) ? quelle.typ : 'standard',
+    tags: Array.isArray(quelle.tags) ? quelle.tags : [],
+    // Ruhen gilt für die ganze Karte: abgeleitete Abfragen lassen sich in der
+    // Oberfläche nicht einzeln öffnen, blieben sonst also unstoppbar.
+    suspendiert: !!quelle.suspendiert
+  };
+
+  let angelegt = 0;
+  soll.forEach(v => {
+    if (v === quellVariante) return;
+    const da = belegt.get(v);
+    if (da) { if (inhaltAbweicht(da, inhalt)) ops.push(['merge', da.id, { ...inhalt }]); }
+    else {
+      const karte = neueKarte({ ...inhalt, quelleId: quelle.id, variante: v });
+      karte.tags = inhalt.tags;
+      karte.suspendiert = inhalt.suspendiert;
+      ops.push(['set', neueId(), karte]);
+      angelegt++;
+    }
+  });
+  weg.forEach(a => ops.push(['delete', a.id]));
+  if (Object.keys(quellPatch).length) ops.unshift(['merge', quelle.id, quellPatch]);
+
+  return { ops, quellVariante, quellPatch, angelegt, entfernt: weg.length };
+}
+
+/** Schreibt die Schritte eines oder mehrerer Variantenpläne.
+ *  Bewusst ohne update(): ein merge-set gelingt auch, wenn das Dokument
+ *  gerade erst angelegt wurde und noch nicht beim Server angekommen ist. */
+function variantenOpsSchreiben(ops, wobei) {
+  if (!ops.length) return;
+  for (let i = 0; i < ops.length; i += 400) {
+    const b = FB.writeBatch(db);
+    ops.slice(i, i + 400).forEach(([art, id, daten]) => {
+      const ref = FB.doc(colCards(), id);
+      if (art === 'delete') b.delete(ref);
+      else b.set(ref, daten, art === 'merge' ? { merge: true } : undefined);
+    });
+    schreibe(b.commit(), wobei || 'Kartenvarianten');
+  }
+}
+
+function variantenAbgleichen(quelle, deck) {
+  const plan = variantenPlan(quelle, deck || deckVon(quelle.deckId));
+  variantenOpsSchreiben(plan.ops, 'Kartenvarianten');
+  Object.assign(quelle, plan.quellPatch);     // lokal sofort, s. quellPatch oben
+  return plan;
+}
+
+/** Mehrere Quellkarten auf einmal abgleichen — nach Import, Massen-
+ *  verschiebung oder einer geänderten Abfragerichtung. `nurWenn` grenzt auf
+ *  einen Teilbestand ein (z. B. einen Kasten); ohne Filter wird zusätzlich
+ *  nach Karteileichen gesucht. Liefert die Zusammenfassung. */
+function ableitungsIndex() {
+  const m = new Map();
+  S.cards.forEach(k => {
+    if (!k.quelleId) return;
+    if (!m.has(k.quelleId)) m.set(k.quelleId, []);
+    m.get(k.quelleId).push(k);
+  });
+  return m;
+}
+
+function alleVariantenAbgleichen(nurWenn) {
+  const ops = [];
+  const index = ableitungsIndex();
+  let angelegt = 0, entfernt = 0, betroffen = 0;
+  S.cards.filter(k => istQuellkarte(k) && (!nurWenn || nurWenn(k))).forEach(q => {
+    const plan = variantenPlan(q, deckVon(q.deckId), index);
+    if (!plan.ops.length) return;
+    betroffen++; angelegt += plan.angelegt; entfernt += plan.entfernt;
+    ops.push(...plan.ops);
+    Object.assign(q, plan.quellPatch);
+  });
+  if (!nurWenn) {
+    // Abfragen, deren Quellkarte es nicht mehr gibt, sind Karteileichen:
+    // sie kämen weiter in Sitzungen vor, ließen sich aber nicht bearbeiten.
+    const quellen = new Set(S.cards.filter(istQuellkarte).map(k => k.id));
+    const verwaist = S.cards.filter(k => k.quelleId && !quellen.has(k.quelleId));
+    verwaist.forEach(k => ops.push(['delete', k.id]));
+    entfernt += verwaist.length;
+  }
+  variantenOpsSchreiben(ops, 'Varianten abgleichen');
+  return { betroffen, angelegt, entfernt };
+}
+
+/** Trockenlauf des vollständigen Abgleichs: liefert dieselbe Bilanz wie
+ *  alleVariantenAbgleichen(), ohne etwas zu schreiben. */
+function alleVariantenAbgleichenProbe() {
+  const index = ableitungsIndex();
+  let angelegt = 0, entfernt = 0, betroffen = 0;
+  S.cards.filter(istQuellkarte).forEach(q => {
+    const plan = variantenPlan(q, deckVon(q.deckId), index);
+    if (!plan.ops.length) return;
+    betroffen++; angelegt += plan.angelegt; entfernt += plan.entfernt;
+  });
+  const bekannt = new Set(S.cards.filter(istQuellkarte).map(k => k.id));
+  entfernt += S.cards.filter(k => k.quelleId && !bekannt.has(k.quelleId)).length;
+  return { betroffen, angelegt, entfernt };
+}
+
+/** Wie viele Karten weichen vom Soll ab? Nur zählen, nicht schreiben — für
+ *  die Diagnose. */
+function variantenBedarf() {
+  const index = ableitungsIndex();
+  const quellen = S.cards.filter(istQuellkarte);
+  let karten = 0;
+  quellen.forEach(q => { if (variantenPlan(q, deckVon(q.deckId), index).ops.length) karten++; });
+  const bekannt = new Set(quellen.map(k => k.id));
+  const verwaist = S.cards.filter(k => k.quelleId && !bekannt.has(k.quelleId)).length;
+  return { karten, verwaist };
+}
+
+/** Alle Kennungen, die zu denselben Quellkarten gehören wie die übergebenen.
+ *  Löschen und Verschieben dürfen keine halben Kartenfamilien hinterlassen —
+ *  eine Rückwärtsabfrage ohne ihre Quellkarte wäre nicht mehr bearbeitbar. */
+function mitVarianten(ids) {
+  const quellen = new Set();
+  ids.forEach(x => {
+    const k = S.cards.find(y => y.id === x);
+    if (k) quellen.add(k.quelleId || k.id);
+  });
+  const out = new Set();
+  quellen.forEach(q => {
+    if (S.cards.some(c => c.id === q)) out.add(q);
+    abgeleiteteVon(q).forEach(a => out.add(a.id));
+  });
+  return Array.from(out);
+}
+
+/* --- Inhalt einer Abfrage ------------------------------------------------ */
+
+/** Klartext der Frageseite — auch für die Sprachausgabe. */
+function frageText(k) {
+  if (istClozeVariante(k)) {
+    const ziel = clozeNrVon(k);
+    return String(k.frage || '').replace(clozeRegex(),
+      (_, nr, loesung, hinweis) => Number(nr) === ziel ? (hinweis || '…') : loesung);
+  }
+  return varianteVon(k) === 'r' ? String(k.antwort || '') : String(k.frage || '');
+}
+/** Klartext der erwarteten Antwort — für Tippen, Multiple Choice, Vorlesen. */
+function antwortText(k) {
+  if (istClozeVariante(k)) return clozeLoesung(k.frage, clozeNrVon(k));
+  return varianteVon(k) === 'r' ? String(k.frage || '') : String(k.antwort || '');
+}
+function frageHtml(k)   { return istClozeVariante(k) ? clozeHtml(k.frage, clozeNrVon(k), false) : esc(frageText(k)); }
+function antwortHtml(k) { return istClozeVariante(k) ? clozeHtml(k.frage, clozeNrVon(k), true)  : esc(antwortText(k)); }
+function variantenMarke(k) {
+  if (istClozeVariante(k)) return 'Lücke ' + clozeNrVon(k);
+  return varianteVon(k) === 'r' ? 'rückwärts' : '';
+}
+
+/* --- Tippen: Auswertung mit Tippfehlertoleranz --------------------------- */
+
+function levenshtein(a, b) {
+  a = String(a); b = String(b);
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  let vorher = Array.from({ length: b.length + 1 }, (_, i) => i);
+  let jetzt = new Array(b.length + 1);
+  for (let i = 0; i < a.length; i++) {
+    jetzt[0] = i + 1;
+    for (let j = 0; j < b.length; j++) {
+      jetzt[j + 1] = Math.min(jetzt[j] + 1, vorher[j + 1] + 1, vorher[j] + (a[i] === b[j] ? 0 : 1));
+    }
+    const tausch = vorher; vorher = jetzt; jetzt = tausch;
+  }
+  return vorher[b.length];
+}
+
+/** Vergleichsform einer Antwort.
+ *  Akzente und ß werden bewusst eingeebnet: Auf einer Handytastatur tippt
+ *  kaum jemand „hôtel“ oder „Straße“ mit dem richtigen Sonderzeichen. Ohne
+ *  diese Einebnung gälte eine sachlich richtige Antwort als falsch — und
+ *  weil daraufhin die Bewertung 1 vorgeschlagen wird, kostete das der Karte
+ *  Monate an Intervall. */
+function antwortNormalisieren(s) {
+  return String(s ?? '').toLowerCase()
+    .replace(/ß/g, 'ss')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')   // Akzente ablegen
+    .replace(/[.,;:!?¿¡"'„“”‚‘’()[\]{}]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+/** Zulässige Schreibweisen: „a / b“, „a; b“ und „a oder b“ gelten als
+ *  Alternativen, Klammerzusätze sind optional. */
+function antwortAlternativen(erwartet) {
+  const roh = String(erwartet ?? '');
+  const teile = roh.split(/\s*[/;]\s*|\s+oder\s+/i).map(t => t.trim()).filter(Boolean);
+  const menge = new Set();
+  (teile.length ? teile : [roh]).forEach(t => {
+    menge.add(antwortNormalisieren(t));
+    menge.add(antwortNormalisieren(t.replace(/\([^)]*\)/g, ' ')));
+  });
+  menge.add(antwortNormalisieren(roh));
+  return Array.from(menge).filter(Boolean);
+}
+/** 'richtig' | 'fast' | 'falsch' | 'leer'.
+ *  KONZEPT §5: Tippfehlertoleranz erst über fünf Zeichen, Levenshtein ≤ 2.
+ *  Die erlaubte Distanz ist nach Länge gestaffelt, weil ein pauschales „≤ 2“
+ *  bei kurzen Wörtern keine Vertipper mehr erkennt, sondern andere Wörter:
+ *  „Ratten“ für „Katzen“, „fahnen“ für „fahren“. Ein falsches Zeichen ab
+ *  sechs Zeichen, zwei erst ab zwölf. */
+function antwortPruefen(eingabe, erwartet) {
+  const e = antwortNormalisieren(eingabe);
+  if (!e) return 'leer';
+  const alt = antwortAlternativen(erwartet);
+  if (!alt.length) return 'falsch';
+  if (alt.includes(e)) return 'richtig';
+  const fast = alt.some(a => {
+    if (a.length <= 5) return false;
+    return levenshtein(e, a) <= (a.length >= 12 ? 2 : 1);
+  });
+  return fast ? 'fast' : 'falsch';
+}
+
+/* --- Multiple Choice ----------------------------------------------------- */
+
+/** Drei Distraktoren aus demselben Kasten (KONZEPT §5). Liefert null, wenn
+ *  der Kasten zu wenige unterschiedliche Antworten hergibt — dann greift ein
+ *  anderer Modus. */
+function mcOptionenBauen(k) {
+  const richtig = antwortText(k).trim();
+  if (!richtig) return null;
+  // Die eigene Frage darf nie unter den Vorgaben stehen — bei „beide
+  //  Richtungen“ ist die Antwort der Geschwisterabfrage genau dieser Text.
+  const gesehen = new Set([antwortNormalisieren(richtig), antwortNormalisieren(frageText(k))]);
+  const familie = k.quelleId || k.id;
+  const richtung = varianteVon(k);
+  const pool = [];
+  S.cards.forEach(x => {
+    if (x.id === k.id || x.deckId !== k.deckId || x.suspendiert) return;
+    if ((x.quelleId || x.id) === familie) return;      // Geschwisterabfragen
+    // Nur Vorgaben derselben Richtung: In einem Kasten mit beiden Richtungen
+    // lieferten die Rückwärtsabfragen sonst Wörter der anderen Sprache. Die
+    // Aufgabe wäre dann „welches ist das englische Wort“ statt „welches ist
+    // die richtige Übersetzung“.
+    if (varianteVon(x) !== richtung) return;
+    const t = antwortText(x).trim();
+    const n = antwortNormalisieren(t);
+    if (!t || !n || gesehen.has(n)) return;
+    gesehen.add(n); pool.push(t);
+  });
+  if (pool.length < 3) return null;
+  return mischen(mischen(pool).slice(0, 3).concat([richtig]))
+    .map(t => ({ text: t, richtig: t === richtig }));
+}
+
+/* --- Modusauswahl je Karte ---------------------------------------------- */
+
+/** Kleiner, stabiler Hash für die Formatvielfalt (KONZEPT §7): dieselbe Karte
+ *  wird mal getippt, mal aufgedeckt abgefragt — aber nicht zufällig innerhalb
+ *  einer Sitzung, sondern reproduzierbar aus Kennung und Wiederholungszahl. */
+function textHash(s) {
+  let h = 2166136261;
+  const t = String(s);
+  for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return Math.abs(h | 0);
+}
+
+function modusFuer(k) {
+  const modi = deckModi(k.deckId);
+  // Multiple Choice ist der Einstieg für Karten, die noch nie dran waren.
+  // Danach greift automatisch Tippen bzw. Aufdecken (KONZEPT §5).
+  if (modi.includes('mc') && istNeu(k) && !istClozeVariante(k) && mcOptionenBauen(k)) return 'mc';
+  const kandidaten = [];
+  if (modi.includes('tippen')) kandidaten.push('tippen');
+  if (modi.includes('aufdecken')) kandidaten.push('aufdecken');
+  // „Hören“ allein trägt keine Bewertung — dann bleibt Aufdecken der Träger.
+  if (!kandidaten.length) kandidaten.push('aufdecken');
+  return kandidaten[textHash(k.id + ':' + (Number(k.reps) || 0)) % kandidaten.length];
+}
+
+/* --- Sprachausgabe ------------------------------------------------------- */
+
+const sprachAusgabeDa = () => typeof window !== 'undefined' && 'speechSynthesis' in window;
+function sprechen(text, sprache) {
+  const t = String(text ?? '').trim();
+  if (!sprachAusgabeDa() || !t) return false;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(t.slice(0, 500));
+    u.lang = sprache || 'de-DE';
+    u.rate = 0.95;
+    window.speechSynthesis.speak(u);
+    return true;
+  } catch (e) { console.warn('[Sprachausgabe]', e); return false; }
+}
+function sprechenStoppen() {
+  try { if (sprachAusgabeDa()) window.speechSynthesis.cancel(); } catch (_) {}
+}
+
+/* ---------- 7c. Prüfung, Problemkarten, Karten-Check (Stufe 4) ---------- */
+
+/* --- Prüfungstermin je Kasten (KONZEPT §6.6) ---------------------------- */
+
+/* Auch auf Gültigkeit prüfen, nicht nur auf die Form: „2026-02-30“ rollt in
+   JavaScript stillschweigend auf den 2. März weiter, und aus einer von Hand
+   bearbeiteten Sicherung kommt so etwas durchaus. */
+const deckPruefung = deckId => {
+  const p = deckVon(deckId)?.pruefungsdatum;
+  if (typeof p !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(p)) return null;
+  const [y, m, t] = p.split('-').map(Number);
+  const d = new Date(Date.UTC(y, m - 1, t));
+  return (d.getUTCFullYear() === y && d.getUTCMonth() === m - 1 && d.getUTCDate() === t) ? p : null;
+};
+
+/** Stauchen: Liegt der errechnete Termin hinter der Prüfung, wäre die Karte
+ *  bis dahin kein einziges Mal mehr dran. Sie wird deshalb in die letzten
+ *  Tage davor vorgezogen — verteilt über ein Fenster statt alles auf den
+ *  Prüfungstag, sonst entstünde am Vortag ein unbearbeitbarer Berg. */
+function terminStauchen(iso, deckId, kartenId) {
+  const p = deckPruefung(deckId);
+  if (!p || p < heute()) return iso;      // kein Termin oder schon vorbei
+  if (iso <= p) return iso;               // passt ohnehin davor
+  const rest = tageDiff(p, heute());
+  // In den letzten beiden Tagen nicht mehr eingreifen: Die Karte war ja
+  // gerade dran, ein weiterer Termin davor bringt nichts. Früher wurde hier
+  // auf „morgen“ gesetzt — dadurch türmten sich am Prüfungstag und am Tag
+  // danach sämtliche Karten des Kastens auf.
+  if (rest <= 1) return iso;
+  const fenster = Math.min(rest, 7);
+  return plusTage(p, -(textHash(String(kartenId)) % fenster));
+}
+
+/** Ein Termin allein bewirkt nichts: Karten, deren Fälligkeit schon hinter
+ *  der Prüfung liegt, kommen bis dahin nie dran und werden folglich auch nie
+ *  neu terminiert. Beim Setzen des Termins müssen sie deshalb einmalig
+ *  vorgezogen werden — sonst bleibt genau der reife Teil des Bestands, um
+ *  den es vor einer Prüfung geht, unangetastet liegen. */
+function pruefungTermineVorziehen(deckId) {
+  const p = deckPruefung(deckId);
+  if (!p || p < heute()) return 0;
+  const ops = [];
+  kartenVon(deckId).forEach(k => {
+    if (k.suspendiert) return;
+    const alt = k.due || heute();
+    if (alt <= p) return;
+    const neu = terminStauchen(alt, deckId, k.id);
+    if (neu === alt) return;
+    k.due = neu;                                   // lokal sofort
+    ops.push(['merge', k.id, { due: neu }]);
+  });
+  variantenOpsSchreiben(ops, 'Termine vorziehen');
+  return ops.length;
+}
+
+const deckPruefungAktiv = deckId => {
+  const p = deckPruefung(deckId);
+  return (p && p >= heute()) ? p : null;
+};
+
+/** Gemessene Sekunden je Abfrage aus dem eigenen Bestand. Damit rechnet die
+ *  Machbarkeitsschätzung statt mit einer Pauschale — die App weiß ja, wie
+ *  schnell dieser Nutzer tatsächlich ist. */
+function gemesseneSekundenJeKarte() {
+  let zeit = 0, n = 0;
+  S.cards.forEach(k => {
+    const z = Number(k.zeitGesamt) || 0, r = Number(k.zeitReps) || 0;
+    if (z > 0 && r > 0) { zeit += z; n += r; }
+  });
+  return n >= 20 ? zeit / n : null;      // erst ab 20 Messungen aussagekräftig
+}
+
+/** Wie viele Abfragen fallen bis zum Termin voraussichtlich an? Eine Karte
+ *  kommt in dieser Zeit nicht einmal dran, sondern so oft, wie ihr Intervall
+ *  in die verbleibenden Tage passt. Genau das war der Fehler der ersten
+ *  Fassung: Sie zählte jede Karte einmal und versprach damit ein Vielfaches
+ *  zu wenig Aufwand. */
+function erwarteteAbfragen(karten, tage) {
+  if (tage <= 0) return karten.length;
+  const retention = Math.min(0.95, Math.max(0.8, Number(S.einstellungen.retention) || 0.88));
+  const iv = S.einstellungen.intervalle;
+  let summe = 0;
+  karten.forEach(k => {
+    // Neue Karten: Einführung plus die kurzen Folgewiederholungen.
+    if (istNeu(k)) { summe += Math.min(tage, 3); return; }
+    const s = Number(k.stability) || 0;
+    const intervall = S.einstellungen.klassikModus
+      ? Math.max(1, iv[Math.min(11, Math.max(0, fachVon(k) - 1))] || 1)
+      : Math.max(1, fsrsIntervallTage(s || 1, retention, FSRS_STANDARD_GEWICHTE));
+    summe += Math.max(1, Math.round(tage / intervall));
+  });
+  return Math.round(summe);
+}
+
+/** Wie steht es vor der Prüfung? Liefert die nötige Tagesmenge und ein
+ *  Urteil dazu, gemessen an der tatsächlichen eigenen Geschwindigkeit. */
+function pruefungsLage(deckId) {
+  const datum = deckPruefung(deckId);
+  if (!datum) return null;
+  const tage = tageDiff(datum, heute());
+  const alle = kartenVon(deckId);
+  const karten = alle.filter(k => !k.suspendiert);
+  const ruhend = alle.length - karten.length;
+  const dran = karten.filter(k => istNeu(k) || (k.due || heute()) <= datum);
+  const offen = dran.length;
+  const neue = dran.filter(istNeu).length;
+
+  // Je Kartenfamilie kommt pro Sitzung nur eine Abfrage dran (Geschwister
+  // werden zurückgestellt, Stufe 3).
+  const jeFamilie = new Map();
+  dran.forEach(k => {
+    const f = k.quelleId || k.id;
+    jeFamilie.set(f, (jeFamilie.get(f) || 0) + 1);
+  });
+  const familien = jeFamilie.size;
+  const maxJeFamilie = Math.max(0, ...jeFamilie.values());
+
+  const abfragen = erwarteteAbfragen(dran, tage);
+  const proTag = tage > 0 ? Math.ceil(abfragen / tage) : abfragen;
+
+  // Tagesziel in Karten. Liegen eigene Messungen vor, wird damit gerechnet —
+  // sonst mit 15 Sekunden je Karte als Näherung.
+  const sekJeKarte = gemesseneSekundenJeKarte() || 15;
+  const ziel = S.einstellungen.zielEinheit === 'karten'
+    ? zahl(S.einstellungen.zielKarten, 1, 2000, 30)
+    : Math.max(5, Math.round(zahl(S.einstellungen.zielMinuten, 1, 600, 15) * 60 / sekJeKarte));
+  const minutenNoetig = Math.round(proTag * sekJeKarte / 60);
+
+  // Harte Schranken, unabhängig vom Tempo:
+  //  – mehr Lücken/Richtungen an einer Karte als Tage übrig,
+  //  – mehr Abfragen je Tag als es überhaupt Kartenfamilien gibt,
+  //  – mehr neue Karten als der Tagesdeckel bis dahin durchlässt.
+  const deckel = zahl(S.einstellungen.neuProTag, 5, 50, 20);
+  const unmoeglich = maxJeFamilie > Math.max(1, tage)
+    || (tage > 0 && proTag > familien)
+    || neue > deckel * Math.max(1, tage + 1);
+
+  const urteil = tage < 0 ? 'vorbei'
+    : offen === 0 ? 'gut'
+    : unmoeglich ? 'kritisch'
+    : proTag <= ziel ? 'gut'
+    : proTag <= ziel * 1.5 ? 'eng' : 'kritisch';
+  return { datum, tage, offen, neue, ruhend, proTag, abfragen, ziel, minutenNoetig,
+           urteil, familien, maxJeFamilie, sekJeKarte };
+}
+const PRUEFUNG_URTEIL = {
+  gut:      ['machbar', 'var(--bewertung-3)'],
+  eng:      ['eng', 'var(--faellig)'],
+  kritisch: ['kaum zu schaffen', 'var(--bewertung-1)'],
+  vorbei:   ['Termin vorbei', 'var(--txt3)']
+};
+/** Kästen mit anstehender Prüfung, die nächste zuerst. */
+function anstehendePruefungen(nurDecks) {
+  return S.decks
+    .filter(d => (!nurDecks || nurDecks.has(d.id)) && deckPruefungAktiv(d.id))
+    .map(d => ({ deck: d, lage: pruefungsLage(d.id) }))
+    .sort((a, b) => a.lage.datum.localeCompare(b.lage.datum));
+}
+/** Termine, die verstrichen sind und noch am Kasten hängen. Ohne Hinweis
+ *  bliebe der Kasten dauerhaft auf Prüfungsbetrieb getrimmt. */
+function abgelaufenePruefungen(nurDecks) {
+  return S.decks
+    .filter(d => (!nurDecks || nurDecks.has(d.id)) && deckPruefung(d.id) && deckPruefung(d.id) < heute())
+    .map(d => ({ deck: d, datum: deckPruefung(d.id) }));
+}
+
+/* --- Problemkarten (KONZEPT §6.3) --------------------------------------- */
+
+const leechGrenze = () => zahl(S.einstellungen.leechGrenze, 3, 20, 7);
+/** Aussetzer seit dem letzten Wiederaufnehmen. Ohne diesen Bezugspunkt würde
+ *  eine wieder aufgenommene Karte beim allerersten Fehler sofort erneut
+ *  ausgesetzt — sie liegt ja weiterhin über der Grenze. */
+const leechZaehler = k => Math.max(0, (Number(k.lapses) || 0) - (Number(k.leechBasis) || 0));
+const istProblemkarte = k => !!k.leech || leechZaehler(k) >= leechGrenze();
+const problemkarten = () => S.cards.filter(istProblemkarte);
+
+/* --- Karten-Check beim Anlegen (KONZEPT §6.4) --------------------------- */
+
+/* Eine gewöhnliche deutsche Definition hat gut 20 Wörter. Bei 15 hätte der
+   Hinweis bei fast jeder Prüfungskarte angeschlagen und wäre zur reinen
+   Belästigung geworden. */
+const WORTGRENZE = 28;
+
+/** Zerlegt eine Antwort in Aufzählungspunkte — aber nur, wenn sie wirklich
+ *  wie eine Aufzählung aussieht. Ein Komma allein reicht nicht: „Berlin, die
+ *  Hauptstadt Deutschlands“ ist keine Liste. Deshalb greift die
+ *  Komma-Trennung erst ab drei kurzen Gliedern. */
+const LISTEN_MARKE = /^\s*(?:[-–—•*·]|\d{1,2}[.)])\s+/;
+function aufzaehlungTeilen(text) {
+  const leer = { stamm: '', teile: [] };
+  const s = String(text ?? '').trim();
+  if (!s) return leer;
+  const abstreifen = z => z.replace(LISTEN_MARKE, '').trim();
+  const zeilen = s.split(/\r?\n+/).map(z => z.trim()).filter(Boolean);
+
+  if (zeilen.length >= 2) {
+    // Eine Einleitungszeile mit Doppelpunkt gehört in den Kartenkopf und
+    // nicht in eine eigene Lücke — sonst würde „Die drei Gewalten sind:“
+    // zu einer eigenständig terminierten Abfrage.
+    let stamm = '';
+    let roh = zeilen;
+    if (zeilen.length >= 3 && /:$/.test(zeilen[0]) && !LISTEN_MARKE.test(zeilen[0])) {
+      stamm = zeilen[0]; roh = zeilen.slice(1);
+    }
+    const mitMarke = roh.length >= 2 && roh.every(z => LISTEN_MARKE.test(z));
+    const teile = roh.map(abstreifen).filter(Boolean);
+    // Ohne Aufzählungszeichen nur dann als Liste werten, wenn die Zeilen
+    // wirklich kurz sind. Zwei Sätze auf zwei Zeilen sind keine Liste, und
+    // daraus zwei „Satz wörtlich wiedergeben“-Lücken zu machen wäre schlimmer
+    // als die Ausgangskarte.
+    const kurz = teile.length >= 2 && teile.every(t => t.split(/\s+/).length <= 6);
+    if (teile.length >= 2 && (mitMarke || kurz)) return { stamm, teile };
+    return leer;
+  }
+
+  // Einzeilig: „Die drei Gewalten: Legislative, Exekutive, Judikative“
+  let stamm = '', rest = s;
+  const dp = s.indexOf(':');
+  if (dp > 0 && dp < 60) { stamm = s.slice(0, dp + 1).trim(); rest = s.slice(dp + 1); }
+  const kandidaten = rest.split(/\s*;\s*|\s*,\s*(?=\S)/).map(t => abstreifen(t)).filter(Boolean);
+  if (kandidaten.length >= 3 && kandidaten.every(t => t.split(/\s+/).length <= 4))
+    return { stamm, teile: kandidaten };
+  return leer;
+}
+
+/** Prüft eine Karte auf die beiden Muster, die erfahrungsgemäß viel Zeit
+ *  kosten und schlecht behalten werden: sehr lange Antworten und getarnte
+ *  Aufzählungen. Nur ein Hinweis, nie eine Sperre (KONZEPT §6.4). */
+function kartenCheck(antwort) {
+  const woerter = String(antwort ?? '').trim().split(/\s+/).filter(Boolean).length;
+  const { stamm, teile } = aufzaehlungTeilen(antwort);
+  const gruende = [];
+  if (woerter > WORTGRENZE)
+    gruende.push(`Die Antwort hat <strong>${woerter} Wörter</strong>. Lange Antworten werden
+      schlechter behalten, weil beim Abfragen unklar bleibt, wie viel davon genau gefragt ist.`);
+  if (teile.length >= 2)
+    gruende.push(`Die Antwort sieht nach einer Aufzählung mit <strong>${teile.length} Punkten</strong>
+      aus. Aufzählungen lernt man einzeln deutlich schneller als am Stück.`);
+  return { woerter, liste: teile, stamm, gruende };
+}
+
+/* --- Zeitauswertung (KONZEPT §6.7) -------------------------------------- */
+
+/** Durchschnittliche Sekunden je gemessener Abfrage. null, wenn noch nichts
+ *  gemessen wurde. Geteilt wird durch zeitReps, nicht durch reps: Karten aus
+ *  Stufe 1–3 haben Wiederholungen aus einer Zeit ohne Zeitmessung, und die
+ *  würden den Schnitt dauerhaft gegen null drücken. */
+function schnittSekunden(k) {
+  const zeit = Number(k.zeitGesamt) || 0;
+  const n = Number(k.zeitReps) || 0;
+  return (zeit > 0 && n > 0) ? zeit / n : null;
+}
+/** Die Karten, die am meisten Zeit kosten — erst ab zwei gemessenen
+ *  Abfragen, damit ein einzelner Ausreißer (Telefonat mitten in der Sitzung)
+ *  niemanden in die Liste bringt. */
+function zeitfresser(karten, anzahl = 8) {
+  return karten
+    .map(k => ({ k, schnitt: schnittSekunden(k) }))
+    .filter(x => x.schnitt !== null && (Number(x.k.zeitReps) || 0) >= 2)
+    .sort((a, b) => b.schnitt - a.schnitt)
+    .slice(0, anzahl);
+}
+
 /* ---------- 8. Navigation ---------------------------------------------- */
 
 const SEITEN = ['lernen', 'kaesten', 'karten', 'statistik', 'einstellungen'];
@@ -1086,7 +1924,10 @@ $('#nav').addEventListener('click', e => {
 
 function seiteZeigen(name) {
   if (!SEITEN.includes(name)) return;
-  if (name !== 'lernen') { sitzung = null; letzteSitzung = null; }
+  // Ein Klick auf die ohnehin offene Seite darf eine laufende Sitzung nicht
+  // neu zeichnen — sonst wäre eine halb getippte Antwort weg.
+  if (name === S.seite && sitzung?.aktiv) return;
+  if (name !== 'lernen') { sprechenStoppen(); sitzung = null; letzteSitzung = null; }
   S.seite = name;
   SEITEN.forEach(s => { $('#seite-' + s).hidden = (s !== name); });
   $$('#nav button').forEach(b => b.classList.toggle('aktiv', b.dataset.seite === name));
@@ -1172,6 +2013,37 @@ function malLernen() {
       </div>
     </div>
 
+    ${anstehendePruefungen(lernAuswahl).slice(0, 3).map(({ deck, lage }) => {
+      const [wort, farbe] = PRUEFUNG_URTEIL[lage.urteil];
+      return `<div class="hinweis" style="border-left-color:${farbe};margin-bottom:10px">
+        <strong>${esc(deck.name)}: Prüfung ${lage.tage === 0 ? 'heute'
+          : 'in ' + lage.tage + (lage.tage === 1 ? ' Tag' : ' Tagen')}</strong>
+        (${datumDeutsch(lage.datum)}). ${lage.offen} ${lage.offen === 1 ? 'Karte' : 'Karten'}
+        stehen an, das sind voraussichtlich <strong>${lage.abfragen} Abfragen</strong> bis dahin —
+        rund <strong>${lage.proTag} pro Tag</strong> oder ${lage.minutenNoetig === 1
+          ? 'eine Minute' : lage.minutenNoetig + ' Minuten'}:
+        <span style="color:${farbe};font-weight:700">${wort}</span>.
+        ${lage.ruhend ? `<br><span class="mini">${lage.ruhend} ruhende ${lage.ruhend === 1
+          ? 'Karte ist' : 'Karten sind'} dabei nicht mitgerechnet.</span>` : ''}
+        ${lage.urteil === 'kritisch' ? '<br><span class="mini">Weniger neue Karten pro Tag oder ein kleinerer Ausschnitt hilft mehr als längere Sitzungen.</span>' : ''}
+      </div>`;
+    }).join('')}
+
+    ${(() => {
+      const p = S.cards.filter(k => lernAuswahl.has(k.deckId) && istProblemkarte(k));
+      return p.length ? `<div class="hinweis" style="margin-bottom:10px">
+        <strong>${p.length} ${p.length === 1 ? 'Problemkarte' : 'Problemkarten'}</strong> in der
+        Auswahl — Karten, die immer wieder durchfallen. Umformulieren bringt dort mehr als üben.
+        <div style="margin-top:8px"><button class="btn klein" data-tu="zuProblemkarten">
+          Ansehen</button></div></div>` : '';
+    })()}
+
+    ${abgelaufenePruefungen(lernAuswahl).map(({ deck, datum }) => `<div class="hinweis" style="margin-bottom:10px">
+      <strong>${esc(deck.name)}: Der Termin vom ${datumDeutsch(datum)} ist vorbei.</strong>
+      Solange er stehen bleibt, werden die Termine dieses Kastens weiter vorgezogen.
+      <div style="margin-top:8px"><button class="btn klein" data-tu="pruefungBeenden" data-id="${esc(deck.id)}">
+        Termin entfernen</button></div></div>`).join('')}
+
     ${fachGesamt ? `
     <div class="dash-fachleiste">${proFach.map((n, i) =>
       n ? `<div style="width:${(n / fachGesamt * 100).toFixed(2)}%;background:var(--akzent);opacity:${(0.28 + i * 0.06).toFixed(2)}" title="Fach ${i + 1}: ${n} Karten"></div>` : ''
@@ -1205,11 +2077,14 @@ function malLernen() {
         <span style="flex:1">Alle fälligen, auch überfällige</span><span class="badge">${alleN}</span></label>
     </div>
 
-    <button class="btn primary gross breit" data-tu="starten" ${dran ? '' : 'disabled'}>
-      ${dran ? `Sitzung starten — ${dran} ${dran === 1 ? 'Karte' : 'Karten'}` : 'Nichts fällig'}
+    <button class="btn primary gross breit"
+      data-tu="${!dran && alleN ? 'startenAlle' : 'starten'}" ${dran || alleN ? '' : 'disabled'}>
+      ${dran ? `Sitzung starten — ${dran} ${dran === 1 ? 'Karte' : 'Karten'}`
+        : alleN ? `Überfällige lernen — ${alleN} ${alleN === 1 ? 'Karte' : 'Karten'}`
+        : 'Nichts fällig'}
     </button>
     ${!dran && alleN ? `<p class="mini mt" style="text-align:center">
-        Heute ist nichts dran, aber ${alleN} überfällige Karten warten. Umfang umstellen.</p>` : ''}
+        Heute ist planmäßig nichts dran — diese Karten sind an früheren Tagen liegen geblieben.</p>` : ''}
     ${!dran && !alleN ? `<p class="mini mt" style="text-align:center">
         Alles erledigt. Nächste Fälligkeit: ${esc(naechsteFaelligkeitText())}</p>` : ''}
 
@@ -1263,7 +2138,29 @@ async function sitzungStarten() {
     .filter(modus === 'heute' ? istHeuteGenau : istFaellig);
   if (!pool.length) return toast('Keine fälligen Karten in der Auswahl.');
 
-  const heutigeNeu = await heutigeStatistikLaden();
+  // Geschwisterabfragen zurückstellen: Die Lücken eines Satzes und die
+  // beiden Richtungen einer Vokabel gehören zusammen. Kämen sie in derselben
+  // Sitzung dran, verriete die erste die Antwort der übrigen — der
+  // Lückentext zeigt die anderen Lücken im Klartext, die Rückwärtsfrage ist
+  // die Antwort der Vorwärtsfrage. Die Bewertung misst dann Wiedererkennen
+  // statt Erinnern, und FSRS verlängert die Abstände auf falscher Grundlage.
+  const familien = new Set();
+  const zurueckgestellt = [];
+  pool = pool.slice()
+    .sort((a, b) => String(a.due || '').localeCompare(String(b.due || '')))
+    .filter(k => {
+      const familie = k.quelleId || k.id;
+      if (familien.has(familie)) { zurueckgestellt.push(k); return false; }
+      familien.add(familie);
+      return true;
+    });
+
+  // Ohne Netz kann diese Abfrage hängen bleiben. Der Start darf davon nicht
+  // abhängen — dieselbe Absicherung wie beim Erststart-Test.
+  const heutigeNeu = await Promise.race([
+    heutigeStatistikLaden(),
+    new Promise(r => setTimeout(() => r(S.heutigeNeu), 3000))
+  ]);
   const deckel = zahl(S.einstellungen.neuProTag, 5, 50, 20);
   const nochFrei = Math.max(0, deckel - heutigeNeu);
   const alte = pool.filter(k => !istNeu(k));
@@ -1275,12 +2172,41 @@ async function sitzungStarten() {
     `Tagesgrenze für neue Karten erreicht (${deckel}/Tag). In der Auswahl sind nur noch neue Karten fällig.`, 'fehler');
 
   sitzung = {
+    // KONZEPT §6.5: Interleaving — die gewählten Kästen werden gemischt
+    // abgearbeitet, nicht blockweise nacheinander.
     karten: mischen(pool), i: 0, aufgedeckt: false, aktiv: true,
     zaehler: { 1: 0, 2: 0, 3: 0, 4: 0 }, gesamt: pool.length,
     start: Date.now(), kartenStart: Date.now(), sekunden: 0,
-    proDeck: {}, bewertet: 0, uebrigeNeue: uebrig
+    proDeck: {}, bewertet: 0, uebrigeNeue: uebrig,
+    zurueckgestellt: zurueckgestellt.length
   };
+  kartenZustandLeeren(sitzung);
   malSitzung();
+}
+
+/* Doppeltipp-Schutz. Auf dem Handy trifft der zweite Tipp eines
+   Doppeltipps dieselbe Bildschirmstelle der bereits nachgerückten Karte —
+   dort liegt „Antwort zeigen“ bzw. „Prüfen“, und die nächste Karte wäre
+   ungefragt aufgedeckt. Bewusst an Ort UND Zeit festgemacht statt an einer
+   pauschalen Sperre: Wer zügig lernt, drückt durchaus 200 ms nach der
+   Bewertung schon wieder — nur eben nicht auf denselben Punkt. */
+let letzteBewertungsStelle = null;
+document.addEventListener('click', e => {
+  if (!sitzung?.aktiv || !e.clientX || !e.clientY) return;
+  if (e.target.closest?.('[data-bew]')) {
+    letzteBewertungsStelle = { x: e.clientX, y: e.clientY, t: Date.now() };
+    return;
+  }
+  if (!letzteBewertungsStelle) return;
+  const nah = Math.abs(e.clientX - letzteBewertungsStelle.x) < 45
+           && Math.abs(e.clientY - letzteBewertungsStelle.y) < 45;
+  if (nah && Date.now() - letzteBewertungsStelle.t < 400) { e.preventDefault(); e.stopPropagation(); }
+}, true);
+
+/** Zustand, der nur zur gerade gezeigten Karte gehört. */
+function kartenZustandLeeren(s) {
+  s.modus = null; s.urteil = null; s.mcOptionen = null; s.mcGewaehlt = null;
+  s.gesprochenFuer = -1;
 }
 
 function malSitzung() {
@@ -1290,14 +2216,45 @@ function malSitzung() {
 
   if (s.i >= s.karten.length) return malAbschluss();
 
+  // Inhalt aus dem aktuellen Bestand nehmen, falls die Karte inzwischen
+  // woanders bearbeitet wurde. Fehlt sie, bleibt die Kopie stehen —
+  // bewerten() fängt den Fall ab.
+  const frisch = S.cards.find(x => x.id === s.karten[s.i].id);
+  if (frisch) s.karten[s.i] = frisch;
+
   const k = s.karten[s.i];
+  if (!s.modus) {
+    s.modus = modusFuer(k);
+    if (s.modus === 'mc') {
+      s.mcOptionen = mcOptionenBauen(k);
+      if (!s.mcOptionen) s.modus = 'aufdecken';   // zu wenige Distraktoren
+    }
+  }
+  const modi = deckModi(k.deckId);
+  const hoeren = modi.includes('hoeren');
+  // Reiner Hörmodus: ist „Hören“ der einzige gewählte Modus, bleibt die Frage
+  // verdeckt und wird nur vorgelesen — sonst ist Hören eine Ergänzung.
+  // Ohne Sprachausgabe wäre eine verdeckte Frage unbeantwortbar; dann wird
+  // der Text gezeigt, statt den Nutzer vor eine leere Karte zu setzen.
+  const nurHoeren = hoeren && modi.length === 1 && !istClozeVariante(k) && sprachAusgabeDa();
+  if (hoeren && !sprachAusgabeDa() && !hoerenHinweisGezeigt) {
+    hoerenHinweisGezeigt = true;
+    setTimeout(() => toast('Dieser Browser bietet keine Sprachausgabe an — die Karten werden angezeigt.', 'fehler'), 300);
+  }
+
   const fach = fachVon(k);
   const proz = Math.round((s.i / s.gesamt) * 100);
   const ueberfaellig = tageDiff(heute(), k.due || heute());
+  const marke = variantenMarke(k);
+  const markeHtml = marke ? esc(marke) + ' · ' : '';
+  const lautsprecher = was =>
+    hoeren ? `<button type="button" class="sprech-knopf" data-tu="vorlesen" data-id="${was}"
+                 aria-label="Vorlesen" title="Vorlesen">🔊</button>` : '';
 
   ziel.innerHTML = `
     <div class="spread" style="margin-bottom:8px">
-      <span class="mini">${s.i + 1} / ${s.gesamt}</span>
+      <span class="mini">${s.i + 1} / ${s.gesamt}${
+        s.modus !== 'aufdecken' || hoeren ? ` · ${esc(modusEtikett(s.modus, hoeren))}` : ''}</span>
       <button class="btn klein" data-tu="abbrechen">Beenden</button>
     </div>
     <div class="fortschritt"><div style="width:${proz}%"></div></div>
@@ -1307,31 +2264,119 @@ function malSitzung() {
         <div class="flip-seite vorn">
           <div class="flip-kopf">
             <span style="color:${esc(deckFarbe(k.deckId))}">${esc(deckName(k.deckId))}</span>
-            <span>Fach ${fach}${istNeu(k) ? ' · neu' : ''}${ueberfaellig > 0 ? ` · ${ueberfaellig} T. überfällig` : ''}</span>
+            <span>${markeHtml}Fach ${fach}${istNeu(k) ? ' · neu' : ''}${ueberfaellig > 0 ? ` · ${ueberfaellig} T. überfällig` : ''}</span>
           </div>
-          <div class="flip-text">${esc(k.frage)}</div>
+          ${nurHoeren
+            ? `<div class="nur-hoeren"><span class="gross-ico">🔊</span>Die Frage wird vorgelesen</div>`
+            : `<div class="flip-text">${frageHtml(k)}</div>`}
+          ${lautsprecher('frage')}
         </div>
         <div class="flip-seite hinten">
           <div class="flip-kopf">
             <span style="color:${esc(deckFarbe(k.deckId))}">${esc(deckName(k.deckId))}</span>
-            <span>Fach ${fach}</span>
+            <span>${markeHtml}Fach ${fach}</span>
           </div>
-          <div class="flip-text">${esc(k.antwort)}</div>
+          <div class="flip-text">${antwortHtml(k)}</div>
+          ${nurHoeren ? `<div class="flip-notiz">Frage: ${esc(frageText(k))}</div>` : ''}
           ${k.notiz ? `<div class="flip-notiz">${esc(k.notiz)}</div>` : ''}
+          ${lautsprecher('antwort')}
         </div>
       </div>
     </div>
 
-    <div id="aktionen">${s.aufgedeckt ? bewertungsHtml(k) : aufdeckHtml()}</div>`;
+    <div id="aktionen">${aktionenHtml(s, k)}</div>`;
 
   verdrahten(ziel);
   aktionenVerdrahten();
-  $('#flip')?.addEventListener('click', () => { if (!sitzung?.aufgedeckt) umdrehen(); });
+  // Klick auf die Karte deckt nur dort auf, wo es keine Eingabe gibt —
+  // sonst würde ein Fehlklick die Tipp- oder Auswahlaufgabe überspringen.
+  // Der Lautsprecher liegt innerhalb der Karte: ohne diese Ausnahme würde
+  // jedes Nachhören die Antwort aufdecken, im reinen Hörmodus wäre die
+  // Wiederholtaste damit unbrauchbar.
+  if (s.modus === 'aufdecken')
+    $('#flip')?.addEventListener('click', ev => {
+      if (ev.target.closest('.sprech-knopf')) return;
+      if (!sitzung?.aufgedeckt) umdrehen();
+    });
+
+  if (hoeren && s.gesprochenFuer !== s.i && !s.aufgedeckt) {
+    s.gesprochenFuer = s.i;
+    sprechen(frageText(k), spracheFuer(k, 'frage'));
+  }
+  if (s.modus === 'tippen' && !s.aufgedeckt) $('#tipp-eingabe')?.focus();
+}
+
+function modusEtikett(modus, hoeren) {
+  const n = MODUS_NAME[modus] || MODUS_NAME.aufdecken;
+  return hoeren && modus !== 'hoeren' ? n + ' + Hören' : n;
+}
+
+/** Der Bereich unter der Karte — je nach Modus und Auswertungsstand. */
+function aktionenHtml(s, k) {
+  const teile = [];
+  if (s.modus === 'mc' && s.mcOptionen) teile.push(mcHtml(s));
+  if (s.urteil) teile.push(urteilHtml(s.urteil, k));
+  if (s.aufgedeckt) teile.push(bewertungsHtml(k, s.urteil));
+  else if (s.modus === 'tippen') teile.push(tippenHtml());
+  else if (s.modus !== 'mc') teile.push(aufdeckHtml());
+  return teile.join('');
 }
 
 function aufdeckHtml() {
   return `<button class="btn primary gross breit" data-tu="umdrehen">Antwort zeigen</button>
           <p class="tastenhilfe"><kbd>Leertaste</kbd></p>`;
+}
+
+function tippenHtml() {
+  return `<div class="tipp-zeile">
+      <input id="tipp-eingabe" type="text" autocomplete="off" autocapitalize="off"
+             autocorrect="off" spellcheck="false" placeholder="Antwort eintippen …"
+             aria-label="Antwort eintippen">
+      <button class="btn primary" data-tu="tippPruefen">Prüfen</button>
+    </div>
+    <p class="tastenhilfe"><kbd>Enter</kbd> prüfen · leer lassen und <kbd>Enter</kbd> zeigt die Antwort</p>`;
+}
+
+const MC_BUCHSTABEN = ['A', 'B', 'C', 'D'];
+function mcHtml(s) {
+  return `<div class="mc-liste">${s.mcOptionen.map((o, i) => {
+    const fertig = !!s.urteil;
+    const klasse = !fertig ? '' : o.richtig ? ' richtig' : (i === s.mcGewaehlt ? ' falsch' : '');
+    return `<button type="button" class="mc-option${klasse}" data-mc="${i}" ${fertig ? 'disabled' : ''}>
+       <span class="mc-buchstabe">${MC_BUCHSTABEN[i]}</span><span>${esc(o.text)}</span></button>`;
+  }).join('')}</div>
+    ${s.urteil ? '' : `<p class="tastenhilfe"><kbd>A</kbd>–<kbd>D</kbd> oder anklicken</p>`}`;
+}
+
+/** Bewertungsvorschlag aus der automatischen Auswertung.
+ *  Bewusst kein Vorschlag bei „falsch“: Die 1 wirft eine reife Karte um
+ *  Monate zurück. Wer gerade getippt und Enter gedrückt hat, drückt Enter
+ *  gern noch einmal — dieser Reflex darf nicht die härteste Bewertung
+ *  auslösen, zumal die Auswertung selbst danebenliegen kann. */
+function urteilVorschlag(art) {
+  return (art === 'richtig' || art === 'fast') ? 3 : null;
+}
+
+function urteilHtml(u, k) {
+  const titel = {
+    richtig: 'Richtig',
+    fast:    'Fast richtig — als gewusst werten?',
+    falsch:  'Nicht richtig',
+    leer:    'Antwort angesehen'
+  }[u.art] || '';
+  const ikon = { richtig: '✓', fast: '≈', falsch: '✗', leer: '👁' }[u.art] || '';
+  const klasse = u.art === 'leer' ? '' : u.art;
+  const zeilen = [];
+  if (u.eingabe) zeilen.push(`Deine Antwort: <strong>${esc(u.eingabe)}</strong>`);
+  if (u.art !== 'richtig') zeilen.push(`Richtig wäre: <strong>${esc(antwortText(k))}</strong>`);
+  return `<div class="urteil ${klasse}">
+      <span style="font-size:19px;line-height:1.15">${ikon}</span>
+      <span><b>${titel}</b>${zeilen.length ? `<span class="ihre">${zeilen.join('<br>')}</span>` : ''}</span>
+    </div>
+    ${u.art === 'fast' ? `<div class="row" style="margin-bottom:12px">
+      <button class="btn" data-tu="fastJa">Ja, als gewusst werten</button>
+      <button class="btn" data-tu="fastNein">Nein, nicht gewusst</button>
+    </div>` : ''}`;
 }
 
 function aktionenVerdrahten() {
@@ -1340,6 +2385,51 @@ function aktionenVerdrahten() {
   verdrahten(a);
   $$('[data-bew]', a).forEach(b =>
     b.addEventListener('click', () => bewerten(Number(b.dataset.bew))));
+  $$('[data-mc]', a).forEach(b =>
+    b.addEventListener('click', () => mcWaehlen(Number(b.dataset.mc))));
+  const feld = $('#tipp-eingabe', a);
+  if (feld) feld.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); tippAuswerten(); }
+    // Der globale Tastaturhandler lässt Eingabefelder in Ruhe — ohne diese
+    // Zeile wäre Esc genau dort wirkungslos, wo der Cursor immer steht.
+    if (e.key === 'Escape') { e.preventDefault(); sitzungBeenden(false); }
+  });
+}
+
+/** Aufdecken ohne die Karte neu zu zeichnen — sonst entstünde das Element neu
+ *  und die Umdreh-Animation liefe gar nicht erst an. */
+function aktionenAuffrischen() {
+  const s = sitzung;
+  if (!s) return;
+  const k = s.karten[s.i];
+  const karte = $('#flip'), a = $('#aktionen');
+  if (!karte || !a || !k) return malSitzung();
+  karte.classList.add('gedreht');
+  a.innerHTML = aktionenHtml(s, k);
+  aktionenVerdrahten();
+  if (deckModi(k.deckId).includes('hoeren')) sprechen(antwortText(k), spracheFuer(k, 'antwort'));
+}
+
+function tippAuswerten() {
+  const s = sitzung;
+  if (!s?.aktiv || s.aufgedeckt) return;
+  const k = s.karten[s.i];
+  if (!k) return;
+  const eingabe = String($('#tipp-eingabe')?.value ?? '').trim();
+  s.urteil = { art: antwortPruefen(eingabe, antwortText(k)), eingabe };
+  s.aufgedeckt = true;
+  aktionenAuffrischen();
+}
+
+function mcWaehlen(i) {
+  const s = sitzung;
+  if (!s?.aktiv || s.aufgedeckt || !s.mcOptionen) return;
+  const opt = s.mcOptionen[i];
+  if (!opt) return;
+  s.mcGewaehlt = i;
+  s.urteil = { art: opt.richtig ? 'richtig' : 'falsch', eingabe: opt.text };
+  s.aufgedeckt = true;
+  aktionenAuffrischen();
 }
 
 /** Text für "in wie vielen Tagen" unter jedem Bewertungsknopf. */
@@ -1351,6 +2441,10 @@ function intervallTextAus(tage) {
  *  Intervalltabelle oder direkt von FSRS. repeat() liefert alle vier
  *  Ausgänge auf einen Schlag, genau passend für diese Vorschau. */
 function intervallVorschauTexte(k) {
+  // Der Prüfungstermin staucht die Fälligkeit — die Vorschau muss denselben
+  // Weg nehmen, sonst verspricht sie „1,4 Jahre“ und die Karte kommt in vier
+  // Tagen wieder.
+  const gestaucht = iso => tageDiff(terminStauchen(iso, k.deckId, k.id), heute());
   if (S.einstellungen.klassikModus) {
     const iv = S.einstellungen.intervalle;
     const max = iv.length;
@@ -1358,14 +2452,14 @@ function intervallVorschauTexte(k) {
     const out = {};
     [1, 2, 3, 4].forEach(r => {
       const neu = r === 1 ? 1 : r === 2 ? alt : Math.min(max, alt + (r === 3 ? 1 : 2));
-      out[r] = intervallTextAus(iv[neu - 1] ?? iv[max - 1]);
+      out[r] = intervallTextAus(gestaucht(plusTage(heute(), iv[neu - 1] ?? iv[max - 1])));
     });
     return out;
   }
   try {
     const vorschau = fsrsMotor().repeat(fsrsKarteAus(k), fsrsJetzt());
     const out = {};
-    [1, 2, 3, 4].forEach(r => { out[r] = intervallTextAus(tageDiff(datumZuIso(vorschau[r].card.due), heute())); });
+    [1, 2, 3, 4].forEach(r => { out[r] = intervallTextAus(gestaucht(datumZuIso(vorschau[r].card.due))); });
     return out;
   } catch (e) {
     console.warn('[Vorschau]', e);
@@ -1373,15 +2467,21 @@ function intervallVorschauTexte(k) {
   }
 }
 
-function bewertungsHtml(k) {
+/** Die vier Bewertungsknöpfe. Kam die Karte aus einer automatischen
+ *  Auswertung (Tippen, Multiple Choice), wird die dazu passende Bewertung
+ *  hervorgehoben und liegt auf der Eingabetaste — die Feinabstufung 1–4
+ *  bleibt aber immer beim Nutzer. */
+function bewertungsHtml(k, urteil) {
   const vorschauTexte = intervallVorschauTexte(k);
+  const empfohlen = urteil ? urteilVorschlag(urteil.art) : null;
   const knopf = (r, titel) =>
-    `<button class="bew bew${r}" data-bew="${r}">
+    `<button class="bew bew${r}${r === empfohlen ? ' empfohlen' : ''}" data-bew="${r}">
        <b>${r}</b><span>${titel}</span><small>${vorschauTexte[r]}</small></button>`;
   return `<div class="bewertung">
       ${knopf(1, 'Nicht gewusst')}${knopf(2, 'Schwer')}${knopf(3, 'Gewusst')}${knopf(4, 'Sehr leicht')}
     </div>
-    <p class="tastenhilfe"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd></p>`;
+    <p class="tastenhilfe"><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd>${
+      empfohlen ? ` · <kbd>Enter</kbd> übernimmt ${empfohlen}` : ''}</p>`;
 }
 
 /* Nicht neu zeichnen, sondern nur umklappen — sonst entsteht das Element neu
@@ -1389,11 +2489,7 @@ function bewertungsHtml(k) {
 function umdrehen() {
   if (!sitzung?.aktiv || sitzung.aufgedeckt) return;
   sitzung.aufgedeckt = true;
-  const karte = $('#flip'), a = $('#aktionen');
-  if (!karte || !a) return malSitzung();
-  karte.classList.add('gedreht');
-  a.innerHTML = bewertungsHtml(sitzung.karten[sitzung.i]);
-  aktionenVerdrahten();
+  aktionenAuffrischen();
 }
 
 /* ---------- 9b. FSRS (Stufe 2) ------------------------------------------ */
@@ -1476,7 +2572,12 @@ function fsrsIntervallTage(stability, retention, w) {
  *  ergibt die erwartete Anzahl Wiederholungen pro Tag im eingeschwungenen
  *  Zustand. Nur eine Orientierungshilfe, keine exakte Vorhersage. */
 function geschaetzteWiederholungenProTag(retention) {
-  const karten = S.cards.filter(k => !k.suspendiert);
+  // Nur Karten, die schon im Umlauf sind. Eine noch nie gelernte Karte
+  // erzeugt heute keine Wiederholung — würde sie mitgezählt, spränge die
+  // Schätzung nach jedem Import oder nach dem Einschalten der zweiten
+  // Abfragerichtung um ein Vielfaches nach oben, und der Regler daneben
+  // wäre nicht mehr sinnvoll einzustellen.
+  const karten = S.cards.filter(k => !k.suspendiert && !istNeu(k));
   if (!karten.length) return 0;
   let summe = 0;
   karten.forEach(k => { summe += 1 / fsrsIntervallTage(Number(k.stability) || 0.5, retention, FSRS_STANDARD_GEWICHTE); });
@@ -1496,7 +2597,7 @@ function bewertungsPatch(k, rating) {
     const tage = iv[neuFach - 1] ?? iv[max - 1];
     return {
       fach: neuFach,
-      due: plusTage(heute(), tage),
+      due: terminStauchen(plusTage(heute(), tage), k.deckId, k.id),
       stability: tage,
       lastReview: heute(),
       reps: (Number(k.reps) || 0) + 1,
@@ -1507,7 +2608,10 @@ function bewertungsPatch(k, rating) {
   const { card } = fsrsMotor().next(fsrsKarteAus(k), fsrsJetzt(), rating);
   const schwellen = STANDARD_INTERVALLE.filter(g => card.stability >= g).length;
   return {
-    due: datumZuIso(card.due),
+    // Der Prüfungstermin staucht nur die Fälligkeit, nicht die Stabilität:
+    // Die gemessene Gedächtnisstärke bleibt, was sie ist — vorgezogen wird
+    // allein der Termin (KONZEPT §6.6).
+    due: terminStauchen(datumZuIso(card.due), k.deckId, k.id),
     stability: card.stability,
     difficulty: card.difficulty,
     lastReview: heute(),
@@ -1526,10 +2630,28 @@ function bewertungsPatch(k, rating) {
 function bewerten(rating) {
   const s = sitzung;
   if (!s?.aktiv || !s.aufgedeckt) return;
-  const k = s.karten[s.i];
-  if (!k) return;
+  // Doppeltippen auf dem Handy: Der zweite Tipp landet sonst auf derselben
+  // Stelle der nächsten Karte — dort liegt „Antwort zeigen“ bzw. „Prüfen“,
+  // und die nächste Karte wäre ungefragt aufgedeckt.
+  if (s.zuletztBewertet && Date.now() - s.zuletztBewertet < 300) return;
+  const gezeigt = s.karten[s.i];
+  if (!gezeigt) return;
+  // Die Sitzung arbeitet mit Kopien vom Startzeitpunkt. Vor dem Schreiben
+  // auf den aktuellen Stand beziehen — sonst überschriebe eine Bewertung
+  // stillschweigend, was inzwischen auf einem anderen Gerät passiert ist.
+  const k = S.cards.find(x => x.id === gezeigt.id);
+  if (!k) {
+    toast('Diese Karte gibt es nicht mehr — sie wird übersprungen.');
+    s.i++; s.aufgedeckt = false; s.kartenStart = Date.now();
+    kartenZustandLeeren(s);
+    return malSitzung();
+  }
+  s.karten[s.i] = k;
+  s.zuletztBewertet = Date.now();
 
-  const sekunden = Math.min(600, Math.round((Date.now() - s.kartenStart) / 1000));
+  // Deckel bei drei Minuten: Länger sitzt niemand an einer Karteikarte —
+  // was darüber liegt, ist eine Unterbrechung und keine Lernzeit.
+  const sekunden = Math.min(180, Math.round((Date.now() - s.kartenStart) / 1000));
   const warNeu = istNeu(k);
   let patch;
   try {
@@ -1538,17 +2660,54 @@ function bewerten(rating) {
     console.error('[Terminierung]', e);
     toast('Terminierung fehlgeschlagen, Karte wird übersprungen: ' + (e?.message || e), 'fehler');
     s.i++; s.aufgedeckt = false; s.kartenStart = Date.now();
+    kartenZustandLeeren(s);
     return malSitzung();
   }
+  // Zeit je Karte mitschreiben (KONZEPT §6.7) — daraus wird in der Statistik
+  // sichtbar, welche Karten unverhältnismäßig viel Zeit kosten. Eigener
+  // Zähler dafür: Der Bestand aus Stufe 1–3 hat Wiederholungen ohne
+  // Zeitmessung, und durch `reps` geteilt käme dort dauerhaft „0 s“ heraus.
+  patch.zeitGesamt = (Number(k.zeitGesamt) || 0) + sekunden;
+  patch.zeitReps = (Number(k.zeitReps) || 0) + 1;
+
+  // Problemkarte (KONZEPT §6.3): Wer eine Karte immer wieder vergisst, lernt
+  // nicht die Sache, sondern übt das Scheitern. Sie wird ausgesetzt und zur
+  // Umformulierung vorgeschlagen, statt weiter Zeit zu binden.
+  //
+  // Ausgelöst wird das nur durch einen NEUEN Aussetzer. Ohne diese Bedingung
+  // würde jede Bewertung — auch „sehr leicht“ — eine Karte aussetzen, sobald
+  // ihr Lebenszähler über der Grenze liegt. Beim ersten Öffnen nach dem
+  // Umstieg träfe das reihenweise Karten, die längst wieder sitzen.
+  const grenze = leechGrenze();
+  const neuerAussetzer = (Number(patch.lapses) || 0) > (Number(k.lapses) || 0);
+  const zaehlerNeu = Math.max(0, (Number(patch.lapses) || 0) - (Number(k.leechBasis) || 0));
+  const nunProblem = neuerAussetzer && zaehlerNeu >= grenze && !k.leech;
+  if (nunProblem) { patch.leech = true; patch.suspendiert = true; }
+
   Object.assign(k, patch);                                   // lokal sofort
   schreibe(FB.updateDoc(FB.doc(colCards(), k.id), patch), 'Bewertung');
+  if (nunProblem) {
+    // Ruhen gilt für die ganze Kartenfamilie — sonst kämen die übrigen
+    // Lücken bzw. die Gegenrichtung weiter dran, obwohl die Karte in der
+    // Oberfläche als ruhend geführt wird.
+    const familie = mitVarianten([k.id]).filter(x => x !== k.id);
+    if (familie.length) {
+      familie.forEach(x => { const c = S.cards.find(y => y.id === x); if (c) c.suspendiert = true; });
+      variantenOpsSchreiben(familie.map(x => ['merge', x, { suspendiert: true }]), 'Problemkarte aussetzen');
+    }
+    toast(`„${frageText(k).slice(0, 40)}“ ist ${zaehlerNeu}× durchgefallen und ruht jetzt. ` +
+      'Unter Karten → Problemkarten kannst du sie umformulieren.', 'fehler');
+    s.problemkarten = (s.problemkarten || 0) + 1;
+  }
 
   s.zaehler[rating]++; s.bewertet++; s.sekunden += sekunden;
   s.proDeck[k.deckId] = (s.proDeck[k.deckId] || 0) + 1;
   tagesstatistikSchreiben(rating, sekunden, k.deckId, warNeu);
   streakPflegen();
 
+  sprechenStoppen();
   s.i++; s.aufgedeckt = false; s.kartenStart = Date.now();
+  kartenZustandLeeren(s);
   malSitzung();
 }
 
@@ -1560,7 +2719,8 @@ function tagesstatistikSchreiben(rating, sekunden, deckId, warNeu) {
     neu: FB.increment(warNeu ? 1 : 0),
     sekunden: FB.increment(sekunden),
     bewertungen: { [rating]: FB.increment(1) },
-    proDeck: { [deckId]: FB.increment(1) }
+    proDeck: { [deckId]: FB.increment(1) },
+    sekundenProDeck: { [deckId]: FB.increment(sekunden) }
   }, { merge: true }), 'Tagesstatistik');
   S.reviewsGeladen = false;
 }
@@ -1576,6 +2736,7 @@ function streakPflegen() {
 }
 
 function sitzungBeenden(still) {
+  sprechenStoppen();
   if (!sitzung) return;
   if (still) { sitzung = null; letzteSitzung = null; return; }
   sitzung.aktiv = false;
@@ -1618,6 +2779,16 @@ function malAbschluss() {
     ${s.uebrigeNeue ? `<p class="mini mt" style="text-align:center">
       ${s.uebrigeNeue} weitere neue ${s.uebrigeNeue === 1 ? 'Karte wartet' : 'Karten warten'} —
       Tagesgrenze für neue Karten erreicht.</p>` : ''}
+    ${s.zurueckgestellt ? `<p class="mini mt" style="text-align:center">
+      ${s.zurueckgestellt} ${s.zurueckgestellt === 1 ? 'Abfrage' : 'Abfragen'} zurückgestellt:
+      weitere Lücken bzw. die Gegenrichtung von Karten, die heute schon dran waren.
+      Sie kommen beim nächsten Mal.</p>` : ''}
+    ${s.problemkarten ? `<div class="hinweis mt">
+      <strong>${s.problemkarten} ${s.problemkarten === 1 ? 'Karte wurde' : 'Karten wurden'}
+      als Problemkarte ausgesetzt</strong>, weil sie immer wieder durchfallen.
+      Umformulieren hilft mehr als weiter üben.
+      <div style="margin-top:8px"><button class="btn klein" data-tu="zuProblemkarten">
+        Problemkarten ansehen</button></div></div>` : ''}
     <div class="row mt2" style="justify-content:center">
       <button class="btn primary" data-tu="nochmal">Zur Übersicht</button>
       <button class="btn" data-tu="zuStatistik">Statistik ansehen</button>
@@ -1636,6 +2807,8 @@ function malKaesten() {
       const k = kartenVon(d.id);
       const f = k.filter(istFaellig).length;
       const neu = k.filter(istNeu).length;
+      const modi = deckModi(d.id);
+      const richtung = deckRichtung(d.id);
       return `<div class="liste-item">
         <span class="punkt-farbe" style="background:${esc(d.farbe)}"></span>
         <div class="haupt">
@@ -1644,6 +2817,22 @@ function malKaesten() {
             <span class="badge">${k.length} Karten</span>
             ${f ? `<span class="badge faellig">${f} fällig</span>` : ''}
             ${neu ? `<span class="badge neu">${neu} neu</span>` : ''}
+          </div>
+          <div class="row mini" style="gap:6px;margin-top:4px">
+            <span>${esc(modi.map(m => MODUS_NAME[m]).join(' · '))}</span>
+            ${richtung !== 'vorwaerts'
+              ? `<span class="badge" style="background:var(--akzent-bg);color:var(--akzent)">${
+                  richtung === 'beide' ? 'beide Richtungen' : 'rückwärts'}</span>` : ''}
+            ${modi.includes('hoeren')
+              ? `<span class="badge">${esc((SPRACHEN.find(s => s[0] === deckSprache(d.id)) || ['', deckSprache(d.id)])[1])}</span>` : ''}
+            ${(() => {
+              const lage = pruefungsLage(d.id);
+              if (!lage || lage.tage < 0) return '';
+              const [wort, farbe] = PRUEFUNG_URTEIL[lage.urteil];
+              return `<span class="badge" style="background:${farbe}22;color:${farbe}">
+                Prüfung ${lage.tage === 0 ? 'heute' : 'in ' + lage.tage + (lage.tage === 1 ? ' Tag' : ' Tagen')}
+                · ${lage.proTag}/Tag · ${wort}</span>`;
+            })()}
           </div>
         </div>
         <div class="werkzeuge">
@@ -1700,10 +2889,20 @@ async function deckAnlegen(vorschlag) {
 
 /* ---------- 11. Karten -------------------------------------------------- */
 
+const KARTEN_FILTER = {
+  alle:    ['Alle Karten',    () => true],
+  faellig: ['Nur fällige',    istFaellig],
+  neu:     ['Nur neue',       k => istNeu(k) && !k.suspendiert],
+  problem: ['Problemkarten',  istProblemkarte],
+  ruht:    ['Ruhende',        k => !!k.suspendiert]
+};
+
 function gefilterteKarten() {
   const q = S.kartenSuche.trim().toLowerCase();
   let l = S.cards;
   if (S.kartenFilterDeck !== 'alle') l = l.filter(k => k.deckId === S.kartenFilterDeck);
+  const filter = KARTEN_FILTER[S.kartenFilter] ? S.kartenFilter : 'alle';
+  if (filter !== 'alle') l = l.filter(KARTEN_FILTER[filter][1]);
   if (q) {
     const teile = q.split(/\s+/);
     l = l.filter(k => {
@@ -1734,11 +2933,32 @@ function malKarten() {
         ${S.decks.map(d => `<option value="${esc(d.id)}" ${S.kartenFilterDeck === d.id ? 'selected' : ''}>
           ${esc(d.name)} (${kartenVon(d.id).length})</option>`).join('')}
       </select>
+      <select id="k-filter" style="flex:1;min-width:140px">
+        ${(() => {
+          // Zählen im gerade gewählten Kasten, nicht im Gesamtbestand — sonst
+          // stünde „Problemkarten (2)“ neben einer Liste mit einer Karte.
+          const grund = S.kartenFilterDeck === 'alle' ? S.cards : kartenVon(S.kartenFilterDeck);
+          return Object.entries(KARTEN_FILTER).map(([wert, [name, pruef]]) => {
+            const n = wert === 'alle' ? grund.length : grund.filter(pruef).length;
+            return `<option value="${wert}" ${S.kartenFilter === wert ? 'selected' : ''}>${esc(name)} (${n})</option>`;
+          }).join('');
+        })()}
+      </select>
     </div>
+
+    ${S.kartenFilter === 'problem' ? `<div class="hinweis mt">
+      <strong>Problemkarten</strong> sind seit dem letzten Wiederaufnehmen mindestens
+      ${leechGrenze()}× durchgefallen. Sie werden ausgesetzt, sobald sie erneut nicht gewusst
+      werden — Karten ohne die Kennzeichnung „ruht“ laufen also noch mit.
+      Weiter zu üben bringt hier wenig: Meist ist die Karte zu umfangreich, mehrdeutig oder
+      verwechselt sich mit einer anderen. Formuliere sie um oder teile sie auf und nimm sie
+      dann über „Bearbeiten“ wieder auf.</div>` : ''}
 
     ${ausw ? `<div class="box flach mt row" style="justify-content:space-between">
       <span><strong>${ausw}</strong> ausgewählt</span>
       <span class="row">
+        ${Array.from(S.auswahl).some(id => { const c = S.cards.find(x => x.id === id); return c && istProblemkarte(c); })
+          ? `<button class="btn klein" data-tu="massAufnehmen">Wieder aufnehmen</button>` : ''}
         <button class="btn klein" data-tu="massVerschieben">Verschieben</button>
         <button class="btn klein gefahr" data-tu="massLoeschen">Löschen</button>
         <button class="btn klein" data-tu="massAus">Aufheben</button>
@@ -1753,12 +2973,14 @@ function malKarten() {
         <input type="checkbox" data-sel="${esc(k.id)}" ${S.auswahl.has(k.id) ? 'checked' : ''}
                style="margin-top:3px" aria-label="Karte auswählen">
         <div class="haupt">
-          <div class="frage">${esc(k.frage) || '<em class="muted">ohne Frage</em>'}</div>
-          <div class="antwort">${esc(k.antwort)}</div>
+          <div class="frage">${esc(frageText(k)) || '<em class="muted">ohne Frage</em>'}</div>
+          <div class="antwort">${esc(antwortText(k))}</div>
           <div class="row mini" style="gap:5px;margin-top:5px">
             <span class="badge" style="background:${esc(deckFarbe(k.deckId))}22;color:${esc(deckFarbe(k.deckId))}">
               ${esc(deckName(k.deckId))}</span>
+            ${variantenMarke(k) ? `<span class="badge" style="background:var(--akzent-bg);color:var(--akzent)">${esc(variantenMarke(k))}</span>` : ''}
             <span class="badge">Fach ${fachVon(k)}</span>
+            ${istProblemkarte(k) ? `<span class="badge" style="background:var(--bewertung-1-bg);color:var(--bewertung-1)">Problemkarte · ${Number(k.lapses) || 0}×</span>` : ''}
             ${k.suspendiert ? '<span class="badge ruht">ruht</span>'
               : istNeu(k) ? '<span class="badge neu">neu</span>'
               : `<span class="badge ${f ? 'faellig' : ''}">${f ? 'fällig' : datumDeutsch(k.due)}</span>`}
@@ -1789,6 +3011,9 @@ function malKarten() {
   $('#k-deck').addEventListener('change', e => {
     S.kartenFilterDeck = e.target.value; S.kartenLimit = 60; malKarten();
   });
+  $('#k-filter').addEventListener('change', e => {
+    S.kartenFilter = e.target.value; S.kartenLimit = 60; malKarten();
+  });
   $$('#seite-karten input[data-sel]').forEach(cb => cb.addEventListener('change', () => {
     cb.checked ? S.auswahl.add(cb.dataset.sel) : S.auswahl.delete(cb.dataset.sel);
     malKarten();
@@ -1796,18 +3021,53 @@ function malKarten() {
 }
 
 async function karteBearbeiten(id) {
-  const k = id ? S.cards.find(x => x.id === id) : null;
+  let k = id ? S.cards.find(x => x.id === id) : null;
   if (id && !k) return;
+  // Abgeleitete Abfragen (Rückwärtskarte, einzelne Cloze-Lücke) tragen keinen
+  // eigenen Inhalt — bearbeitet wird immer die Quellkarte.
+  if (k && k.quelleId) {
+    const quelle = S.cards.find(x => x.id === k.quelleId);
+    if (quelle) { toast('Der Inhalt steht auf der Quellkarte — die wird geöffnet.'); k = quelle; }
+    else {
+      // Quellkarte fehlt (etwa nach einem unvollständigen Import). Die
+      // Abfrage wird eigenständig — sonst entstünden beim Speichern
+      // Abfragen einer Abfrage, die niemand mehr auflösen kann.
+      k.quelleId = null; k.variante = 'v';
+      schreibe(FB.setDoc(FB.doc(colCards(), k.id),
+        { quelleId: null, variante: 'v' }, { merge: true }), 'Karte verselbständigen');
+    }
+  }
   if (!S.decks.length) return toast('Zuerst einen Kasten anlegen.');
   const vorDeck = k?.deckId || (S.kartenFilterDeck !== 'alle' ? S.kartenFilterDeck : S.decks[0].id);
   const klassik = S.einstellungen.klassikModus;
+  const typAlt = KARTEN_TYPEN.includes(k?.typ) ? k.typ : 'standard';
+  const antwortVorher = k ? String(k.antwort ?? '') : null;
+  const abgeleitet = k ? abgeleiteteVon(k.id).length : 0;
+  // Problemkarte kann auch an einer abgeleiteten Abfrage hängen (eine Lücke,
+  // die Gegenrichtung). Bearbeitet wird trotzdem die Quellkarte — der
+  // Wiederaufnehmen-Block muss deshalb auch dann erscheinen.
+  const problemFamilie = k ? (istProblemkarte(k) || abgeleiteteVon(k.id).some(istProblemkarte)) : false;
 
   const r = await modal({
     titel: k ? 'Karte bearbeiten' : 'Neue Karte',
     breit: true,
     html: `
-      <label class="feld"><span>Frage</span><textarea id="m-frage">${esc(k?.frage || '')}</textarea></label>
-      <label class="feld"><span>Antwort</span><textarea id="m-antwort">${esc(k?.antwort || '')}</textarea></label>
+      <label class="feld"><span>Kartentyp</span>
+        <select id="m-typ">
+          <option value="standard" ${typAlt === 'standard' ? 'selected' : ''}>Frage und Antwort</option>
+          <option value="cloze" ${typAlt === 'cloze' ? 'selected' : ''}>Lückentext</option>
+        </select></label>
+      <label class="feld"><span id="m-frage-titel">Frage</span><textarea id="m-frage">${esc(k?.frage || '')}</textarea></label>
+      <div id="m-cloze-hilfe" hidden style="margin:-6px 0 12px">
+        <div class="row" style="gap:8px">
+          <button type="button" class="btn klein" id="m-cloze-einfuegen">Lücke aus Auswahl</button>
+          <span class="mini" id="m-cloze-zahl"></span>
+        </div>
+        <p class="mini" style="margin-top:6px">Schreibweise <code>{{c1::Lösung}}</code>, mit Hinweis
+          <code>{{c1::Lösung::Hinweis}}</code>. <strong>Jede Lücke wird eigenständig terminiert</strong> —
+          aus einem Satz mit drei Lücken werden drei Abfragen.</p>
+      </div>
+      <label class="feld"><span id="m-antwort-titel">Antwort</span><textarea id="m-antwort">${esc(k?.antwort || '')}</textarea></label>
       <label class="feld"><span>Notiz (optional)</span><textarea id="m-notiz" style="min-height:56px">${esc(k?.notiz || '')}</textarea></label>
       <label class="feld"><span>Kasten</span><select id="m-deck">${S.decks.map(d =>
         `<option value="${esc(d.id)}" ${d.id === vorDeck ? 'selected' : ''}>${esc(d.name)}</option>`).join('')}</select></label>
@@ -1823,24 +3083,85 @@ async function karteBearbeiten(id) {
       <label class="karo" style="margin-top:6px"><input type="checkbox" id="m-susp" ${k.suspendiert ? 'checked' : ''}>
         <span>Ruhen lassen (kommt nicht mehr dran)</span></label>
       <p class="mini">${k.reps || 0} Wiederholungen · ${k.lapses || 0} Aussetzer ·
-         zuletzt ${datumDeutsch(k.lastReview)}${klassik ? '' : ` · Stabilität ${Math.round(Number(k.stability) || 0)} Tage`}</p>` : ''}`,
+         zuletzt ${datumDeutsch(k.lastReview)}${klassik ? '' : ` · Stabilität ${Math.round(Number(k.stability) || 0)} Tage`}${
+         schnittSekunden(k) ? ` · Ø ${Math.round(schnittSekunden(k))} s je Abfrage` : ''}</p>
+      ${problemFamilie ? `<div class="hinweis rot" style="margin-bottom:12px">
+        <strong>Problemkarte:</strong> ${leechZaehler(k) || Math.max(...abgeleiteteVon(k.id).map(leechZaehler), 0)}× nicht gewusst. Was meistens hilft:
+        die Frage eindeutiger stellen, eine zu lange Antwort aufteilen, eine Eselsbrücke in die
+        Notiz schreiben — oder prüfen, ob sie sich mit einer anderen Karte verwechselt.
+        <label class="karo" style="margin-top:8px"><input type="checkbox" id="m-leech-weg">
+          <span>Wieder aufnehmen (Problemkennzeichen entfernen, Karte lernt wieder mit)</span></label>
+        <label class="karo" style="padding-top:0"><input type="checkbox" id="m-leech-reset">
+          <span>Dabei den Lernstand zurücksetzen — sinnvoll, wenn du sie umformuliert hast</span></label>
+      </div>` : ''}
+      ${abgeleitet ? `<p class="mini">Diese Karte erzeugt ${abgeleitet + 1} eigenständig
+         terminierte Abfragen. Termine und Fortschritt der zusätzlichen Abfragen bleiben beim
+         Bearbeiten erhalten, solange die Lücken bzw. die Richtung bestehen bleiben.</p>` : ''}` : ''}`,
     knoepfe: [{ text: 'Abbrechen', wert: null }, {
       text: k ? 'Speichern' : 'Anlegen', wert: 'ok', art: 'primary',
       pruefen: () => {
-        if (!$('#m-frage').value.trim()) { toast('Die Frage darf nicht leer sein.'); return false; }
-        if (!$('#m-antwort').value.trim()) { toast('Die Antwort darf nicht leer sein.'); return false; }
+        const cloze = $('#m-typ').value === 'cloze';
+        if (!$('#m-frage').value.trim()) {
+          toast(cloze ? 'Der Lückentext darf nicht leer sein.' : 'Die Frage darf nicht leer sein.');
+          return false;
+        }
+        if (cloze && !clozeNummern($('#m-frage').value).length) {
+          toast('Bitte mindestens eine Lücke markieren, z. B. {{c1::Lösung}}.'); return false;
+        }
+        if (!cloze && !$('#m-antwort').value.trim()) {
+          toast('Die Antwort darf nicht leer sein.'); return false;
+        }
       }
-    }]
+    }],
+    beimOeffnen: m => {
+      const typSel = $('#m-typ', m), frageFeld = $('#m-frage', m);
+      const aktualisieren = () => {
+        const cloze = typSel.value === 'cloze';
+        $('#m-cloze-hilfe', m).hidden = !cloze;
+        $('#m-frage-titel', m).textContent = cloze ? 'Lückentext' : 'Frage';
+        $('#m-antwort-titel', m).textContent = cloze ? 'Erläuterung (optional)' : 'Antwort';
+        if (cloze) {
+          const n = clozeNummern(frageFeld.value);
+          $('#m-cloze-zahl', m).textContent = n.length
+            ? `${n.length} ${n.length === 1 ? 'Lücke' : 'Lücken'} erkannt: c${n.join(' · c')}`
+            : 'Noch keine Lücke markiert.';
+        }
+      };
+      typSel.addEventListener('change', aktualisieren);
+      frageFeld.addEventListener('input', aktualisieren);
+      $('#m-cloze-einfuegen', m).addEventListener('click', () => {
+        const anfang = frageFeld.selectionStart, ende = frageFeld.selectionEnd;
+        const text = frageFeld.value;
+        const auswahl = text.slice(anfang, ende) || 'Lösung';
+        // Eine Lücke um eine bestehende Lücke herum ergäbe verschachtelte
+        // Klammern — der Text wäre danach weder lesbar noch reparierbar,
+        // und der Zähler zeigte trotzdem „alles in Ordnung“.
+        if (/\{\{|\}\}/.test(auswahl))
+          return toast('Die Auswahl enthält schon eine Lücke. Bitte nur reinen Text markieren.', 'fehler');
+        const nummern = clozeNummern(text);
+        const nr = (nummern.length ? nummern[nummern.length - 1] : 0) + 1;
+        if (nr > 20) return toast('Mehr als 20 Lücken je Karte sind nicht vorgesehen.', 'fehler');
+        const vorne = `{{c${nr}::`;
+        frageFeld.value = text.slice(0, anfang) + vorne + auswahl + '}}' + text.slice(ende);
+        frageFeld.focus();
+        frageFeld.setSelectionRange(anfang + vorne.length, anfang + vorne.length + auswahl.length);
+        aktualisieren();
+      });
+      aktualisieren();
+    }
   });
   if (r !== 'ok') return;
 
+  const typNeu = KARTEN_TYPEN.includes(W('m-typ', 'standard')) ? W('m-typ', 'standard') : 'standard';
   const werte = {
     frage: String(W('m-frage', '')).trim(),
     antwort: String(W('m-antwort', '')).trim(),
     notiz: String(letzteWerte['m-notiz'] ?? '').trim(),
-    deckId: W('m-deck', vorDeck)
+    deckId: W('m-deck', vorDeck),
+    typ: typNeu
   };
-  if (!werte.frage || !werte.antwort) return;
+  if (!werte.frage) return;
+  if (typNeu !== 'cloze' && !werte.antwort) return;
 
   if (k) {
     // Terminierung nur im Klassik-Modus über das Fach neu berechnen — im
@@ -1851,17 +3172,128 @@ async function karteBearbeiten(id) {
       const fachNeu = zahl(W('m-fach', fachVon(k)), 1, 12, fachVon(k));
       Object.assign(werte, { fach: fachNeu, stability: S.einstellungen.intervalle[fachNeu - 1] });
     }
+    // Sämtliche Felder einlesen, bevor unten eine Rückfrage aufgehen kann —
+    // die überschreibt letzteWerte.
     Object.assign(werte, {
       due: W('m-due', k.due || heute()),
       suspendiert: letzteWerte['m-susp'] === true
     });
+    // Problemkarte wieder aufnehmen (KONZEPT §6.3). Der Zähler bekommt einen
+    // neuen Bezugspunkt — sonst wäre die Karte beim ersten Fehler sofort
+    // wieder ausgesetzt, weil ihr Lebenszähler über der Grenze bleibt.
+    // „Zurücksetzen“ allein wäre wirkungslos, weil die Karte weiter ruhte —
+    // es schließt das Wiederaufnehmen deshalb ein.
+    const wiederAuf = letzteWerte['m-leech-weg'] === true || letzteWerte['m-leech-reset'] === true;
+    if (wiederAuf) {
+      Object.assign(werte, { leech: false, suspendiert: false, leechBasis: Number(k.lapses) || 0 });
+      if (letzteWerte['m-leech-reset'] === true) Object.assign(werte, {
+        stability: 0, difficulty: 0, reps: 0, lapses: 0, state: 0, leechBasis: 0,
+        fach: 1, lastReview: null, zeitGesamt: 0, zeitReps: 0, due: heute()
+      });
+      // Die Kennzeichnung kann an einer abgeleiteten Abfrage hängen — die
+      // wird über die Quellkarte mitbefreit, sonst bliebe sie für immer als
+      // Problemkarte gelistet und könnte nie wieder aussetzen.
+      const geschwister = abgeleiteteVon(k.id);
+      if (geschwister.length) {
+        const patch = { leech: false, suspendiert: false, leechBasis: 0 };
+        geschwister.forEach(g => Object.assign(g, patch));
+        variantenOpsSchreiben(geschwister.map(g => ['merge', g.id, patch]), 'Problemkarte aufnehmen');
+      }
+    }
+
+    // Trockenlauf: Entfällt durch diese Änderung eine Abfrage — etwa weil
+    // eine Lücke gestrichen oder der Lückentext zur normalen Karte wurde —
+    // geht deren Lernstand verloren. Vorher fragen.
+    const vorschau = variantenPlan({ ...k, ...werte }, deckVon(werte.deckId));
+    if (vorschau.entfernt && !await frage('Karte ändern',
+      `Dadurch ${vorschau.entfernt === 1 ? 'entfällt eine eigenständig terminierte Abfrage'
+        : `entfallen ${vorschau.entfernt} eigenständig terminierte Abfragen`} dieser Karte
+       — mitsamt dem jeweiligen Lernfortschritt.`,
+      'Trotzdem speichern', 'gefahr')) return;
+
     Object.assign(k, werte);
     schreibe(FB.updateDoc(FB.doc(colCards(), k.id), werte), 'Karte ändern');
-    toast('Gespeichert.');
+    const bilanz = variantenAbgleichen(k, deckVon(werte.deckId));
+    toast(bilanz.angelegt || bilanz.entfernt
+      ? `Gespeichert. ${bilanz.angelegt} Abfragen angelegt, ${bilanz.entfernt} entfernt.`
+      : 'Gespeichert.');
   } else {
-    schreibe(FB.setDoc(FB.doc(colCards(), neueId()), neueKarte(werte)), 'Karte anlegen');
-    toast('Karte angelegt.');
+    // Erst die Quellkarte, dann ihre weiteren Abfragen — die Quellkarte trägt
+    // gleich die richtige Variante, damit sie nicht sofort nachgebessert
+    // werden muss.
+    const quellId = neueId();
+    const soll = gewuenschteVarianten({ ...werte, id: quellId }, deckVon(werte.deckId));
+    const quelle = neueKarte({ ...werte, variante: soll[0] });
+    schreibe(FB.setDoc(FB.doc(colCards(), quellId), quelle), 'Karte anlegen');
+    const weitere = soll.slice(1).map(v =>
+      ['set', neueId(), neueKarte({ ...werte, quelleId: quellId, variante: v })]);
+    variantenOpsSchreiben(weitere, 'Kartenvarianten');
+    toast(weitere.length
+      ? `Karte angelegt — ${soll.length} eigenständig terminierte Abfragen.`
+      : 'Karte angelegt.');
+    k = { ...quelle, id: quellId };
   }
+  // Karten-Check ganz am Schluss und bewusst nach dem Speichern: Der Hinweis
+  // soll nicht blockieren (KONZEPT §6.4), und niemand soll seine Eingabe
+  // verlieren, weil die App sie für zu lang hält.
+  // Nur prüfen, wenn sich der Inhalt tatsächlich geändert hat — sonst
+  // erschiene der Hinweis auch beim bloßen Nachtragen einer Notiz erneut.
+  if (typNeu !== 'cloze' && werte.antwort !== antwortVorher) await kartenCheckAnbieten(k);
+}
+
+/** Nicht blockierender Hinweis auf schwer lernbare Karten, mit dem Angebot,
+ *  eine Aufzählung mechanisch in einen Lückentext zu verwandeln — daraus
+ *  werden dann eigenständig terminierte Einzelabfragen. */
+async function kartenCheckAnbieten(k) {
+  if (!k) return;
+  const pruef = kartenCheck(k.antwort);
+  if (!pruef.gruende.length) return;
+  // Mehr als 20 Lücken kann eine Karte nicht führen (clozeNummern). Statt
+  // stillschweigend abzuschneiden wird das Angebot dann nicht gemacht.
+  const zuViele = pruef.liste.length > 20;
+  const kannTeilen = pruef.liste.length >= 2 && !zuViele;
+  // Vorhandene Lückenmarkierungen abstreifen, sonst entstünde {{c1::c1::…}}
+  // oder zweimal dieselbe Nummer im selben Text.
+  const entkleiden = t => String(t ?? '')
+    .replace(/\{\{c\d{1,2}::([\s\S]*?)(?:::[\s\S]*?)?\}\}/g, '$1')
+    .replace(/[{}]/g, '').trim();
+  const clozeText = kannTeilen
+    ? entkleiden(k.frage) + (pruef.stamm ? '\n' + entkleiden(pruef.stamm) : '') + '\n' +
+      pruef.liste.map((t, i) => `{{c${i + 1}::${entkleiden(t)}}}`).join('\n')
+    : null;
+
+  const wahl = await modal({
+    titel: 'Diese Karte wird schwer zu lernen sein',
+    breit: true,
+    html: `${pruef.gruende.map(g => `<p>${g}</p>`).join('')}
+      <p class="mini">Die Karte ist gespeichert — das hier ist nur ein Hinweis.</p>
+      ${kannTeilen ? `<div class="hinweis blau mt">
+        <strong>Vorschlag:</strong> als Lückentext speichern. Jeder Punkt wird dann einzeln
+        abgefragt und einzeln terminiert — was schon sitzt, kommt seltener.
+        <pre class="code" style="margin-top:8px">${esc(clozeText)}</pre></div>` : ''}
+      ${zuViele ? `<div class="hinweis mt">Mit ${pruef.liste.length} Punkten ist die Antwort zu
+        umfangreich für einen Lückentext (höchstens 20). Besser sind mehrere kleinere Karten.</div>` : ''}`,
+    knoepfe: kannTeilen
+      ? [{ text: 'So lassen', wert: null }, { text: 'Als Lückentext', wert: 'cloze', art: 'primary' }]
+      : [{ text: 'Verstanden', wert: null, art: 'primary' }]
+  });
+  if (wahl !== 'cloze' || !clozeText) return;
+
+  // Dieselbe Rückfrage wie beim normalen Bearbeiten: Aus einer Karte mit
+  // Gegenrichtung wird durch den Lückentext eine ohne — die Rückwärtsabfrage
+  // verschwindet dabei samt Lernstand.
+  const werte = { frage: clozeText, typ: 'cloze' };   // antwort bleibt als Sicherungsnetz stehen
+  const vorschau = variantenPlan({ ...k, ...werte }, deckVon(k.deckId));
+  if (vorschau.entfernt && !await frage('In Lückentext umwandeln',
+    `Dabei ${vorschau.entfernt === 1 ? 'entfällt eine bestehende Abfrage' :
+      `entfallen ${vorschau.entfernt} bestehende Abfragen`} dieser Karte — mitsamt Lernfortschritt.`,
+    'Trotzdem umwandeln', 'gefahr')) return;
+
+  Object.assign(k, werte);
+  schreibe(FB.updateDoc(FB.doc(colCards(), k.id), werte), 'In Lückentext umwandeln');
+  const bilanz = variantenAbgleichen(k, deckVon(k.deckId));
+  toast(`Als Lückentext gespeichert — ${pruef.liste.length} einzeln terminierte Abfragen.`);
+  return bilanz;
 }
 
 /* ---------- 12. Statistik ----------------------------------------------- */
@@ -1898,18 +3330,63 @@ function malStatistik() {
     karten.filter(k => !k.suspendiert && fachVon(k) === i + 1).length);
   const maxFach = Math.max(1, ...proFach);
 
+  // Tageswerte immer über denselben Weg holen, damit die Kastenauswahl
+  // überall greift — auch bei den Sekunden (Stufe 4, KONZEPT §6.7).
+  const revAn = t => S.reviews.find(x => (x.datum || x.id) === t);
+  const anzahlAn = t => {
+    const r = revAn(t); if (!r) return 0;
+    return Number(S.statDeck === 'alle' ? r.anzahl : r.proDeck?.[S.statDeck]) || 0;
+  };
+  const sekundenAn = t => {
+    const r = revAn(t); if (!r) return 0;
+    if (S.statDeck === 'alle') return Number(r.sekunden) || 0;
+    const genau = Number(r.sekundenProDeck?.[S.statDeck]);
+    if (Number.isFinite(genau)) return genau;
+    // Tagesdokumente aus Stufe 1–3 kennen die Sekunden je Kasten nicht. Statt
+    // „0 Minuten“ zu behaupten, wird der Tagesanteil des Kastens geschätzt —
+    // sonst läse sich die eigene Lernhistorie als hätte sie keine Zeit gekostet.
+    const anteil = Number(r.proDeck?.[S.statDeck]) || 0;
+    const gesamt = Number(r.anzahl) || 0;
+    return gesamt ? Math.round((Number(r.sekunden) || 0) * anteil / gesamt) : 0;
+  };
+
   const tage = Array.from({ length: 14 }, (_, i) => plusTage(heute(), i - 13));
-  const proTag = tage.map(t => {
-    const r = S.reviews.find(x => (x.datum || x.id) === t);
-    if (!r) return 0;
-    if (S.statDeck === 'alle') return Number(r.anzahl) || 0;
-    return Number(r.proDeck?.[S.statDeck]) || 0;
-  });
+  const proTag = tage.map(anzahlAn);
   const maxTag = Math.max(1, ...proTag);
   const summe14 = proTag.reduce((a, b) => a + b, 0);
-  const sekunden14 = S.reviews
-    .filter(r => tage.includes(r.datum || r.id))
-    .reduce((a, r) => a + (Number(r.sekunden) || 0), 0);
+  const sekunden14 = tage.reduce((a, t) => a + sekundenAn(t), 0);
+
+  /* --- Wochenbericht (Stufe 4) --- */
+  const wocheTage = Array.from({ length: 7 }, (_, i) => plusTage(heute(), i - 6));
+  const vorTage   = Array.from({ length: 7 }, (_, i) => plusTage(heute(), i - 13));
+  const wKarten = wocheTage.reduce((a, t) => a + anzahlAn(t), 0);
+  const vKarten = vorTage.reduce((a, t) => a + anzahlAn(t), 0);
+  const wSek    = wocheTage.reduce((a, t) => a + sekundenAn(t), 0);
+  const vSek    = vorTage.reduce((a, t) => a + sekundenAn(t), 0);
+  const wAktiv  = wocheTage.filter(t => anzahlAn(t) > 0).length;
+  const besterTag = wocheTage.reduce((b, t) => anzahlAn(t) > anzahlAn(b) ? t : b, wocheTage[0]);
+  const schnittProKarte = wKarten ? wSek / wKarten : 0;
+  const trend = (jetzt, vorher) => {
+    if (!vorher && !jetzt) return { pfeil: '·', text: 'wie vorher', farbe: 'var(--txt3)' };
+    if (!vorher) return { pfeil: '▲', text: 'neu', farbe: 'var(--bewertung-3)' };
+    const p = Math.round((jetzt - vorher) / vorher * 100);
+    if (Math.abs(p) < 8) return { pfeil: '·', text: 'wie in der Vorwoche', farbe: 'var(--txt3)' };
+    return p > 0
+      ? { pfeil: '▲', text: `+${p} % zur Vorwoche`, farbe: 'var(--bewertung-3)' }
+      : { pfeil: '▼', text: `${p} % zur Vorwoche`, farbe: 'var(--faellig)' };
+  };
+  const trendKarten = trend(wKarten, vKarten);
+  const trendZeit = trend(wSek, vSek);
+  const WOCHENTAG = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+  const wochentag = iso => {
+    const [y, m, t] = String(iso).split('-').map(Number);
+    return WOCHENTAG[new Date(Date.UTC(y, m - 1, t)).getUTCDay()];
+  };
+
+  const fresser = zeitfresser(karten.filter(k => !k.suspendiert));
+  const probleme = karten.filter(istProblemkarte);
+  const pruefungen = anstehendePruefungen(
+    S.statDeck === 'alle' ? null : new Set([S.statDeck]));
 
   const vorschauTage = Array.from({ length: 7 }, (_, i) => plusTage(heute(), i + 1));
   const vorschau = vorschauTage.map(t => karten.filter(k => !k.suspendiert && k.due === t).length);
@@ -1929,7 +3406,81 @@ function malStatistik() {
       <div class="kennzahl"><b style="color:var(--blue)">${neu}</b><span>noch nie gelernt</span></div>
       <div class="kennzahl"><b style="color:var(--green)">${S.einstellungen.streak || 0}</b><span>Tage in Folge</span></div>
       ${ruht ? `<div class="kennzahl"><b>${ruht}</b><span>ruhend</span></div>` : ''}
+      ${probleme.length ? `<div class="kennzahl"><b style="color:var(--bewertung-1)">${probleme.length}</b><span>Problemkarten</span></div>` : ''}
     </div>
+
+    <div class="box mt2">
+      <div class="spread" style="margin-bottom:10px">
+        <h2 style="margin:0">Die Woche im Rückblick</h2>
+        <span class="mini">${datumDeutsch(wocheTage[0])} – ${datumDeutsch(wocheTage[6])}</span>
+      </div>
+      ${wKarten ? `
+      <div class="kennzahlen">
+        <div class="kennzahl"><b>${wKarten}</b><span>Abfragen
+          <span style="color:${trendKarten.farbe}">${trendKarten.pfeil} ${esc(trendKarten.text)}</span></span></div>
+        <div class="kennzahl"><b>${Math.round(wSek / 60)}</b><span>Minuten
+          <span style="color:${trendZeit.farbe}">${trendZeit.pfeil} ${esc(trendZeit.text)}</span></span></div>
+        <div class="kennzahl"><b>${schnittProKarte.toFixed(1)}s</b><span>je Abfrage</span></div>
+        <div class="kennzahl"><b>${wAktiv}/7</b><span>Tage gelernt</span></div>
+      </div>
+      <div class="tage" style="height:80px;margin-top:12px">${wocheTage.map(t => {
+        const n = anzahlAn(t);
+        const maxW = Math.max(1, ...wocheTage.map(anzahlAn));
+        return `<div title="${datumDeutsch(t)}: ${n} Abfragen, ${Math.round(sekundenAn(t) / 60)} Minuten">
+          <span class="mini" style="font-size:10px">${n || ''}</span>
+          <span class="saeule ${n ? '' : 'null'}" style="height:${Math.round(n / maxW * 100)}%"></span>
+          <span class="tag">${wochentag(t)}</span></div>`;
+      }).join('')}</div>
+      <p class="mini" style="margin-top:10px">
+        ${anzahlAn(besterTag) ? `Bester Tag: <strong>${wochentag(besterTag)}, ${datumDeutsch(besterTag)}</strong>
+          mit ${anzahlAn(besterTag)} Abfragen. ` : ''}
+        ${wAktiv >= 6 ? 'Sehr regelmäßig — genau das bringt die Intervalle zum Tragen.'
+          : wAktiv >= 3 ? 'Gleichmäßiger verteilt wäre wirksamer als wenige lange Sitzungen.'
+          : 'Kurze tägliche Sitzungen wirken deutlich besser als seltene lange.'}
+      </p>` : `<p class="muted" style="margin:0">In den letzten sieben Tagen wurde nichts gelernt.</p>`}
+    </div>
+
+    ${pruefungen.length ? `<div class="box">
+      <h2>Anstehende Prüfungen</h2>
+      <table class="daten"><thead><tr>
+        <th>Kasten</th><th>Termin</th><th class="num">Tage</th>
+        <th class="num">offen</th><th class="num">nötig/Tag</th><th>Urteil</th></tr></thead><tbody>
+        ${pruefungen.map(({ deck, lage }) => {
+          const [wort, farbe] = PRUEFUNG_URTEIL[lage.urteil];
+          return `<tr><td>${esc(deck.name)}</td><td>${datumDeutsch(lage.datum)}</td>
+            <td class="num">${lage.tage}</td><td class="num">${lage.offen}</td>
+            <td class="num">${lage.proTag}</td>
+            <td style="color:${farbe};font-weight:700">${wort}</td></tr>`;
+        }).join('')}
+      </tbody></table>
+      <p class="mini" style="margin-top:8px">„Nötig/Tag“ verteilt die noch offenen Karten auf die
+        verbleibenden Tage. Das Urteil vergleicht das mit deinem Tagesziel.</p>
+    </div>` : ''}
+
+    ${fresser.length ? `<div class="box">
+      <h2>Zeitfresser</h2>
+      <p class="mini">Karten mit der höchsten durchschnittlichen Bearbeitungszeit (ab zwei
+        Abfragen). Wer hier viel Zeit lässt, hat meist eine zu umfangreiche oder unklare Karte —
+        aufteilen lohnt sich.</p>
+      <table class="daten mt"><thead><tr>
+        <th>Karte</th><th class="num">Ø&nbsp;Zeit</th><th class="num">gemessen</th><th></th></tr></thead><tbody>
+        ${fresser.map(({ k, schnitt }) => `<tr>
+          <td>${esc(frageText(k).slice(0, 60))}${frageText(k).length > 60 ? '…' : ''}</td>
+          <td class="num">${Math.round(schnitt)}&nbsp;s</td>
+          <td class="num">${Number(k.zeitReps) || 0}×</td>
+          <td class="num"><button class="btn klein" data-tu="karteBearbeiten" data-id="${esc(k.id)}">Bearbeiten</button></td>
+        </tr>`).join('')}
+      </tbody></table>
+    </div>` : ''}
+
+    ${probleme.length ? `<div class="box">
+      <h2>Problemkarten</h2>
+      <p class="mini">Mindestens ${leechGrenze()}× nicht gewusst. Sie ruhen und binden keine
+        Zeit mehr — umformulieren hilft mehr als weiter üben.</p>
+      <div class="row mt">
+        <button class="btn" data-tu="zuProblemkarten">Alle ${probleme.length} ansehen</button>
+      </div>
+    </div>` : ''}
 
     <div class="box mt2">
       <h2>Karten pro Fach</h2>
@@ -1964,18 +3515,31 @@ function malStatistik() {
       <h2>Pro Kasten</h2>
       <table class="daten"><thead><tr>
         <th>Kasten</th><th class="num">Karten</th><th class="num">fällig</th>
-        <th class="num">neu</th><th class="num">Ø&nbsp;Fach</th></tr></thead><tbody>
+        <th class="num">neu</th><th class="num">Ø&nbsp;Fach</th>
+        <th class="num">Ø&nbsp;Zeit</th><th class="num">Min./Woche</th></tr></thead><tbody>
         ${S.decks.map(d => {
           const k = kartenVon(d.id);
           const aktiv = k.filter(x => !x.suspendiert);
           const schnitt = aktiv.length
             ? (aktiv.reduce((a, x) => a + fachVon(x), 0) / aktiv.length).toFixed(1) : '—';
+          const zeiten = k.map(schnittSekunden).filter(x => x !== null);
+          const zeitSchnitt = zeiten.length
+            ? Math.round(zeiten.reduce((a, b) => a + b, 0) / zeiten.length) + ' s' : '—';
+          const minuten = Math.round(wocheTage.reduce((a, t) => {
+            const r = revAn(t); if (!r) return a;
+            const genau = Number(r.sekundenProDeck?.[d.id]);
+            if (Number.isFinite(genau)) return a + genau;
+            const gesamt = Number(r.anzahl) || 0;      // ältere Tage: Anteil schätzen
+            return a + (gesamt ? (Number(r.sekunden) || 0) * (Number(r.proDeck?.[d.id]) || 0) / gesamt : 0);
+          }, 0) / 60);
           return `<tr><td>${esc(d.name)}</td><td class="num">${k.length}</td>
             <td class="num">${k.filter(istFaellig).length}</td>
-            <td class="num">${k.filter(istNeu).length}</td><td class="num">${schnitt}</td></tr>`;
+            <td class="num">${k.filter(istNeu).length}</td><td class="num">${schnitt}</td>
+            <td class="num">${zeitSchnitt}</td><td class="num">${minuten}</td></tr>`;
         }).join('')}
       </tbody></table></div>` : ''}`;
 
+  verdrahten(ziel);
   $('#st-deck').addEventListener('change', e => { S.statDeck = e.target.value; malStatistik(); });
   if (!S.reviewsGeladen) reviewsLaden().then(() => { if (S.seite === 'statistik') malStatistik(); });
 }
@@ -2036,6 +3600,13 @@ function malEinstellungen() {
         Wiederholungen erzeugt.</p>
       <label class="feld" style="margin-top:10px"><span>Neue Karten pro Tag (5–50)</span>
         <input type="number" id="s-neuprotag" min="5" max="50" value="${zahl(e.neuProTag, 5, 50, 20)}"></label>
+      <label class="feld"><span>Problemkarte ab … Aussetzern (3–20)</span>
+        <input type="number" id="s-leech" min="3" max="20" value="${leechGrenze()}"></label>
+      <p class="mini" style="margin-top:-8px">Karten, die so oft nicht gewusst wurden, ruhen
+        automatisch und landen unter <em>Karten → Problemkarten</em>. Weiter zu üben bringt dort
+        wenig — meist ist die Karte zu umfangreich oder mehrdeutig.
+        <strong>Die Grenze gilt rückwirkend:</strong> mit der aktuellen Einstellung wären
+        ${problemkarten().length} deiner Karten betroffen.</p>
       <label class="feld"><span>Tagesziel</span>
         <div class="row" style="gap:14px">
           <label class="karo" style="padding:2px 0"><input type="radio" name="s-zieleinheit" value="minuten" ${e.zielEinheit !== 'karten' ? 'checked' : ''}> <span>Minuten</span></label>
@@ -2132,10 +3703,12 @@ function malEinstellungen() {
     const wert = $('#s-retention-wert'); if (wert) wert.textContent = Math.round(r * 100) + '%';
     const schaetz = $('#s-retention-schaetzung');
     if (schaetz) {
-      const aktiv = S.cards.filter(k => !k.suspendiert).length;
+      const aktiv = S.cards.filter(k => !k.suspendiert && !istNeu(k)).length;
+      const neu = S.cards.filter(k => !k.suspendiert && istNeu(k)).length;
       schaetz.textContent = aktiv
-        ? `≈ ${geschaetzteWiederholungenProTag(r)} Wiederholungen/Tag bei ${aktiv} aktiven Karten.`
-        : 'Noch keine Karten vorhanden — Schätzung folgt, sobald welche angelegt sind.';
+        ? `≈ ${geschaetzteWiederholungenProTag(r)} Wiederholungen/Tag bei ${aktiv} gelernten Karten.`
+          + (neu ? ` ${neu} noch nie gelernte Karten kommen nach und nach dazu.` : '')
+        : 'Noch nichts gelernt — die Schätzung folgt nach den ersten Sitzungen.';
     }
     const warn = $('#s-retention-warnung'); if (warn) warn.hidden = r <= 0.93;
   };
@@ -2150,21 +3723,39 @@ function malEinstellungen() {
 
 function diagnoseMalen() {
   const d = $('#diag-status'); if (!d) return;
+  // Die Diagnose hängt an statusMalen() und liefe damit bei jeder
+  // Firestore-Aktualisierung mit — auch mitten in einer Lernsitzung. Der
+  // Variantenabgleich darunter geht über den ganzen Bestand; das gehört
+  // nur auf die Seite, die man gerade ansieht.
+  if (S.seite !== 'einstellungen') return;
   const alt = altdatenImBrowser();
   const verwaist = verwaisteKarten();
+  const quellen = S.cards.filter(istQuellkarte).length;
+  const zusatz = S.cards.length - quellen;
+  const bedarf = variantenBedarf();
   d.innerHTML = `
     Projekt: <code>${esc(CFG.projectId)}</code><br>
-    Firebase-SDK: <code>${esc(SDK_VERSION)}</code><br>
+    Firebase-SDK: <code>${esc(SDK_VERSION)}</code> · FSRS: <code>${esc(FSRS?.FSRSVersion || 'ts-fsrs')}</code><br>
+    Sprachausgabe: ${sprachAusgabeDa() ? 'verfügbar' : 'in diesem Browser nicht verfügbar'}<br>
     Verbindung: ${statusZustand.offen ? 'Änderungen unterwegs'
       : navigator.onLine ? 'online' : 'offline'}<br>
-    Daten: ${S.decks.length} Kästen · ${S.cards.length} Karten<br>
+    Daten: ${S.decks.length} Kästen · ${quellen} Karten${
+      zusatz ? ` · ${zusatz} zusätzliche Abfragen (Rückwärts, Lücken)` : ''}<br>
     Lerntag beginnt um ${TAGESGRENZE}:00 Uhr · heute = <code>${heute()}</code><br>
     Altbestand im Browser: ${alt ? Object.keys(alt).length + ' Einträge gefunden' : 'nichts gefunden'}
     ${verwaist.length ? `<div class="hinweis" style="margin-top:10px">
       <strong>${verwaist.length} Karten ohne Kasten.</strong>
       Sie tauchen in keiner Lernsitzung auf, werden aber in der Statistik mitgezählt.
       <div style="margin-top:8px"><button class="btn klein" data-tu="verwaisteEinsammeln">
-        In einen Kasten einsammeln</button></div></div>` : ''}`;
+        In einen Kasten einsammeln</button></div></div>` : ''}
+    ${(bedarf.karten || bedarf.verwaist) ? `<div class="hinweis" style="margin-top:10px">
+      <strong>${bedarf.karten} Karten haben nicht die Abfragen, die ihr Kasten vorsieht.</strong>
+      ${bedarf.verwaist ? `Dazu ${bedarf.verwaist} Abfragen ohne Quellkarte.` : ''}
+      Das kommt nach einem Import oder nach dem Umstellen der Abfragerichtung vor.
+      <div style="margin-top:8px"><button class="btn klein" data-tu="variantenAbgleich">
+        Abfragen abgleichen</button></div></div>`
+      : `<div style="margin-top:8px"><button class="btn klein" data-tu="variantenAbgleich">
+        Abfragen abgleichen</button></div>`}`;
   verdrahten(d);
 }
 
@@ -2219,8 +3810,16 @@ function csvFeld(s) { return '"' + String(s ?? '').replace(/"/g, '""') + '"'; }
 /** Karten als CSV "Frage";"Antwort";"Kasten" — mit BOM, damit Excel die
  *  Umlaute richtig anzeigt. */
 function csvBauen(karten) {
-  return '\uFEFF' + karten.map(k =>
-    [k.frage, k.antwort, deckName(k.deckId)].map(csvFeld).join(';')).join('\r\n');
+  // Nur Quellkarten: die zus\u00E4tzlichen Abfragen (R\u00FCckw\u00E4rtsrichtung, einzelne
+  // Cloze-L\u00FCcken) tragen denselben Inhalt und st\u00FCnden sonst doppelt in der
+  // Datei \u2014 beim Wiedereinlesen entst\u00FCnden Dubletten.
+  return '\uFEFF' + karten.filter(istQuellkarte).map(k =>
+    // Bei L\u00FCckentexten steht die L\u00F6sung in der Frage-Spalte; ohne Ersatz in
+    // der Antwort-Spalte w\u00FCrde die Zeile beim Wiedereinlesen verworfen.
+    [k.frage,
+     k.antwort || (k.typ === 'cloze'
+       ? clozeNummern(k.frage).map(n => clozeLoesung(k.frage, n)).join(' \u00B7 ') : ''),
+     deckName(k.deckId)].map(csvFeld).join(';')).join('\r\n');
 }
 function dateiTeil(s) {
   return String(s).replace(/[^\wäöüÄÖÜß -]+/g, '_').trim().slice(0, 40) || 'export';
@@ -2284,7 +3883,13 @@ function deckNormalisieren(d, i) {
     id: sichereId(q.id || neueId()),
     name: String(q.name ?? 'Kasten').slice(0, 120) || 'Kasten',
     farbe: /^#[0-9a-fA-F]{3,8}$/.test(farbe) ? farbe : DECK_FARBEN[i % DECK_FARBEN.length],
-    richtung: q.richtung === 'rueckwaerts' || q.richtung === 'beide' ? q.richtung : 'vorwaerts',
+    richtung: RICHTUNGEN.includes(q.richtung) ? q.richtung : 'vorwaerts',
+    modi: Array.isArray(q.modi) && q.modi.filter(x => MODI_ALLE.includes(x)).length
+      ? q.modi.filter(x => MODI_ALLE.includes(x)) : ['aufdecken'],
+    sprache: typeof q.sprache === 'string' && /^[a-z]{2}(-[A-Z]{2})?$/.test(q.sprache) ? q.sprache : 'de-DE',
+    spracheAntwort: typeof q.spracheAntwort === 'string' && /^[a-z]{2}(-[A-Z]{2})?$/.test(q.spracheAntwort)
+      ? q.spracheAntwort
+      : (typeof q.sprache === 'string' && /^[a-z]{2}(-[A-Z]{2})?$/.test(q.sprache) ? q.sprache : 'de-DE'),
     pruefungsdatum: isoOder(q.pruefungsdatum, null),
     createdAt: isoOder(q.createdAt, heute()),
     archiviert: !!q.archiviert
@@ -2301,6 +3906,16 @@ function karteNormalisieren(k, deckId, ivListe) {
   const reps = hist ? hist.length : zahl(q.reps, 0, 99999, 0);
   const lapses = hist ? hist.filter(h => Number(h.rating) === 1).length : zahl(q.lapses, 0, 99999, 0);
   const letzte = hist && hist.length ? hist[hist.length - 1] : null;
+  const zuletzt = letzte ? isoOder(letzte.date, null) : isoOder(q.lastReview, null);
+  const stabRoh = Number(q.stability);
+  const hatStab = Number.isFinite(stabRoh) && stabRoh > 0;
+  const schwRoh = Number(q.difficulty);
+  // Nur eine Karte, an der nichts auf eine frühere Abfrage hindeutet, darf
+  // als frischer Gedächtniszustand (0/0) ankommen — den braucht ts-fsrs für
+  // die Ersteinschätzung. Würde er auf 1/1 hochgeklemmt, hielte die
+  // Bibliothek sie für eine bereits gelernte Karte am unteren Anschlag.
+  // Alles andere behält seinen Platz (KONZEPT §9: Fach → Stabilität).
+  const unberuehrt = !hatStab && reps === 0 && fach <= 1 && !zuletzt;
   return {
     id: sichereId(q.id || neueId()),
     deckId,
@@ -2308,18 +3923,26 @@ function karteNormalisieren(k, deckId, ivListe) {
     antwort: String(q.antwort ?? q.back ?? '').trim(),
     notiz: String(q.notiz ?? '').trim(),
     tags: Array.isArray(q.tags) ? q.tags.map(t => String(t).slice(0, 60)).slice(0, 30) : [],
-    typ: ['standard', 'cloze', 'bild'].includes(q.typ) ? q.typ : 'standard',
+    typ: KARTEN_TYPEN.includes(q.typ) ? q.typ : 'standard',
+    // Stufe 3: Zugehörigkeit zur Quellkarte mitnehmen, sonst würden aus
+    // Rückwärtsabfragen beim Import eigenständige Karten ohne Inhalt.
+    quelleId: q.quelleId ? sichereId(q.quelleId) : null,
+    variante: /^(v|r|c\d{1,2})$/.test(String(q.variante || '')) ? q.variante : 'v',
     fach,
-    stability: Number.isFinite(Number(q.stability)) && Number(q.stability) > 0
-      ? Math.min(3650, Number(q.stability))
-      : (ivListe[fach - 1] ?? 1),                       // KONZEPT §9
-    difficulty: zahl(q.difficulty, 1, 10, 5),
+    stability: unberuehrt ? 0
+      : (hatStab ? Math.min(3650, stabRoh) : (ivListe[fach - 1] ?? 1)),   // KONZEPT §9
+    difficulty: unberuehrt ? 0
+      : (Number.isFinite(schwRoh) && schwRoh >= 1 ? Math.min(10, Math.round(schwRoh)) : 5),
     due: isoOder(q.faellig ?? q.due, heute()),
-    lastReview: letzte ? isoOder(letzte.date, null) : isoOder(q.lastReview, null),
+    lastReview: zuletzt,
     reps,
     lapses,
     state: [0, 1, 2, 3].includes(q.state) ? q.state : (reps ? 2 : 0),
     suspendiert: !!q.suspendiert,
+    leech: !!q.leech,
+    leechBasis: zahl(q.leechBasis, 0, 99999, 0),
+    zeitGesamt: zahl(q.zeitGesamt, 0, 9999999, 0),
+    zeitReps: zahl(q.zeitReps, 0, 99999, 0),
     createdAt: isoOder(q.createdAt, heute())
   };
 }
@@ -2372,6 +3995,23 @@ function altdatenDeuten(roh) {
         ziel = auffang.id;
       }
       return karteNormalisieren(k, ziel, ivL2 || aktuelleIntervalle());
+    });
+    // Kartenkennungen können beim Einlesen entschärft werden (sichereId).
+    // Dann müssen die quelleId-Verweise mitwandern, sonst hinge eine
+    // Rückwärtsabfrage im Leeren und wäre nicht mehr zu bearbeiten.
+    const idKarteNeu = new Map();
+    o.cards.forEach((roh, i) => {
+      const alt = String(roh && roh.id != null ? roh.id : '');
+      if (alt && cards[i]) idKarteNeu.set(alt, cards[i].id);
+    });
+    const vorhandeneIds = new Set(cards.map(c => c.id));
+    cards.forEach(c => {
+      if (!c.quelleId) return;
+      const neu = idKarteNeu.get(String(c.quelleId)) || c.quelleId;
+      // Zeigt der Verweis ins Nichts, wird aus der Abfrage eine eigenständige
+      // Karte — besser als ein Datensatz, den niemand mehr öffnen kann.
+      if (vorhandeneIds.has(neu) && neu !== c.id) c.quelleId = neu;
+      else { c.quelleId = null; c.variante = 'v'; }
     });
     return {
       quelle: 'Lernkartei 2',
@@ -2570,7 +4210,9 @@ async function importSchreiben(geparst, modus, ivUebernehmen) {
       <strong>${geparst.decks.length}</strong> Kästen übernommen.
       ${uebersprungen ? `<br>${uebersprungen} Karten waren schon vorhanden und wurden übersprungen.` : ''}</p>
       <p class="mini">Die Daten sind sofort nutzbar. Die Übertragung zu Firestore läuft im
-      Hintergrund weiter — der Punkt oben rechts wird grün, sobald alles angekommen ist.</p>`,
+      Hintergrund weiter — der Punkt oben rechts wird grün, sobald alles angekommen ist.</p>
+      <p class="mini">Wenn ein Kasten Rückwärtsabfragen oder Lückentexte vorsieht, prüft
+      <em>Einstellungen → Diagnose → Abfragen abgleichen</em>, ob dazu alle Abfragen vorhanden sind.</p>`,
     knoepfe: [{ text: 'Gut', wert: 'ok', art: 'primary' }]
   });
   seiteZeigen('kaesten');
@@ -2603,10 +4245,36 @@ const AKTION = {
   alleAn:  () => { lernAuswahl = new Set(S.decks.map(d => d.id)); malLernen(); },
   alleAus: () => { lernAuswahl = new Set(); malLernen(); },
   starten: () => sitzungStarten(),
+  startenAlle: () => {
+    try { localStorage.setItem('lk2:modus', 'alle'); } catch (_) {}
+    return sitzungStarten();
+  },
   umdrehen: () => umdrehen(),
+  tippPruefen: () => tippAuswerten(),
+  fastJa:   () => bewerten(3),
+  fastNein: () => bewerten(1),
+  vorlesen: was => {
+    const k = sitzung?.karten?.[sitzung.i];
+    if (!k) return;
+    const seite = was === 'antwort' ? 'antwort' : 'frage';
+    const text = seite === 'antwort' ? antwortText(k) : frageText(k);
+    if (!sprechen(text, spracheFuer(k, seite)))
+      toast('Dieser Browser bietet keine Sprachausgabe an.', 'fehler');
+  },
   abbrechen: () => sitzungBeenden(false),
   nochmal: () => { sitzung = null; letzteSitzung = null; malLernen(); },
   zuStatistik: () => seiteZeigen('statistik'),
+  pruefungBeenden: id => {
+    const d = S.decks.find(x => x.id === id); if (!d) return;
+    d.pruefungsdatum = null;
+    schreibe(FB.updateDoc(FB.doc(colDecks(), id), { pruefungsdatum: null }), 'Termin entfernen');
+    toast('Termin entfernt. Die Termine richten sich wieder allein nach dem Lernstand.');
+    malLernen();
+  },
+  zuProblemkarten: () => {
+    S.kartenFilter = 'problem'; S.kartenFilterDeck = 'alle'; S.kartenSuche = ''; S.kartenLimit = 60;
+    seiteZeigen('karten');
+  },
   zuEinstellungen: () => seiteZeigen('einstellungen'),
   ersterKasten: () => AKTION.neuerKasten(),
 
@@ -2614,11 +4282,55 @@ const AKTION = {
   neuerKasten: () => deckAnlegen(),
   deckBearbeiten: async id => {
     const d = S.decks.find(x => x.id === id); if (!d) return;
+    const modiAktiv = deckModi(id);
+    const richtungAlt = deckRichtung(id);
+    const spracheAlt = deckSprache(id);
+    const spracheAntwortAlt = deckSpracheAntwort(id);
+    const pruefungAlt = deckPruefung(id);
+
     const r = await modal({
       titel: 'Kasten bearbeiten',
+      breit: true,
       html: `<label class="feld"><span>Name</span>
                <input id="m-name" maxlength="120" value="${esc(d.name)}"></label>
              ${farbwahlHtml(d.farbe)}
+
+             <label class="feld" style="margin-bottom:4px"><span>Lernmodi — mehrere möglich</span>
+               <div class="modus-chips" id="m-modi">${MODI_ALLE.map(m => `
+                 <label class="modus-chip ${modiAktiv.includes(m) ? 'an' : ''}" title="${esc(MODUS_HILFE[m])}">
+                   <input type="checkbox" id="m-modus-${m}" value="${m}" ${modiAktiv.includes(m) ? 'checked' : ''}>
+                   <span>${esc(MODUS_NAME[m])}</span></label>`).join('')}</div></label>
+             <p class="mini" style="margin-bottom:14px">Sind mehrere Modi aktiv, wechseln sie sich
+               kartenweise ab. <strong>Multiple Choice</strong> greift nur bei Karten, die noch nie
+               dran waren. <strong>Hören</strong> ergänzt die anderen Modi; allein gewählt bleibt
+               die Frage verdeckt und wird nur vorgelesen.</p>
+
+             <label class="feld"><span>Abfragerichtung</span>
+               <select id="m-richtung">${RICHTUNGEN.map(x =>
+                 `<option value="${x}" ${richtungAlt === x ? 'selected' : ''}>${esc(RICHTUNG_NAME[x])}</option>`).join('')}</select></label>
+             <p class="mini" style="margin-top:-8px;margin-bottom:14px">Bei „beide Richtungen“ entsteht
+               je Karte eine zweite, getrennt terminierte Abfrage — aktiv und passiv sind
+               unterschiedlich schwer und dürfen sich keinen Termin teilen. Lückentexte sind davon
+               ausgenommen, dort zählen die Lücken.</p>
+
+             <div class="row" style="gap:10px">
+               <label class="feld" style="flex:1"><span>Sprache der Frageseite</span>
+                 <select id="m-sprache">${SPRACHEN.map(([c, n]) =>
+                   `<option value="${c}" ${spracheAlt === c ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></label>
+               <label class="feld" style="flex:1"><span>Sprache der Antwortseite</span>
+                 <select id="m-sprache-antwort">${SPRACHEN.map(([c, n]) =>
+                   `<option value="${c}" ${spracheAntwortAlt === c ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></label>
+             </div>
+             <p class="mini" style="margin-top:-8px">Für den Hörmodus. Bei Vokabelkästen
+               gehören Frage und Antwort zu verschiedenen Sprachen — sonst liest eine
+               englische Stimme die deutschen Wörter.</p>
+
+             <label class="feld"><span>Prüfungstermin (optional)</span>
+               <input type="date" id="m-pruefung" value="${esc(deckPruefung(id) || '')}"></label>
+             <p class="mini" style="margin-top:-8px">Ist ein Termin gesetzt, zieht die App
+               Fälligkeiten vor, die sonst dahinter lägen — so kommt jede Karte vorher noch
+               mindestens einmal dran. Auf dem Startbildschirm steht dann, wie viel täglich
+               nötig ist und ob das zu schaffen ist.</p>
              <p class="mini">${kartenVon(id).length} Karten in diesem Kasten.</p>`,
       knoepfe: [{ text: 'Abbrechen', wert: null }, {
         text: 'Speichern', wert: 'ok', art: 'primary',
@@ -2626,14 +4338,83 @@ const AKTION = {
           if (!$('#m-name').value.trim()) { toast('Bitte einen Namen eingeben.'); return false; }
         }
       }],
-      beimOeffnen: m => farbwahlVerdrahten(m, d.farbe)
+      beimOeffnen: m => {
+        farbwahlVerdrahten(m, d.farbe);
+        $('#m-modi', m)?.addEventListener('change', ev => {
+          const chip = ev.target.closest('.modus-chip');
+          if (chip) chip.classList.toggle('an', ev.target.checked);
+        });
+      }
     });
     if (r !== 'ok') return;
-    schreibe(FB.updateDoc(FB.doc(colDecks(), id), {
+
+    // ALLE Werte einlesen, bevor unten ein weiterer Dialog aufgeht: modal()
+    // überschreibt letzteWerte beim Schließen, und die Rückfrage hat selbst
+    // keine Felder. Wer danach noch W() aufruft, bekommt nur die Vorgaben.
+    const modiNeu = MODI_ALLE.filter(m => letzteWerte['m-modus-' + m] === true);
+    const richtungRoh = W('m-richtung', richtungAlt);
+    const richtungNeu = RICHTUNGEN.includes(richtungRoh) ? richtungRoh : richtungAlt;
+    const patch = {
       name: String(W('m-name', d.name)).trim().slice(0, 120),
-      farbe: W('farbe', d.farbe)
-    }), 'Kasten ändern');
-    toast('Gespeichert.');
+      farbe: W('farbe', d.farbe),
+      modi: modiNeu.length ? modiNeu : ['aufdecken'],
+      richtung: richtungNeu,
+      sprache: W('m-sprache', spracheAlt),
+      spracheAntwort: W('m-sprache-antwort', spracheAntwortAlt),
+      pruefungsdatum: /^\d{4}-\d{2}-\d{2}$/.test(String(letzteWerte['m-pruefung'] || ''))
+        ? letzteWerte['m-pruefung'] : null
+    };
+
+    // Jede Änderung der Abfragerichtung greift tief in den Bestand ein und
+    // wird deshalb angekündigt — auch der Wechsel vorwärts ↔ rückwärts, der
+    // keine Karte löscht: Dort behält jede Karte ihren Termin, wird aber ab
+    // sofort spiegelverkehrt gefragt. Der Lernstand gehört dann zu einer
+    // Frage, die so nie geübt wurde, und die erste Sitzung danach besteht
+    // aus lauter Einsen — mit entsprechendem Rückwurf der Intervalle.
+    if (richtungNeu !== richtungAlt && kartenVon(id).length) {
+      const nurQuellen = kartenVon(id).filter(istQuellkarte).length;
+      const rueck = kartenVon(id).filter(k => k.quelleId && varianteVon(k) === 'r').length;
+      const text = richtungAlt === 'beide'
+        ? `Je Karte wird eine der beiden Abfragen entfernt — insgesamt
+           <strong>${rueck}</strong>. Der Lernstand der Richtung, die bleibt, wird
+           übernommen; der Stand der wegfallenden Richtung geht verloren.`
+        : richtungNeu === 'beide'
+        ? `Zu jeder der <strong>${nurQuellen}</strong> Karten kommt eine zweite,
+           getrennt terminierte Abfrage in der Gegenrichtung dazu. Sie sind sofort
+           fällig und verdoppeln auf Dauer die tägliche Wiederholungsmenge.`
+        : `Alle <strong>${nurQuellen}</strong> Karten dieses Kastens werden ab sofort
+           in der anderen Richtung gefragt. Sie behalten dabei ihren Termin, obwohl
+           die neue Frageform noch nie geübt wurde — rechne mit einigen Durchfällern
+           in der nächsten Sitzung.`;
+      if (!await frage('Abfragerichtung ändern', text, 'Trotzdem ändern',
+        richtungAlt === 'beide' ? 'gefahr' : '')) return;
+    }
+    Object.assign(d, patch);                       // lokal sofort, damit der Abgleich stimmt
+    schreibe(FB.updateDoc(FB.doc(colDecks(), id), patch), 'Kasten ändern');
+
+    // Ein neuer Termin muss die Fälligkeiten einmalig einsammeln, die schon
+    // dahinter liegen — sonst kämen genau die reifen Karten bis zur Prüfung
+    // kein einziges Mal dran.
+    const terminNeu = !!patch.pruefungsdatum && patch.pruefungsdatum !== pruefungAlt;
+    if (richtungNeu !== richtungAlt) {
+      const bilanz = alleVariantenAbgleichen(k => k.deckId === id);
+      toast(bilanz.angelegt || bilanz.entfernt
+        ? `Gespeichert. ${bilanz.angelegt} Abfragen angelegt, ${bilanz.entfernt} entfernt.`
+        : 'Gespeichert.');
+    } else {
+      toast('Gespeichert.');
+    }
+    if (terminNeu) {
+      if (patch.pruefungsdatum < heute()) {
+        toast('Der eingetragene Termin liegt in der Vergangenheit und bleibt deshalb wirkungslos.', 'fehler');
+      } else {
+        const vorgezogen = pruefungTermineVorziehen(id);
+        if (vorgezogen) setTimeout(() => toast(
+          `${vorgezogen} ${vorgezogen === 1 ? 'Karte wurde' : 'Karten wurden'} vorgezogen, ` +
+          'damit sie vor der Prüfung noch drankommen.'), 900);
+      }
+    }
+    if (!modiNeu.length) toast('Ohne Auswahl bleibt es beim Modus „Aufdecken“.');
   },
   deckLoeschen: async id => {
     const d = S.decks.find(x => x.id === id); if (!d) return;
@@ -2666,26 +4447,52 @@ const AKTION = {
   karteBearbeiten: id => karteBearbeiten(id),
   karteLoeschen: async id => {
     const k = S.cards.find(x => x.id === id); if (!k) return;
-    if (!await frage('Karte löschen', `„${esc((k.frage || '').slice(0, 80))}“ löschen?`,
+    const alle = mitVarianten([id]);
+    const zusatz = alle.length - 1;
+    if (!await frage('Karte löschen',
+      `„${esc((k.frage || '').slice(0, 80))}“ löschen?${zusatz
+        ? `<br><span class="mini">Dazu ${zusatz} weitere eigenständig terminierte
+           ${zusatz === 1 ? 'Abfrage' : 'Abfragen'} derselben Karte.</span>` : ''}`,
       'Löschen', 'gefahr')) return;
-    S.auswahl.delete(id);
-    schreibe(FB.deleteDoc(FB.doc(colCards(), id)), 'Karte löschen');
-    toast('Karte gelöscht.');
+    alle.forEach(x => S.auswahl.delete(x));
+    variantenOpsSchreiben(alle.map(x => ['delete', x]), 'Karte löschen');
+    toast(zusatz ? `Karte mit ${zusatz + 1} Abfragen gelöscht.` : 'Karte gelöscht.');
   },
   mehrKarten: () => { S.kartenLimit += 60; malKarten(); },
   massAus: () => { S.auswahl.clear(); malKarten(); },
   massLoeschen: async () => {
     const n = S.auswahl.size;
-    if (!await frage('Karten löschen', `<strong>${n}</strong> ausgewählte Karten löschen?`,
+    const ids = mitVarianten(Array.from(S.auswahl));
+    const zusatz = ids.length - n;
+    if (!await frage('Karten löschen',
+      `<strong>${n}</strong> ausgewählte Karten löschen?${zusatz > 0
+        ? `<br><span class="mini">Dazu ${zusatz} weitere Abfragen derselben Karten
+           (Rückwärtsrichtung, Lückentext).</span>` : ''}`,
       'Löschen', 'gefahr')) return;
-    const ids = Array.from(S.auswahl);
     for (let i = 0; i < ids.length; i += 400) {
       const b = FB.writeBatch(db);
       ids.slice(i, i + 400).forEach(x => b.delete(FB.doc(colCards(), x)));
       schreibe(b.commit(), 'Karten löschen');
     }
     S.auswahl.clear();
-    toast(n + ' Karten gelöscht.');
+    toast(ids.length + ' Karten gelöscht.');
+  },
+  massAufnehmen: async () => {
+    const ids = mitVarianten(Array.from(S.auswahl));
+    const betroffen = ids.map(x => S.cards.find(y => y.id === x)).filter(Boolean);
+    if (!betroffen.length) return;
+    if (!await frage('Wieder aufnehmen',
+      `<strong>${betroffen.length}</strong> Abfragen wieder aufnehmen? Kennzeichnung und Ruhen
+       werden aufgehoben, der Lernstand bleibt. Der Zähler beginnt von vorn.`, 'Aufnehmen')) return;
+    const ops = betroffen.map(k => {
+      const patch = { leech: false, suspendiert: false, leechBasis: Number(k.lapses) || 0 };
+      Object.assign(k, patch);
+      return ['merge', k.id, patch];
+    });
+    variantenOpsSchreiben(ops, 'Problemkarten aufnehmen');
+    S.auswahl.clear();
+    toast(betroffen.length + ' Abfragen wieder aufgenommen.');
+    malKarten();
   },
   massVerschieben: async () => {
     if (!S.decks.length) return;
@@ -2699,17 +4506,37 @@ const AKTION = {
     if (r !== 'ok') return;
     const ziel = W('m-deck', S.decks[0].id);
     // Nur vorhandene Karten: ein update auf ein gelöschtes Dokument ließe den
-    // gesamten Stapel scheitern, nicht nur die eine Karte.
+    // gesamten Stapel scheitern, nicht nur die eine Karte. Zusätzliche
+    // Abfragen ziehen mit, sonst lägen sie im alten Kasten.
     const vorhanden = new Set(S.cards.map(k => k.id));
-    const ids = Array.from(S.auswahl).filter(x => vorhanden.has(x));
+    const ids = mitVarianten(Array.from(S.auswahl)).filter(x => vorhanden.has(x));
     if (!ids.length) { S.auswahl.clear(); return toast('Keine der Karten ist noch vorhanden.'); }
+
+    // Hat der Zielkasten eine andere Abfragerichtung, entfallen dabei
+    // Abfragen. Vorher prüfen — ohne dabei schon etwas zu verändern.
+    const zielDeck = deckVon(ziel);
+    const index = ableitungsIndex();
+    const bewegteQuellen = ids.map(x => S.cards.find(c => c.id === x)).filter(c => c && istQuellkarte(c));
+    const wegfallen = bewegteQuellen.reduce((n, q) => n + variantenPlan(q, zielDeck, index).entfernt, 0);
+    if (wegfallen && !await frage('Karten verschieben',
+      `Der Zielkasten fragt in eine andere Richtung ab. Dadurch
+       ${wegfallen === 1 ? 'entfällt eine Abfrage' : `entfallen ${wegfallen} Abfragen`}
+       mitsamt Lernfortschritt.`, 'Trotzdem verschieben', 'gefahr')) return;
+
     for (let i = 0; i < ids.length; i += 400) {
       const b = FB.writeBatch(db);
       ids.slice(i, i + 400).forEach(x => b.update(FB.doc(colCards(), x), { deckId: ziel }));
       schreibe(b.commit(), 'Karten verschieben');
     }
+    // Lokal sofort nachziehen, damit der anschließende Abgleich schon die
+    // Abfragerichtung des Zielkastens sieht statt der des alten.
+    const bewegt = new Set(ids);
+    S.cards.forEach(k => { if (bewegt.has(k.id)) k.deckId = ziel; });
+    const bilanz = alleVariantenAbgleichen(k => bewegt.has(k.id));
     S.auswahl.clear();
-    toast('Verschoben.');
+    toast(bilanz.angelegt || bilanz.entfernt
+      ? `Verschoben. ${bilanz.angelegt} Abfragen angelegt, ${bilanz.entfernt} entfernt.`
+      : 'Verschoben.');
   },
 
   /* Einstellungen */
@@ -2746,14 +4573,25 @@ const AKTION = {
       { intervalle: STANDARD_INTERVALLE.slice() }, { merge: true }), 'Intervalle');
     malEinstellungen();
   },
-  tagespensumSpeichern: () => {
+  tagespensumSpeichern: async () => {
     const neuProTag = zahl($('#s-neuprotag')?.value, 5, 50, 20);
     const zielMinuten = zahl($('#s-zielminuten')?.value, 1, 600, 15);
     const zielKarten = zahl($('#s-zielkarten')?.value, 1, 2000, 30);
     const zielEinheit = $('input[name=s-zieleinheit]:checked')?.value === 'karten' ? 'karten' : 'minuten';
-    Object.assign(S.einstellungen, { neuProTag, zielMinuten, zielKarten, zielEinheit });
+    const leech = zahl($('#s-leech')?.value, 3, 20, 7);
+    // Die Grenze wirkt rückwirkend auf alle bisherigen Aussetzer. Wird sie
+    // gesenkt, sind auf einen Schlag deutlich mehr Karten betroffen — das
+    // darf nicht hinter einem beiläufigen „Gespeichert“ verschwinden.
+    if (leech < leechGrenze()) {
+      const vorher = problemkarten().length;
+      const nachher = S.cards.filter(k => !!k.leech || leechZaehler(k) >= leech).length;
+      if (nachher > vorher && !await frage('Grenze senken',
+        `Damit gelten <strong>${nachher}</strong> statt bisher ${vorher} Karten als Problemkarten.
+         Sie ruhen, sobald sie das nächste Mal nicht gewusst werden.`, 'Übernehmen')) return;
+    }
+    Object.assign(S.einstellungen, { neuProTag, zielMinuten, zielKarten, zielEinheit, leechGrenze: leech });
     schreibe(FB.setDoc(refEinstellungen(),
-      { neuProTag, zielMinuten, zielKarten, zielEinheit }, { merge: true }), 'Tagespensum');
+      { neuProTag, zielMinuten, zielKarten, zielEinheit, leechGrenze: leech }, { merge: true }), 'Tagespensum');
     toast('Tagespensum gespeichert.');
   },
 
@@ -2855,8 +4693,45 @@ const AKTION = {
       ops.slice(i, i + 400).forEach(([, ref, daten]) => b.set(ref, daten));
       schreibe(b.commit(), 'CSV-Import');
     }
-    toast(karten.length + ' Karten eingelesen.');
+    // Sieht der Zielkasten Rückwärtsabfragen vor, fehlen sie den frisch
+    // eingelesenen Karten noch. Gleich nachziehen statt den Nutzer später
+    // über die Diagnose stolpern zu lassen.
+    const neueIds = new Set(karten.map(k2 => k2.id));
+    karten.forEach(k2 => { if (!S.cards.some(c => c.id === k2.id)) S.cards.push(k2); });
+    const bilanz = alleVariantenAbgleichen(k2 => neueIds.has(k2.id));
+    toast(bilanz.angelegt
+      ? `${karten.length} Karten eingelesen, ${bilanz.angelegt} Gegenabfragen ergänzt.`
+      : karten.length + ' Karten eingelesen.');
     seiteZeigen('karten');
+  },
+
+  variantenAbgleich: async () => {
+    // Erst rechnen, dann fragen: Der Abgleich löscht Abfragen mitsamt
+    // Lernstand. Als einziger Knopf auf der Diagnoseseite sähe er wie eine
+    // harmlose Prüfung aus — er darf nicht ungefragt löschen.
+    const bedarf = variantenBedarf();
+    const trocken = alleVariantenAbgleichenProbe();
+    if (trocken.entfernt && !await frage('Abfragen abgleichen',
+      `<strong>${trocken.angelegt}</strong> fehlende Abfragen werden angelegt und
+       <strong>${trocken.entfernt}</strong> nicht mehr vorgesehene entfernt — Letztere
+       samt ihrem Lernfortschritt.
+       ${bedarf.verwaist ? `<br><span class="mini">Darunter ${bedarf.verwaist} Abfragen,
+         deren Quellkarte fehlt.</span>` : ''}`,
+      'Abgleichen', 'gefahr')) return;
+    const bilanz = alleVariantenAbgleichen();
+    await modal({
+      titel: 'Abfragen abgeglichen',
+      html: bilanz.angelegt || bilanz.entfernt
+        ? `<p><strong>${bilanz.angelegt}</strong> Abfragen angelegt,
+             <strong>${bilanz.entfernt}</strong> entfernt —
+             betroffen waren ${bilanz.betroffen} Karten.</p>
+           <p class="mini">Angelegt werden Rückwärtsabfragen und Cloze-Lücken, die der Kasten
+             vorsieht; entfernt werden Abfragen, die nicht mehr vorgesehen sind oder deren
+             Quellkarte fehlt.</p>`
+        : `<p>Alles in Ordnung — jede Karte hat genau die Abfragen, die ihr Kasten vorsieht.</p>`,
+      knoepfe: [{ text: 'Gut', wert: 'ok', art: 'primary' }]
+    });
+    malEinstellungen();
   },
 
   verwaisteEinsammeln: async () => {
@@ -2880,12 +4755,14 @@ const AKTION = {
       schreibe(FB.setDoc(FB.doc(colDecks(), ziel), neuesDeck('Wiederhergestellt')), 'Kasten anlegen');
       lernAuswahl?.add(ziel);
     }
-    for (let i = 0; i < verwaist.length; i += 400) {
-      const b = FB.writeBatch(db);
-      verwaist.slice(i, i + 400).forEach(k => b.update(FB.doc(colCards(), k.id), { deckId: ziel }));
-      schreibe(b.commit(), 'Verwaiste einsammeln');
-    }
-    toast(verwaist.length + ' Karten eingesammelt.');
+    // merge-set statt update: Fehlt eines der Dokumente inzwischen, scheiterte
+    // sonst der ganze Stapel und keine einzige Karte käme an.
+    verwaist.forEach(k => { k.deckId = ziel; });
+    variantenOpsSchreiben(verwaist.map(k => ['merge', k.id, { deckId: ziel }]), 'Verwaiste einsammeln');
+    const bilanz = alleVariantenAbgleichen(k => verwaist.some(v => v.id === k.id));
+    toast(bilanz.angelegt
+      ? `${verwaist.length} Karten eingesammelt, ${bilanz.angelegt} Abfragen ergänzt.`
+      : verwaist.length + ' Karten eingesammelt.');
     seiteZeigen('karten');
   },
 
@@ -2937,7 +4814,9 @@ document.addEventListener('keydown', e => {
   if (sitzung?.aktiv) {
     if (e.code === 'Space' || e.key === ' ') {
       e.preventDefault();
-      sitzung.aufgedeckt ? null : umdrehen();
+      // Im Tipp- und Auswahlmodus deckt die Leertaste nicht auf — dort wird
+      // erst geantwortet. Ausnahme: die Antwort liegt schon offen.
+      if (!sitzung.aufgedeckt && sitzung.modus !== 'tippen' && sitzung.modus !== 'mc') umdrehen();
       return;
     }
     if (['1', '2', '3', '4'].includes(e.key) && sitzung.aufgedeckt) {
@@ -2945,14 +4824,38 @@ document.addEventListener('keydown', e => {
       bewerten(Number(e.key));
       return;
     }
+    // Multiple Choice mit A–D
+    if (sitzung.modus === 'mc' && !sitzung.aufgedeckt && /^[a-dA-D]$/.test(e.key)) {
+      e.preventDefault();
+      mcWaehlen(MC_BUCHSTABEN.indexOf(e.key.toUpperCase()));
+      return;
+    }
+    // Nach automatischer Auswertung übernimmt die Eingabetaste den Vorschlag
+    if (e.key === 'Enter' && sitzung.aufgedeckt && sitzung.urteil) {
+      const v = urteilVorschlag(sitzung.urteil.art);
+      if (v) { e.preventDefault(); bewerten(v); return; }
+    }
     if (e.key === 'Escape') { e.preventDefault(); sitzungBeenden(false); return; }
   }
   if (e.key === 'Escape' && S.seite !== 'lernen') seiteZeigen('lernen');
 });
 
-/* Beim Verlassen der Seite laufende Sitzung sauber beenden (Daten sind
-   ohnehin nach jeder Bewertung geschrieben). */
-window.addEventListener('pagehide', () => { if (sitzung) sitzung.aktiv = false; });
+/* Beim Verlassen der Seite nur die Sprachausgabe stoppen. Die Sitzung wird
+   bewusst NICHT beendet: Bewertungen sind ohnehin einzeln geschrieben, und
+   ein „aktiv = false“ hätte zwei unangenehme Folgen — die Karte reagierte
+   nach der Rückkehr auf keine Taste mehr, und die Schutzabfrage in
+   alleSeitenMalen() griffe nicht mehr, sodass die nächste
+   Firestore-Aktualisierung mitten in der Sitzung den Startbildschirm
+   darüberzeichnet. */
+window.addEventListener('pagehide', sprechenStoppen);
+
+/* Nach einer Unterbrechung — Anruf, Bildschirmsperre, App-Wechsel — zählt
+   die Zeit auf der aktuellen Karte neu. Sonst flössen zwölf Minuten
+   Telefonat als Lernzeit in die Tagesstatistik und füllten den Zielring. */
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && sitzung?.aktiv) sitzung.kartenStart = Date.now();
+  if (document.visibilityState === 'hidden') sprechenStoppen();
+});
 
 /* ---------- 17. Los ----------------------------------------------------- */
 
