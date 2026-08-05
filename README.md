@@ -6,13 +6,20 @@ Daten in Firebase Firestore, Anmeldung über Firebase Auth.
 Der Name erinnert an den physischen Karteikasten, der dieser App vorausging.
 Die laufende Programmversion steht auf dem Anmeldebildschirm, unten in der
 Seitenleiste und in der Diagnose — bei Rückfragen ist sie die erste Angabe,
-die weiterhilft. Dieser Stand ist **Version 5.0**.
+die weiterhilft. Dieser Stand ist **Version 6.1**.
 
 Stufe 1 legte das Fundament: Anmeldung, Datenmodell, Security Rules,
 Offline-Betrieb, Import des Altbestands — funktionsgleich zur
 Vorgängerversion.
 
-Stufe 5 (dieser Stand) bringt die **KI-Sprachausgabe** über Google Chirp 3 HD
+Stufe 6 (dieser Stand) schließt die andere Hälfte des Lernens: die
+**Lernbox**. Bis Stufe 5 konnte HAN CROCO nur den *Erhalt* — FSRS bestimmt
+den richtigen Zeitpunkt. Der *Erwerb* fehlte: Eine Karte, die man nicht
+wusste, wurde bloß neu terminiert und kam in derselben Sitzung nie wieder.
+Die Lernbox ist der Stapel, den man früher zur Seite gelegt hat. Siehe
+„Lernbox" weiter unten.
+
+Stufe 5 brachte die **KI-Sprachausgabe** über Google Chirp 3 HD
 mit vorproduzierten Aufnahmen, einen **Karteneditor im Anki-Stil** mit
 Auszeichnung, den Zusatzfeldern *Extra* und *Merker*, Schlagwörtern und
 Vorschau — und damit erstmals eine Positivliste für Markup statt „alles wird
@@ -663,6 +670,132 @@ kennt, kann sie abspielen und damit den Kartentext hören.
 
 ---
 
+## Lernbox
+
+Die App hat zwei Bereiche, und sie tun Verschiedenes:
+
+| | **Karteikasten** | **Lernbox** |
+|---|---|---|
+| Frage | Sitzt es noch? | Wie kommt es rein? |
+| Rhythmus | schnell, viele Karten | langsam, wenige Karten |
+| Ergebnis | ein neuer Termin | eine Karte, die sitzt |
+
+Bis Stufe 5 gab es nur den Karteikasten. Eine Karte, die man nicht wusste,
+bekam einen neuen Termin und kam in derselben Sitzung **kein einziges Mal**
+wieder — sie wurde genau so oft abgefragt wie eine, die im Schlaf saß.
+
+Das ist nicht bloß eine verpasste Gelegenheit. Karpicke und Roediger haben
+genau diese Bedingung gemessen — eine Karte aus dem Verkehr ziehen, sobald
+sie einmal saß — und sie schnitt von allen geprüften Verfahren **am
+schlechtesten** ab:
+
+| Verfahren | Behalten nach einer Woche |
+|---|---|
+| Weiter abfragen, auch was schon saß | **44 %** |
+| Geballt statt verteilt | 36 % |
+| **Nach dem ersten Treffer weglassen** | **21 %** |
+
+### Wie die Lernbox arbeitet
+
+Karten, die nicht saßen, wandern hinein. Dort werden sie **als Stapel**
+durchlaufen: Karte 1, 2, 3, wieder 1, wieder 2 … Erst nach zwei Treffern
+**mit Abstand** geht eine Karte in den Umlauf zurück.
+
+Der Abstand ist der Wirkstoff, nicht die Wiederholung. Eine Karte fünfmal
+hintereinander zu fragen misst nur das Kurzzeitgedächtnis. Deshalb liegen
+zwischen zwei Anläufen derselben Karte immer andere.
+
+Ein Fehlversuch setzt den Zählstand auf **null** zurück, nicht um eins —
+sonst wäre es kein Kriterium.
+
+### Stufenweises Aufdecken
+
+Statt die Antwort auf einen Schlag umzudrehen, gibt es sie in Stufen:
+
+```
+1. Frage.                Du versuchst die Antwort.
+2. Tipp:                 „A__________“ — Wortlängen und erste Buchstaben.
+3. Noch ein Tipp:        das erste Wort vollständig.
+4. Ganze Antwort.
+5. Zudecken.             Jetzt vollständig selbst erzeugen.
+```
+
+Das ist die formalisierte Fassung des Umdrehens am Papierkasten: ein, zwei
+Wörter aufschreiben — umdrehen — mehr aufschreiben. Als
+**Cover-Copy-Compare** ist das Verfahren seit Jahrzehnten untersucht.
+
+**Die App verlangt nicht, dass du tippst.** Sie stellt die Stufen bereit und
+führt Buch über das Kriterium — ob du dabei zur Tastatur greifst, auf einen
+Zettel schreibst oder es dir vorsagst, bleibt dir überlassen. Wer die
+automatische Auswertung möchte, schaltet in den Einstellungen
+*„Antwort eintippen"* ein; dann gilt dieselbe Tippfehlertoleranz wie im
+Karteikasten.
+
+### Was hineinkommt
+
+- **Karten mit 1 („nicht gewusst") und 2 („schwer gewusst").** Ob die 2
+  mitzählt, ist einstellbar.
+- **Neue Karten, bevor sie terminiert werden.** Ohne das bekommt eine frisch
+  angelegte Karte einen einzigen Blick und danach einen Termin — sie wird
+  terminiert, bevor sie gelernt wurde. Eingeführte Karten zählen auf dasselbe
+  Tagespensum wie im Karteikasten.
+- Über *„Kann ich schon"* geht eine Karte jederzeit ohne Üben in den Umlauf.
+
+Am Ende einer Karteikasten-Sitzung wird die Lernbox angeboten. Der wirksamste
+Zeitpunkt ist gleich im Anschluss: innerhalb derselben Sitzung mit Abstand
+abzurufen ist genau der Teil, der beim bloßen Neuterminieren fehlt.
+
+### Was die Lernbox NICHT anfasst
+
+**Den Terminplan.** FSRS bekommt beim Bewerten die **erste** Bewertung — die
+ehrliche. Wer eine Karte erst im vierten Anlauf kann, hat sie nicht gekonnt;
+würde die Lernbox am Ende „gewusst" melden, hielte der Scheduler sie für
+leichter als sie ist und der Termin rutschte zu weit nach hinten. Die Lernbox
+liegt **über** dem Scheduler.
+
+**Die Abfragezahlen.** Übungsdurchgänge sind keine Abfragen. Sie zählen in
+einem eigenen Feld und erscheinen weder in `anzahl` noch in der
+Bewertungsverteilung — sonst zeigte die Statistik nach einer Übungsrunde
+dreimal so viele „Abfragen" wie tatsächlich terminwirksam stattgefunden
+haben. Die **Zeit** zählt dagegen sehr wohl als Lernzeit und geht in den
+Tagesring ein.
+
+### Einstellungen
+
+Unter **Einstellungen → Lernbox**: an/aus, Treffer bis zum Umlauf (1–5),
+Karten dazwischen (0–10), Auslöser (nur 1 / auch 2), neue Karten einführen,
+Antwort eintippen.
+
+Eine Übungsrunde umfasst höchstens zwölf Karten. Was darüber liegt, bleibt
+für die nächste Runde liegen — am besten an einem anderen Tag, das ist der
+wirksamere Abstand.
+
+**Der Deckel.** Es liegen höchstens 30 Karten gleichzeitig in der Lernbox.
+Ist sie voll, wandert nichts mehr hinein — die Karten werden dann ganz normal
+neu terminiert, gehen also nicht verloren. Gemessen wächst die Box sonst ab
+etwa 30 bewerteten Karten je Sitzung um rund vier Karten am Tag, und eine
+Box, die nie leer wird, hilft niemandem.
+
+**Ein angefangener Stand gilt nur für den laufenden Tag.** Ein Treffer von
+vorgestern ist kein Treffer „mit Abstand", sondern einer aus einer anderen
+Sitzung. Am nächsten Tag beginnt die Karte deshalb wieder bei null.
+
+**Erwartete Nebenwirkung:** Es fühlt sich zäher an als vorher — gemessen
+knapp doppelt so viele Tippvorgänge je Sitzung. Das ist der Zweck. Wer nur
+schnell durch den Stapel will, schaltet die Lernbox ab oder stellt das
+Kriterium auf einen Treffer.
+
+**Am Telefon:** Die Urteilsknöpfe sitzen fest am unteren Rand, im
+Daumenbereich. Ein zweiter Tipp auf dieselbe Stelle innerhalb von 400 ms wird
+verworfen — beim Doppeltippen landete er sonst auf dem Knopf, der gerade
+nachgerückt ist. Bei offener Bildschirmtastatur weicht die Navigationsleiste,
+damit die Bedienelemente sichtbar bleiben.
+
+**Tastatur am Rechner:** <kbd>Leertaste</kbd> aufdecken, <kbd>T</kbd> Tipp,
+<kbd>J</kbd> konnte ich, <kbd>N</kbd> konnte ich nicht, <kbd>Z</kbd> zudecken.
+
+---
+
 ## Offline
 
 Firestore legt eine vollständige Kopie im Browser ab
@@ -694,6 +827,7 @@ users/{uid}
   │                            sprache, spracheAntwort,
   │                            pruefungsdatum, createdAt, archiviert }
   ├─ cards/{cardId}          { deckId, frage, antwort, notiz, tags[], typ,
+  │                            uebung, uebungFertig,             ← Stufe 6
   │                            extra, mark, format,              ← Stufe 5
   │                            lautschrift, lautschriftAntwort,  ← Stufe 5
   │                            quelleId, variante,
@@ -703,7 +837,8 @@ users/{uid}
   │                            createdAt }
   └─ reviews/{YYYY-MM-DD}    { datum, anzahl, neu, sekunden,
                                bewertungen{1..4}, proDeck{deckId:anzahl},
-                               sekundenProDeck{deckId:sekunden} }
+                               sekundenProDeck{deckId:sekunden},
+                               uebungen, uebungSekunden }        ← Stufe 6
 
 audioBedarf/{hash}           { text, sprache, stimme, lautschrift, gemeldetAm }
 ```
