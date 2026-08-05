@@ -304,6 +304,12 @@ kbd{
 .abzeichen .ab-text{display:flex;flex-direction:column;line-height:1.25}
 /* Der Fortschritt stand nur im title-Attribut — auf dem Handy also nirgends. */
 .ab-rest{font-size:10.5px;opacity:.75;font-weight:500}
+.mini.warn,.warn{color:var(--bewertung-1)}
+nav button.nav-laeuft{position:relative}
+nav button.nav-laeuft::after{
+  content:'';position:absolute;top:5px;right:9px;width:7px;height:7px;
+  border-radius:50%;background:var(--faellig);
+}
 .ab-fortschritt{font-size:11.5px;color:var(--txt3);margin-top:4px}
 .dash-deckwahl>summary{cursor:pointer;padding:6px 0;color:var(--txt2)}
 .ab-zeile{display:flex;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)}
@@ -319,6 +325,66 @@ kbd{
 .csv-vorschau th{position:sticky;top:0;background:var(--bg2);font-size:11px}
 .csv-vorschau .rolle{color:var(--akzent)}
 .csv-vorschau th.rolle{font-weight:700}
+
+/* ===== Karteneditor (Stufe 5) =========================================== */
+.ed-leiste{position:sticky;top:0;z-index:3;display:flex;flex-wrap:wrap;gap:3px;padding:6px;
+  margin:0 0 10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)}
+.ed-leiste .tr{width:1px;background:var(--border);margin:2px 3px;align-self:stretch}
+.ed-knopf{min-width:30px;height:29px;padding:0 7px;border:1px solid transparent;border-radius:7px;
+  background:none;color:var(--txt2);font:inherit;font-size:13.5px;line-height:1;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center}
+.ed-knopf:hover{background:var(--bg3);color:var(--txt)}
+.ed-knopf:disabled{opacity:.35;cursor:default;background:none}
+.ed-knopf.an{background:var(--akzent-bg);color:var(--akzent);border-color:var(--akzent)}
+.ed-knopf b,.ed-knopf i,.ed-knopf u,.ed-knopf s{font-size:14px}
+.ed-farbe{width:15px;height:15px;border-radius:4px;border:1px solid var(--border2);display:inline-block}
+.ed-kopf{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 3px}
+.ed-kopf span{font-size:12.5px;font-weight:600;color:var(--txt2)}
+.ed-kopf .ed-knopf{height:22px;min-width:24px;font-size:11px;font-family:ui-monospace,monospace}
+.ed-feld{min-height:62px;max-height:210px;overflow-y:auto;padding:9px 11px;border:1px solid var(--border);
+  border-radius:var(--radius);background:var(--bg);color:var(--txt);font:inherit;line-height:1.5;
+  white-space:pre-wrap;word-break:break-word}
+.ed-feld:focus{outline:none;border-color:var(--akzent);box-shadow:0 0 0 3px var(--akzent-bg)}
+.ed-feld:empty::before{content:attr(data-leer);color:var(--txt3);pointer-events:none}
+.ed-feld ul,.ed-feld ol{margin:4px 0;padding-left:22px}
+.ed-feld hr{border:0;border-top:1px solid var(--border2);margin:8px 0}
+.ed-feld.quelle{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;
+  white-space:pre-wrap;background:var(--bg2)}
+.ed-block{margin:0 0 12px}
+.ed-tags{display:flex;flex-wrap:wrap;gap:5px;align-items:center;padding:6px;border:1px solid var(--border);
+  border-radius:var(--radius);background:var(--bg);min-height:40px}
+.ed-tags input{border:none;background:none;flex:1;min-width:110px;padding:3px 4px;color:var(--txt);font:inherit}
+.ed-tags input:focus{outline:none}
+.ed-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 4px 3px 9px;border-radius:20px;
+  background:var(--akzent-bg);color:var(--akzent);font-size:12.5px;font-weight:600}
+.ed-tag button{border:none;background:none;color:inherit;cursor:pointer;font-size:15px;line-height:1;
+  padding:0 3px;opacity:.65}
+.ed-tag button:hover{opacity:1}
+.ed-vorschau{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.ed-vorschau .vs-seite{padding:14px 16px}
+.ed-vorschau .vs-seite+.vs-seite{border-top:1px solid var(--border)}
+.ed-vorschau .vs-marke{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--txt3);
+  font-weight:700;margin-bottom:7px}
+.ed-vorschau .vs-text{font-size:18px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+.ed-vorschau .vs-extra{margin-top:10px;padding-top:9px;border-top:1px dashed var(--border2);
+  font-size:14px;color:var(--txt2);white-space:pre-wrap}
+.ed-vorschau .vs-mark{display:inline-block;margin-bottom:8px;padding:2px 9px;border-radius:20px;
+  background:var(--bewertung-2-bg);color:var(--bewertung-2);font-size:12px;font-weight:700}
+.ed-umschalt{display:flex;gap:4px;margin:0 0 10px;padding:3px;background:var(--bg2);
+  border:1px solid var(--border);border-radius:var(--radius)}
+.ed-umschalt button{flex:1;padding:6px 10px;border:none;border-radius:8px;background:none;color:var(--txt2);
+  font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
+.ed-umschalt button.an{background:var(--bg);color:var(--txt);box-shadow:var(--schatten)}
+.ed-mehr>summary{cursor:pointer;font-size:12.5px;color:var(--txt2);padding:5px 0;user-select:none}
+.ed-mehr>summary:hover{color:var(--txt)}
+.ed-ipa{font-family:'Doulos SIL','Charis SIL','Gentium Plus',serif}
+.flip-mark{display:inline-block;margin-bottom:8px;padding:2px 9px;border-radius:20px;
+  background:var(--bewertung-2-bg);color:var(--bewertung-2);font-size:12px;font-weight:700}
+.flip-extra{margin-top:12px;padding-top:10px;border-top:1px dashed var(--border2);
+  font-size:14.5px;color:var(--txt2);line-height:1.5;white-space:pre-wrap;text-align:left}
+.flip-text b,.flip-text strong{font-weight:700}
+.flip-text ul,.flip-text ol{margin:6px 0;padding-left:24px;text-align:left;display:inline-block}
+.flip-text hr{border:0;border-top:1px solid var(--border2);margin:10px 0}
 
 /* ===== Statistik ======================================================== */
 .kennzahlen{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
@@ -519,7 +585,7 @@ pre.code{
 /* Programmversion. Bei jeder ausgelieferten Änderung hochzählen — sie steht
    in der Seitenleiste, auf dem Anmeldebildschirm und in der Diagnose, damit
    sich Rückfragen einem Stand zuordnen lassen. */
-const VERSION = '4.2';
+const VERSION = '5.0';
 
 const $  = (s, w = document) => w.querySelector(s);
 const $$ = (s, w = document) => Array.from(w.querySelectorAll(s));
@@ -682,6 +748,11 @@ const STANDARD_EINSTELLUNGEN = () => ({
   abzeichenGesehen: [],   // schon gefeierte Abzeichen
   theme: 'auto',
   modi: ['aufdecken'],    // Stufe 3
+  // Stufe 5 — Sprachausgabe
+  kiStimme: true,         // vorproduzierte Aufnahmen bevorzugen
+  stimmen: {},            // Sprache -> Chirp-3-Stimme, z. B. { 'en-GB': 'Charon' }
+  sprachTempo: 0.95,      // 0,5–1,5
+  bedarfMelden: true,     // fehlende Aufnahmen in die gemeinsame Liste eintragen
   streak: 0,
   lastLearnDate: null,
   lastSeen: null
@@ -857,7 +928,13 @@ function modal(opt) {
          dürfen nicht auf Enter losschreiben: Wer den Kastennamen tippt und
          gewohnheitsmäßig Enter drückt, hätte den Import ausgelöst, ohne
          Vorschau und Bilanz je angesehen zu haben. */
-      if (e.key === 'Enter' && !e.shiftKey && e.target.tagName !== 'TEXTAREA' && !opt.ohneEnter) {
+      /* `data-enter-eigen` nimmt ein Feld von der Enter-Regel aus. Nötig für
+         die Schlagwort-Eingabe (Stufe 5): Dieser Handler hängt mit `capture`
+         am Dokument und läuft damit VOR dem Handler des Feldes — ein
+         stopPropagation() dort käme zu spät. Ohne die Ausnahme legt Enter
+         kein Schlagwort an, sondern speichert die Karte. */
+      if (e.key === 'Enter' && !e.shiftKey && e.target.tagName !== 'TEXTAREA'
+          && !e.target.closest?.('[data-enter-eigen]') && !opt.ohneEnter) {
         const prim = opt.knoepfe?.findIndex(k => k.art === 'primary');
         if (prim >= 0) {
           e.preventDefault();
@@ -1172,13 +1249,30 @@ function neuesDeck(name, farbe) {
 }
 const DECK_FARBEN = ['#378add', '#639922', '#ef9f27', '#e24b4a', '#8e6bd6', '#1B9AAA', '#d6538e', '#5b7083'];
 
-function neueKarte({ deckId, frage, antwort, notiz, typ, quelleId, variante }) {
+function neueKarte({ deckId, frage, antwort, notiz, extra, mark, lautschrift,
+                    lautschriftAntwort, format, tags, typ, quelleId, variante }) {
   return {
     deckId,
     frage: String(frage || '').trim(),
     antwort: String(antwort || '').trim(),
     notiz: String(notiz || '').trim(),
-    tags: [],
+    // Stufe 5, nach dem Vorbild der Anki-Notizfelder:
+    // „Extra“ erscheint zusammen mit der Antwort, „Mark“ ist ein Merker, der
+    // auf beiden Seiten oben steht.
+    extra: String(extra || '').trim(),
+    mark: String(mark || '').trim(),
+    // Lautschrift (IPA) je Seite. Wird an Chirp 3 HD durchgereicht und
+    // erzwingt dort die Aussprache — bei Vokabeln der eigentliche Zweck der
+    // ganzen Sprachausgabe.
+    lautschrift: String(lautschrift || '').trim(),
+    lautschriftAntwort: String(lautschriftAntwort || '').trim(),
+    // 'text' = die Felder sind Klartext und werden beim Anzeigen escaped
+    // (alles vor Stufe 5). 'html' = die Felder enthalten ausgezeichneten Text
+    // und laufen beim Anzeigen durch htmlSauber(). Ein Bestandsfeld ohne
+    // Kennzeichnung bleibt Klartext — sonst würde eine alte Karte mit „a < b“
+    // beim ersten Anzeigen zerbrechen.
+    format: format === 'html' ? 'html' : 'text',
+    tags: Array.isArray(tags) ? tags.slice(0, 30).map(t => String(t).slice(0, 40)) : [],
     typ: KARTEN_TYPEN.includes(typ) ? typ : 'standard',   // standard | cloze
     // Stufe 3: Eine Quellkarte kann mehrere eigenständig terminierte
     // Abfragen erzeugen (Cloze-Lücken, Rückwärtsrichtung). Die Quellkarte
@@ -1295,6 +1389,13 @@ function spracheFuer(k, seite) {
   const zeigtAntwortFeld = (seite === 'frage') === (varianteVon(k) === 'r');
   return zeigtAntwortFeld ? deckSpracheAntwort(k.deckId) : deckSprache(k.deckId);
 }
+/** Lautschrift der gerade gezeigten Seite — nach derselben Regel wie die
+ *  Sprache, denn sie hängt am selben Feld. */
+function lautschriftFuer(k, seite) {
+  if (!k || istClozeVariante(k)) return '';
+  const zeigtAntwortFeld = (seite === 'frage') === (varianteVon(k) === 'r');
+  return String((zeigtAntwortFeld ? k.lautschriftAntwort : k.lautschrift) || '').trim();
+}
 
 /* --- Cloze: {{c1::Lösung}} oder {{c1::Lösung::Hinweis}} ------------------ */
 
@@ -1384,12 +1485,20 @@ const TERMIN_FELDER = ['due', 'stability', 'difficulty', 'reps', 'lapses', 'stat
 /** Weicht der gespiegelte Inhalt ab? Nur dann muss geschrieben werden —
  *  sonst würde jeder Abgleich Dokumente anfassen, obwohl alles stimmt, und
  *  die Diagnose meldete dauerhaft Handlungsbedarf. */
+/* Jedes neue Inhaltsfeld gehört in BEIDE Listen: hierher und in das
+   inhalt-Objekt in variantenPlan(). Fehlt es hier, driftet die Rückwärts-
+   kopie unbemerkt ab; fehlt es dort, wird bei jedem Abgleich geschrieben,
+   obwohl alles stimmt. */
+const INHALT_FELDER = ['deckId', 'frage', 'antwort', 'notiz', 'extra', 'mark',
+  'lautschrift', 'lautschriftAntwort'];
+
 function inhaltAbweicht(k, inhalt) {
-  return String(k.deckId ?? '')  !== String(inhalt.deckId ?? '')
-      || String(k.frage ?? '')   !== String(inhalt.frage ?? '')
-      || String(k.antwort ?? '') !== String(inhalt.antwort ?? '')
-      || String(k.notiz ?? '')   !== String(inhalt.notiz ?? '')
-      || String(k.typ ?? 'standard') !== String(inhalt.typ ?? 'standard')
+  return INHALT_FELDER.some(f => String(k[f] ?? '') !== String(inhalt[f] ?? ''))
+      // typ und format haben eine Vorgabe — ein Altbestand ohne das Feld
+      // gilt als 'standard' bzw. 'text' und darf keinen Schreibvorgang
+      // auslösen, nur weil das Feld fehlt.
+      || String(k.typ ?? 'standard')  !== String(inhalt.typ ?? 'standard')
+      || String(k.format ?? 'text')   !== String(inhalt.format ?? 'text')
       || !!k.suspendiert !== !!inhalt.suspendiert
       || JSON.stringify(Array.isArray(k.tags) ? k.tags : []) !== JSON.stringify(inhalt.tags || []);
 }
@@ -1436,6 +1545,9 @@ function variantenPlan(quelle, deck, index) {
   const inhalt = {
     deckId: quelle.deckId,
     frage: quelle.frage, antwort: quelle.antwort, notiz: quelle.notiz || '',
+    extra: quelle.extra || '', mark: quelle.mark || '',
+    lautschrift: quelle.lautschrift || '', lautschriftAntwort: quelle.lautschriftAntwort || '',
+    format: quelle.format === 'html' ? 'html' : 'text',
     typ: KARTEN_TYPEN.includes(quelle.typ) ? quelle.typ : 'standard',
     tags: Array.isArray(quelle.tags) ? quelle.tags : [],
     // Ruhen gilt für die ganze Karte: abgeleitete Abfragen lassen sich in der
@@ -1566,7 +1678,204 @@ function mitVarianten(ids) {
   return Array.from(out);
 }
 
+/* --- Ausgezeichneter Text (Stufe 5) -------------------------------------- */
+
+/* Bis Stufe 4 lief jeder Kartentext durch esc(). Das war die einzige
+   Absicherung gegen fremdes Markup und hat vier Prüfrunden gehalten. Mit dem
+   Editor im Anki-Stil dürfen Karten jetzt Auszeichnung enthalten — damit
+   verschiebt sich die Verantwortung von „alles escapen“ auf „nur eine
+   Positivliste durchlassen“.
+
+   Die Liste ist bewusst kurz und enthält nichts, was Inhalte nachladen oder
+   Code ausführen könnte: kein <script>, <style>, <iframe>, <object>, <embed>,
+   <link>, <img>, kein href, kein src, keine on*-Attribute, keine
+   style-Eigenschaft, die eine URL aufnehmen kann.
+
+   Verfahren: Der Text wird in ein *inertes* Dokument geparst (DOMParser mit
+   'text/html' führt nichts aus und lädt nichts nach), dann wird der Baum
+   durchlaufen. Alles, was nicht auf der Liste steht, verliert sein Element,
+   behält aber seinen Textinhalt — so geht beim Einfügen aus Word oder Anki
+   kein Inhalt verloren, nur die Formatierung. */
+
+const HTML_ERLAUBT = {
+  B: [], STRONG: [], I: [], EM: [], U: [], S: [], STRIKE: [], DEL: [],
+  SUB: [], SUP: [], MARK: [], CODE: [],
+  BR: [], HR: [], P: [], DIV: [], UL: [], OL: [], LI: [],
+  SPAN: ['style'], FONT: ['color']
+};
+/* Nur Eigenschaften, die reine Darstellung sind. url() und alles mit
+   Klammern fliegt unten ohnehin raus. */
+const CSS_ERLAUBT = ['color', 'background-color', 'font-weight', 'font-style',
+  'text-decoration', 'text-decoration-line'];
+
+/** Ein einzelner style-Wert, auf die Positivliste eingedampft. */
+function styleSauber(roh) {
+  const raus = [];
+  String(roh || '').split(';').forEach(teil => {
+    const p = teil.indexOf(':');
+    if (p < 0) return;
+    const name = teil.slice(0, p).trim().toLowerCase();
+    const wert = teil.slice(p + 1).trim();
+    if (!CSS_ERLAUBT.includes(name)) return;
+    // Klammern schließen url(), expression() und var() gemeinsam aus. Kein
+    // erlaubter Wert braucht sie — Farben stehen als #rgb, rgb(...) wäre
+    // zwar harmlos, ist aber den Sonderfall nicht wert.
+    if (/[(){}<>\\"']|url|expression|image-set/i.test(wert)) return;
+    if (wert.length > 60) return;
+    raus.push(name + ':' + wert);
+  });
+  return raus.join(';');
+}
+
+/** Ausgezeichneten Text auf die Positivliste eindampfen. Liefert HTML. */
+function htmlSauber(roh) {
+  const text = String(roh ?? '');
+  if (!text) return '';
+  if (typeof DOMParser === 'undefined') return esc(text);   // Node-Testlauf
+  /* Geparst wird in ein <template>. Zwei frühere Fassungen sind daran
+     gescheitert:
+
+     1. '<div id="w">' + text + '</div>': Ein '</div>' im Text schloss die
+        Umhüllung vorzeitig, alles danach wurde Geschwister und fiel beim
+        Zurückgeben weg. Eine Karte über HTML verlor also stillschweigend
+        ihre halbe Antwort.
+     2. doc.body nach DOMParser: Ein '<frameset>' am Feldanfang lässt den
+        Parser überhaupt keinen <body> anlegen — das ganze Feld fiel dann
+        auf esc() zurück und verlor seine Auszeichnung.
+
+     <template> kennt beide Fallen nicht: Es hat einen eigenen
+     Einfügemodus, in dem ein herrenloses '</div>' folgenlos bleibt und ein
+     '<frameset>' schlicht überlesen wird. Und sein Inhalt ist inert —
+     Bilder laden nicht, Skripte laufen nicht, auch nicht während des
+     Säuberns. */
+  let wurzel;
+  try {
+    const vorlage = document.createElement('template');
+    vorlage.innerHTML = text;
+    wurzel = vorlage.content;
+  } catch (_) { return esc(text); }
+  if (!wurzel) return esc(text);
+  const doc = document;
+
+  (function saeubern(knoten) {
+    Array.from(knoten.childNodes).forEach(kind => {
+      if (kind.nodeType === 3) return;                       // Text bleibt
+      if (kind.nodeType !== 1) { kind.remove(); return; }     // Kommentare weg
+      const tag = kind.tagName;
+      if (!Object.prototype.hasOwnProperty.call(HTML_ERLAUBT, tag)) {
+        // Element auflösen, Inhalt behalten. Bei <script>/<style> wäre der
+        // „Inhalt“ der Programmtext selbst — der muss mit weg.
+        if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'TEMPLATE') { kind.remove(); return; }
+        saeubern(kind);
+        const halter = doc.createDocumentFragment();
+        while (kind.firstChild) halter.appendChild(kind.firstChild);
+        kind.replaceWith(halter);
+        return;
+      }
+      const erlaubt = HTML_ERLAUBT[tag];
+      Array.from(kind.attributes).forEach(a => {
+        const name = a.name.toLowerCase();
+        if (!erlaubt.includes(name)) { kind.removeAttribute(a.name); return; }
+        if (name === 'style') {
+          const s = styleSauber(a.value);
+          if (s) kind.setAttribute('style', s); else kind.removeAttribute('style');
+        } else if (name === 'color') {
+          if (!/^#[0-9a-f]{3,8}$/i.test(a.value.trim())) kind.removeAttribute('color');
+        }
+      });
+      saeubern(kind);
+    });
+  })(wurzel);
+
+  /* Ein DocumentFragment hat kein innerHTML. Der Umweg über ein frisches
+     <template> serialisiert den gesäuberten Baum, ohne ihn erneut zu
+     parsen — es wird angehängt, nicht neu interpretiert. */
+  const halter = document.createElement('template');
+  halter.content.appendChild(wurzel);
+  return halter.innerHTML;
+}
+
+/** Klartext aus ausgezeichnetem Text — für Sprachausgabe, Tippen, Multiple
+ *  Choice, Suche und CSV-Export. Blockenden werden zu Zeilenumbrüchen, damit
+ *  aus zwei Absätzen nicht ein zusammengeklebtes Wort wird. */
+/* Blockelemente, die einen Zeilenwechsel bedeuten. */
+const HTML_BLOCK = new Set(['P', 'DIV', 'LI', 'UL', 'OL', 'HR', 'BLOCKQUOTE',
+  'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'TR', 'TABLE', 'PRE']);
+
+/* Nur Leerraum am ZEILENENDE fällt weg. Die erste Fassung strich zusätzlich
+   die Einrückung am Zeilenanfang und dampfte Leerzeilen ein — damit sah
+   derselbe Text je nachdem, ob irgendwo ein „&“ oder ein <b> vorkam,
+   verschieden aus (ohne Sonderzeichen steigt htmlZuText vorher aus). Das
+   traf CSV-Export, Tippen-Vergleich und Sprachausgabe. */
+const textAufraeumen = t => String(t)
+  .replace(/\u00a0/g, ' ')
+  .replace(/[ \t]+\n/g, '\n')
+  .trim();
+
+function htmlZuText(roh) {
+  const text = String(roh ?? '');
+  if (!text) return '';
+  if (!/[<&]/.test(text)) return text;
+  if (typeof DOMParser === 'undefined') {
+    // Node-Testlauf: derselbe Gedanke, nur gröber. Öffnende UND schließende
+    // Blockmarken werden zum Umbruch — sonst klebt der Text vor dem ersten
+    // <div> am Inhalt des <div> fest (Begründung unten).
+    return textAufraeumen(text
+      .replace(/<\/?(?:p|div|li|ul|ol|tr|table|pre|blockquote|h[1-6])\b[^>]*>/gi, '\n')
+      .replace(/<(?:br|hr)\b[^>]*>/gi, '\n')
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&'));
+  }
+  // Aus demselben Grund wie in htmlSauber über ein <template>, siehe dort.
+  let w;
+  try {
+    const vorlage = document.createElement('template');
+    vorlage.innerHTML = text;
+    w = vorlage.content;
+  } catch (_) { return text; }
+  if (!w) return text;
+
+  /* Der Umbruch gehört VOR das Blockelement, nicht nur dahinter.
+     Ein contenteditable erzeugt beim Drücken von Enter die Form
+        Zeile1<div>Zeile2</div><div>Zeile3</div>
+     — die erste Zeile steht also nackt davor. Wer nur hinter jedem <div>
+     umbricht, bekommt „Zeile1Zeile2\nZeile3“: Die ersten beiden Zeilen sind
+     zu einem Wort verschmolzen. Aufgefallen ist das an der
+     Aufzählungserkennung (vier Punkte wurden als drei gezählt); getroffen
+     hätte es genauso die Auswertung beim Tippen und den vorgelesenen Text. */
+  let raus = '';
+  (function gehen(knoten) {
+    Array.from(knoten.childNodes).forEach(kind => {
+      if (kind.nodeType === 3) { raus += kind.nodeValue; return; }
+      if (kind.nodeType !== 1) return;
+      if (kind.tagName === 'BR') { raus += '\n'; return; }
+      const block = HTML_BLOCK.has(kind.tagName);
+      if (block && raus && !raus.endsWith('\n')) raus += '\n';
+      gehen(kind);
+      if (block && raus && !raus.endsWith('\n')) raus += '\n';
+    });
+  })(w);
+  return textAufraeumen(raus);
+}
+
+/** Ist das Feld dieser Karte ausgezeichneter Text? */
+const istHtmlKarte = k => k?.format === 'html';
+/** Ein einzelnes Kartenfeld anzeigefertig machen. */
+function feldHtml(k, roh) {
+  return istHtmlKarte(k) ? htmlSauber(roh) : esc(String(roh ?? ''));
+}
+/** Ein einzelnes Kartenfeld als Klartext. */
+function feldText(k, roh) {
+  return istHtmlKarte(k) ? htmlZuText(roh) : String(roh ?? '');
+}
+
 /* --- Inhalt einer Abfrage ------------------------------------------------ */
+
+/* Welches gespeicherte Feld steht bei dieser Abfrage vorn bzw. hinten?
+   Bei der Rückwärtsvariante sind die beiden Seiten vertauscht. */
+const frageRoh   = k => varianteVon(k) === 'r' ? String(k.antwort || '') : String(k.frage || '');
+const antwortRoh = k => varianteVon(k) === 'r' ? String(k.frage || '')   : String(k.antwort || '');
 
 /** Klartext der Frageseite — auch für die Sprachausgabe. */
 function frageText(k) {
@@ -1575,15 +1884,22 @@ function frageText(k) {
     return String(k.frage || '').replace(clozeRegex(),
       (_, nr, loesung, hinweis) => Number(nr) === ziel ? (hinweis || '…') : loesung);
   }
-  return varianteVon(k) === 'r' ? String(k.antwort || '') : String(k.frage || '');
+  return feldText(k, frageRoh(k));
 }
 /** Klartext der erwarteten Antwort — für Tippen, Multiple Choice, Vorlesen. */
 function antwortText(k) {
   if (istClozeVariante(k)) return clozeLoesung(k.frage, clozeNrVon(k));
-  return varianteVon(k) === 'r' ? String(k.frage || '') : String(k.antwort || '');
+  return feldText(k, antwortRoh(k));
 }
-function frageHtml(k)   { return istClozeVariante(k) ? clozeHtml(k.frage, clozeNrVon(k), false) : esc(frageText(k)); }
-function antwortHtml(k) { return istClozeVariante(k) ? clozeHtml(k.frage, clozeNrVon(k), true)  : esc(antwortText(k)); }
+/* Lückentexte bleiben bewusst Klartext (siehe Editor): Ein {{c1::…}} darf
+   nicht von einem <b> zerschnitten werden, sonst findet die Regex die Lücke
+   nicht mehr und die Lösung stünde offen in der Abfrage. */
+function frageHtml(k)   { return istClozeVariante(k) ? clozeHtml(k.frage, clozeNrVon(k), false) : feldHtml(k, frageRoh(k)); }
+function antwortHtml(k) { return istClozeVariante(k) ? clozeHtml(k.frage, clozeNrVon(k), true)  : feldHtml(k, antwortRoh(k)); }
+/** Zusatzfeld „Extra“ — steht bei der Antwort. */
+function extraHtml(k)   { return k?.extra ? feldHtml(k, k.extra) : ''; }
+/** Merker „Mark“ — steht auf beiden Seiten im Kartenkopf. */
+function markHtml(k)    { return k?.mark ? feldHtml(k, k.mark) : ''; }
 function variantenMarke(k) {
   if (istClozeVariante(k)) return 'Lücke ' + clozeNrVon(k);
   return varianteVon(k) === 'r' ? 'rückwärts' : '';
@@ -1713,21 +2029,306 @@ function modusFuer(k) {
 
 /* --- Sprachausgabe ------------------------------------------------------- */
 
+/* Zwei Wege, in dieser Reihenfolge:
+ *
+ *  1. Vorproduzierte Dateien (Stufe 5). Ein Skript auf dem eigenen Rechner
+ *     erzeugt sie mit Google Chirp 3 HD und legt sie unter audio/ ins
+ *     Repository. Die App spielt nur ab — kein Schlüssel im Browser, keine
+ *     laufenden Kosten, funktioniert offline.
+ *  2. speechSynthesis des Browsers als Rückfall. Nötig für alles, was noch
+ *     nicht produziert wurde: eine gerade angelegte Karte spricht sonst gar
+ *     nicht, und das wäre schlechter als eine mittelmäßige Stimme.
+ *
+ * Der Dateiname ist ein Hash über Sprache, Stimme und Text — nicht über die
+ * Karten-ID. Damit teilen sich alle drei Konten dieselbe Datei, sobald sie
+ * dieselbe Vokabel haben, und eine umbenannte oder verschobene Karte behält
+ * ihre Aufnahme. */
+
 const sprachAusgabeDa = () => typeof window !== 'undefined' && 'speechSynthesis' in window;
-function sprechen(text, sprache) {
-  const t = String(text ?? '').trim();
-  if (!sprachAusgabeDa() || !t) return false;
+
+/* Die Stimmen von Chirp 3 HD heißen in jeder Sprache gleich; die Sprache
+   steckt allein im Präfix (de-DE-Chirp3-HD-Kore). Deshalb reicht eine Liste
+   für alle Sprachen. */
+const CHIRP_STIMMEN = [
+  ['Achernar', 'w'], ['Aoede', 'w'], ['Autonoe', 'w'], ['Callirrhoe', 'w'],
+  ['Despina', 'w'], ['Erinome', 'w'], ['Gacrux', 'w'], ['Kore', 'w'],
+  ['Laomedeia', 'w'], ['Leda', 'w'], ['Pulcherrima', 'w'], ['Sulafat', 'w'],
+  ['Vindemiatrix', 'w'], ['Zephyr', 'w'],
+  ['Achird', 'm'], ['Algenib', 'm'], ['Algieba', 'm'], ['Alnilam', 'm'],
+  ['Charon', 'm'], ['Enceladus', 'm'], ['Fenrir', 'm'], ['Iapetus', 'm'],
+  ['Orus', 'm'], ['Puck', 'm'], ['Rasalgethi', 'm'], ['Sadachbia', 'm'],
+  ['Sadaltager', 'm'], ['Schedar', 'm'], ['Umbriel', 'm'], ['Zubenelgenubi', 'm']
+];
+const CHIRP_STIMME_VORGABE = 'Kore';
+
+/** Welche Stimme gilt für diese Sprache? Je Sprache einstellbar, damit die
+ *  Frageseite anders klingt als die Antwortseite — im Hörmodus der
+ *  Unterschied zwischen „zwei Sprachen“ und „ein Brei“. */
+function stimmeFuer(sprache) {
+  const gewaehlt = S.einstellungen?.stimmen?.[sprache];
+  return CHIRP_STIMMEN.some(([n]) => n === gewaehlt) ? gewaehlt : CHIRP_STIMME_VORGABE;
+}
+const kiStimmeAn = () => S.einstellungen?.kiStimme !== false;
+function sprachTempo() {
+  const t = Number(S.einstellungen?.sprachTempo);
+  return Number.isFinite(t) && t >= 0.5 && t <= 1.5 ? t : 0.95;
+}
+
+/* Verzeichnis der vorproduzierten Dateien. Ohne diese Liste müsste die App
+   jede Wiedergabe blind versuchen und würde für jede fehlende Aufnahme einen
+   404 erzeugen — bei einem frischen Bestand also bei jeder einzelnen Karte. */
+let audioVerzeichnis = null;          // Set der vorhandenen Schlüssel
+let audioVerzeichnisLauf = null;      // die laufende Zusage, nicht bloß eine Marke
+const audioVerzeichnisGeladen = () => audioVerzeichnis !== null;
+
+/* Gepuffert wird die ZUSAGE, nicht ein Flag. Die erste Fassung setzte
+   `geladen = true` vor dem fetch — ein zweiter Aufruf im Ladefenster bekam
+   damit `null` zurück und stürzte an `verzeichnis.has(...)` ab, noch bevor
+   der Rückfall auf die Browserstimme erreicht war. Getroffen hat das genau
+   die erste Karte jeder Hörsitzung: Autoplay und Umdrehen fallen dort
+   zusammen, und das Manifest ist bei größerem Bestand keine kleine Datei. */
+function audioVerzeichnisLaden() {
+  if (!audioVerzeichnisLauf) audioVerzeichnisLauf = (async () => {
+    try {
+      /* 'default' statt 'no-cache': Das Manifest wächst mit dem Bestand
+         (bei 6.000 Aufnahmen rund 250 KB) und würde sonst in jeder Sitzung
+         neu geladen. Der Stand im Namen sorgt trotzdem für Aktualität,
+         sobald neue Dateien ausgerollt sind. */
+      const a = await fetch('audio/manifest.json', { cache: 'default' });
+      if (!a.ok) throw new Error('HTTP ' + a.status);
+      const j = await a.json();
+      audioVerzeichnis = new Set(Array.isArray(j.dateien) ? j.dateien : []);
+    } catch (_) {
+      // Kein Verzeichnis heißt schlicht: noch nichts produziert. Das ist der
+      // Normalzustand vor dem ersten Lauf des Skripts und kein Fehler.
+      audioVerzeichnis = new Set();
+    }
+    return audioVerzeichnis;
+  })();
+  return audioVerzeichnisLauf;
+}
+
+/** Text so vereinheitlichen, dass Groß-/Kleinschreibung und Leerraum nicht zu
+ *  zwei verschiedenen Aufnahmen desselben Wortes führen. */
+const audioTextNormalisieren = t => String(t ?? '').replace(/\s+/g, ' ').trim();
+
+const audioSchluesselPuffer = new Map();
+/** Dateiname (ohne Endung) für eine Aufnahme. SHA-256 gekürzt auf 40 Zeichen:
+ *  bei einem Bestand in der Größenordnung 10^4 ist eine Kollision damit
+ *  ausgeschlossen, und der Name bleibt handhabbar. */
+async function audioSchluessel(text, sprache, stimme) {
+  const roh = `${sprache}|${stimme}|${audioTextNormalisieren(text)}`;
+  const treffer = audioSchluesselPuffer.get(roh);
+  if (treffer) return treffer;
+  let hex;
+  try {
+    const puffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(roh));
+    hex = Array.from(new Uint8Array(puffer)).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 40);
+  } catch (_) {
+    // Ohne Web-Crypto (etwa auf einer unverschlüsselten Verbindung) bleibt
+    // nur der Rückfall auf die Browserstimme — dafür genügt ein leerer Wert.
+    return null;
+  }
+  audioSchluesselPuffer.set(roh, hex);
+  return hex;
+}
+
+let laufendesAudio = null;
+
+/* Laufende Nummer der Sprachausgabe.
+   `sprechen` ist asynchron: Zwischen dem Aufruf und dem tatsächlichen
+   Abspielen liegen zwei Wartepunkte (Hash-Berechnung und das Verzeichnis).
+   In dieser Zeit kann die Karte längst gewechselt haben. Ohne diese Nummer
+   erklang die Frage der verlassenen Karte, während die nächste auf dem
+   Schirm stand — und zwei Aufnahmen konnten übereinanderliegen, weil
+   `sprechenStoppen()` am Anfang lief, das Abspielen aber erst danach.
+   Jeder Aufruf merkt sich seine Nummer und bricht nach jedem Wartepunkt ab,
+   sobald sie nicht mehr die aktuelle ist. */
+let sprechLauf = 0;
+
+/**
+ * Liest einen Text vor. Bevorzugt die vorproduzierte Aufnahme.
+ * @param {string} text     Was gesprochen wird
+ * @param {string} sprache  BCP-47, z. B. 'en-GB'
+ * @param {{lautschrift?:string}} [opt]  Lautschrift geht in den Schlüssel ein,
+ *        weil sie eine andere Aufnahme ergibt.
+ */
+async function sprechen(text, sprache, opt) {
+  const t = audioTextNormalisieren(text);
+  if (!t) return false;
+  sprechenStoppen();                 // erhöht sprechLauf
+  const meins = sprechLauf;
+  const spr = sprache || 'de-DE';
+
+  if (kiStimmeAn()) {
+    const stimme = stimmeFuer(spr);
+    const lautschrift = String(opt?.lautschrift || '').trim();
+    const schluessel = await audioSchluessel(lautschrift ? t + '\u0001' + lautschrift : t, spr, stimme);
+    if (meins !== sprechLauf) return false;
+    if (schluessel) {
+      // Der Gurt `|| new Set()` bleibt, obwohl audioVerzeichnisLaden jetzt
+      // immer ein Set liefert: Genau an dieser Zeile ist die App vorher
+      // abgestürzt, wenn zwei Aufrufe ins selbe Ladefenster fielen.
+      const verzeichnis = (await audioVerzeichnisLaden()) || new Set();
+      if (meins !== sprechLauf) return false;
+      if (verzeichnis.has(schluessel)) {
+        const a = new Audio('audio/' + schluessel + '.mp3');
+        try {
+          a.playbackRate = sprachTempo();
+          laufendesAudio = a;
+          await a.play();
+          if (meins !== sprechLauf) { try { a.pause(); } catch (_) {} return false; }
+          return true;
+        } catch (e) {
+          // Autoplay verweigert, Datei fehlt oder ist kaputt.
+          console.warn('[Sprachausgabe] Aufnahme nicht abspielbar', e);
+          // Nur den EIGENEN Verweis löschen. Vorher setzte ein scheiternder
+          // Aufruf `laufendesAudio` bedingungslos auf null und nahm damit
+          // einer parallel laufenden, funktionierenden Aufnahme den Griff —
+          // die ließ sich danach nie mehr stoppen.
+          if (laufendesAudio === a) laufendesAudio = null;
+          /* Steht die Datei im Verzeichnis, fehlt aber tatsächlich (nicht
+             ausgerollt, von .gitignore verschluckt), wäre die Karte sonst
+             für immer stumm: Der Meldezweig unten wird ja nie erreicht.
+             Also Eintrag verwerfen und Bedarf nachtragen. Ein verweigertes
+             Autoplay trifft das ebenfalls — dort ist die Nachmeldung
+             folgenlos, weil das Skript vorhandene Dateien überspringt. */
+          verzeichnis.delete(schluessel);
+          audioBedarfMelden(t, spr, stimme, lautschrift);
+          if (meins !== sprechLauf) return false;
+        }
+      } else {
+        audioBedarfMelden(t, spr, stimme, lautschrift);
+      }
+    }
+  }
+  return browserSprechen(t, spr);
+}
+
+/* Die Browserstimme nimmt je Äußerung nur begrenzt Text an; 500 Zeichen sind
+   der übliche sichere Wert. Vorher wurde einfach abgeschnitten — eine lange
+   Antwort brach mitten im Satz ab, ohne dass etwas darauf hinwies. Jetzt
+   wird an Satzgrenzen zerlegt und stückweise in die Warteschlange gelegt. */
+function textHaeppchen(text, grenze = 460) {
+  const raus = [];
+  let rest = String(text).trim();
+  while (rest.length > grenze) {
+    const fenster = rest.slice(0, grenze);
+    let schnitt = Math.max(fenster.lastIndexOf('. '), fenster.lastIndexOf('! '),
+                           fenster.lastIndexOf('? '), fenster.lastIndexOf('\n'));
+    if (schnitt < grenze * 0.4) schnitt = fenster.lastIndexOf(' ');
+    if (schnitt <= 0) schnitt = grenze;
+    raus.push(rest.slice(0, schnitt + 1).trim());
+    rest = rest.slice(schnitt + 1).trim();
+  }
+  if (rest) raus.push(rest);
+  return raus;
+}
+
+function browserSprechen(text, sprache) {
+  if (!sprachAusgabeDa() || !text) return false;
   try {
     window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(t.slice(0, 500));
-    u.lang = sprache || 'de-DE';
-    u.rate = 0.95;
-    window.speechSynthesis.speak(u);
+    textHaeppchen(String(text)).forEach(stueck => {
+      const u = new SpeechSynthesisUtterance(stueck);
+      u.lang = sprache || 'de-DE';
+      u.rate = sprachTempo();
+      window.speechSynthesis.speak(u);
+    });
     return true;
   } catch (e) { console.warn('[Sprachausgabe]', e); return false; }
 }
+
 function sprechenStoppen() {
+  sprechLauf++;                      // entwertet alle laufenden Aufrufe
   try { if (sprachAusgabeDa()) window.speechSynthesis.cancel(); } catch (_) {}
+  try { if (laufendesAudio) { laufendesAudio.pause(); laufendesAudio = null; } } catch (_) {}
+}
+
+/* --- Sammelliste für die Vorproduktion ---------------------------------- */
+
+/* Die Karten der drei Konten liegen getrennt unter users/{uid}/cards, und
+   dort kommt kein Vorproduktions-Skript ohne Weiteres heran. Statt die
+   Kartenbestände zu öffnen, meldet die App nur, WAS gesprochen werden soll:
+   Text, Sprache, Stimme. Aus dieser gemeinsamen Liste erzeugt das Skript die
+   Dateien; über den Inhalts-Hash profitieren danach alle Konten davon.
+
+   Was das bedeutet und was nicht: In die Liste geraten Kartentexte — für die
+   anderen beiden Konten also lesbar. Für Vokabeln und Prüfungsstoff ist das
+   unerheblich, aber es ist eine bewusste Entscheidung und in den
+   Einstellungen abschaltbar (`bedarfMelden`). Lernstand, Termine und
+   Statistik bleiben in jedem Fall privat. */
+
+const colAudioBedarf = () => FB.collection(db, 'audioBedarf');
+
+/* Welche Schlüssel dieses Gerät schon gemeldet hat.
+   Erste Fassung: ein Set je Sitzung. Das hatte zwei Folgen, die beide erst
+   beim Prüfen auffielen.
+
+   Erstens die Schreibmenge. Bei jedem Neustart begann die Liste von vorn,
+   also wurde in JEDER Sitzung für jede noch nicht vertonte Kartenseite
+   erneut geschrieben. Gemessen hat die Sammelliste die Schreibmenge einer
+   Hörsitzung glatt verdoppelt; auf 2.000 Karten und drei Konten kommt man
+   damit über das Tageskontingent des kostenlosen Firebase-Tarifs (20.000
+   Schreibvorgänge, projektweit) — und wenn das erschöpft ist, scheitern
+   auch die echten Kartenschreibungen.
+
+   Zweitens der Regelverstoß. Firestore entscheidet `create` gegen `update`
+   daran, ob das Dokument existiert, nicht daran, welche SDK-Funktion man
+   ruft. Ein zweites `setDoc` auf denselben Schlüssel ist also ein `update`
+   und wird von den Regeln abgelehnt. Funktional harmlos — der Eintrag steht
+   ja schon drin —, aber es waren rund 4.000 abgelehnte Anfragen je Sitzung.
+
+   localStorage ist hier richtig: Die Liste ist reine Buchführung dieses
+   Geräts, sie muss nicht zwischen Geräten stimmen, und ein Verlust kostet
+   nur eine überflüssige Schreibrunde. */
+const BEDARF_SPEICHER = 'lk2:bedarf';
+const bedarfGemeldet = new Set((() => {
+  try { return JSON.parse(localStorage.getItem(BEDARF_SPEICHER) || '[]'); }
+  catch (_) { return []; }
+})());
+let bedarfSichernTimer = null;
+function bedarfJetztSichern() {
+  clearTimeout(bedarfSichernTimer);
+  bedarfSichernTimer = null;
+  try {
+    // Deckel gegen unbegrenztes Wachstum: Die jüngsten 20.000 Einträge
+    // reichen weit über jeden realistischen Bestand hinaus.
+    const liste = Array.from(bedarfGemeldet).slice(-20000);
+    localStorage.setItem(BEDARF_SPEICHER, JSON.stringify(liste));
+  } catch (_) { /* Speicher voll oder gesperrt — dann eben nicht */ }
+}
+function bedarfSichern() {
+  // Gepuffert, weil beim Aufbau einer Sitzung viele Meldungen dicht
+  // aufeinander folgen und jede sonst die ganze Liste neu serialisieren
+  // würde.
+  clearTimeout(bedarfSichernTimer);
+  bedarfSichernTimer = setTimeout(bedarfJetztSichern, 1200);
+}
+
+function audioBedarfMelden(text, sprache, stimme, lautschrift) {
+  if (S.einstellungen?.bedarfMelden === false || !db || !S.uid) return;
+  const t = audioTextNormalisieren(text);
+  if (!t || t.length > 900) return;   // Chirp nimmt mehr, aber Karten nicht
+  audioSchluessel(lautschrift ? t + '' + lautschrift : t, sprache, stimme).then(schluessel => {
+    if (!schluessel || bedarfGemeldet.has(schluessel)) return;
+    bedarfGemeldet.add(schluessel);
+    bedarfSichern();
+    /* Bewusst ohne schreibe(): Ein Fehlschlag darf hier keinen Fehlertoast
+       auslösen. Die Meldung ist eine Nebensache — wenn sie nicht ankommt,
+       spricht die Karte eben weiter mit der Browserstimme. */
+    Promise.resolve(FB.setDoc(FB.doc(colAudioBedarf(), schluessel), {
+      text: t, sprache, stimme,
+      lautschrift: String(lautschrift || '').slice(0, 200),
+      gemeldetAm: heute()
+    })).catch(e => {
+      // Ein abgelehnter Zweitversuch heißt: Der Eintrag ist schon da. Das
+      // ist der Normalfall auf einem zweiten Gerät und kein Grund für eine
+      // Meldung in der Konsole.
+      if (e?.code === 'permission-denied') return;
+      console.warn('[Sprachbedarf]', e?.code || e);
+    });
+  });
 }
 
 /* ---------- 7c. Prüfung, Problemkarten, Karten-Check (Stufe 4) ---------- */
@@ -2218,10 +2819,20 @@ function seiteZeigen(name) {
   // Ein Klick auf die ohnehin offene Seite darf eine laufende Sitzung nicht
   // neu zeichnen — sonst wäre eine halb getippte Antwort weg.
   if (name === S.seite && sitzung?.aktiv) return;
-  if (name !== 'lernen') { sprechenStoppen(); sitzung = null; letzteSitzung = null; }
+  /* Die laufende Sitzung wird beim Seitenwechsel geparkt, nicht verworfen.
+     Vorher war sie beim Tippen auf „Karten“ ersatzlos weg — mitsamt
+     Zwischenstand und Abschlussbildschirm; ein CSV-Import löste das sogar
+     ungefragt aus, weil er am Ende auf die Kartenliste wechselt. */
+  if (name !== 'lernen') { sprechenStoppen(); letzteSitzung = null; }
   S.seite = name;
   SEITEN.forEach(s => { $('#seite-' + s).hidden = (s !== name); });
-  $$('#nav button').forEach(b => b.classList.toggle('aktiv', b.dataset.seite === name));
+  $$('#nav button').forEach(b => {
+    b.classList.toggle('aktiv', b.dataset.seite === name);
+    // Punkt am Lern-Knopf, solange eine Sitzung geparkt ist — sonst wüsste
+    // niemand, dass sie beim Zurückwechseln weiterläuft.
+    if (b.dataset.seite === 'lernen')
+      b.classList.toggle('nav-laeuft', !!(sitzung?.aktiv) && name !== 'lernen');
+  });
   window.scrollTo({ top: 0 });
   seiteMalen(name);
 }
@@ -2231,7 +2842,10 @@ function seiteZeigen(name) {
    Abschlussbildschirm verschwindet, sobald der eigene Schreibvorgang
    zurückkommt. */
 function alleSeitenMalen() {
-  if (sitzung?.aktiv || letzteSitzung) return;
+  // Nur die Lernseite selbst darf während einer Sitzung nicht neu gezeichnet
+  // werden. Ist die Sitzung geparkt, müssen die übrigen Seiten weiter auf
+  // Änderungen von anderen Geräten reagieren.
+  if ((sitzung?.aktiv || letzteSitzung) && S.seite === 'lernen') return;
   // Nicht mitten in eine Eingabe hineinzeichnen — sonst verliert das Suchfeld
   // den Fokus, sobald eine Aktualisierung von Firestore eintrifft.
   const f = document.activeElement;
@@ -2359,7 +2973,8 @@ function malLernen() {
           : 'in ' + lage.tage + (lage.tage === 1 ? ' Tag' : ' Tagen')}</strong>
         (${datumDeutsch(lage.datum)}). ${lage.offen} ${lage.offen === 1 ? 'Karte' : 'Karten'}
         stehen an, das sind voraussichtlich <strong>${lage.abfragen} Abfragen</strong> bis dahin —
-        rund <strong>${lage.proTag} pro Tag</strong> oder ${lage.minutenNoetig === 1
+        rund <strong>${lage.proTag} pro Tag</strong> oder ${lage.minutenNoetig < 1
+          ? 'weniger als eine Minute' : lage.minutenNoetig === 1
           ? 'eine Minute' : lage.minutenNoetig + ' Minuten'}:
         <span style="color:${farbe};font-weight:700">${wort}</span>.
         ${lage.ruhend ? `<br><span class="mini">${lage.ruhend} ruhende ${lage.ruhend === 1
@@ -2597,6 +3212,9 @@ function malSitzung() {
   const lautsprecher = was =>
     hoeren ? `<button type="button" class="sprech-knopf" data-tu="vorlesen" data-id="${was}"
                  aria-label="Vorlesen" title="Vorlesen">🔊</button>` : '';
+  // Merker steht auf beiden Seiten — er ist eine Eigenschaft der Karte, nicht
+  // ihrer Antwort („unregelmäßig“ hilft nur, wenn man es vorher sieht).
+  const merker = markHtml(k) ? `<div class="flip-mark">${markHtml(k)}</div>` : '';
 
   ziel.innerHTML = `
     <div class="spread" style="margin-bottom:8px">
@@ -2613,6 +3231,7 @@ function malSitzung() {
             <span style="color:${esc(deckFarbe(k.deckId))}">${esc(deckName(k.deckId))}</span>
             <span>${markeHtml}Fach ${fach}${istNeu(k) ? ' · neu' : ''}${ueberfaellig > 0 ? ` · ${ueberfaellig} T. überfällig` : ''}</span>
           </div>
+          ${merker}
           ${nurHoeren
             ? `<div class="nur-hoeren"><span class="gross-ico">🔊</span>Die Frage wird vorgelesen</div>`
             : `<div class="flip-text">${frageHtml(k)}</div>`}
@@ -2623,9 +3242,11 @@ function malSitzung() {
             <span style="color:${esc(deckFarbe(k.deckId))}">${esc(deckName(k.deckId))}</span>
             <span>${markeHtml}Fach ${fach}</span>
           </div>
+          ${merker}
           <div class="flip-text">${antwortHtml(k)}</div>
+          ${extraHtml(k) ? `<div class="flip-extra">${extraHtml(k)}</div>` : ''}
           ${nurHoeren ? `<div class="flip-notiz">Frage: ${esc(frageText(k))}</div>` : ''}
-          ${k.notiz ? `<div class="flip-notiz">${esc(k.notiz)}</div>` : ''}
+          ${k.notiz ? `<div class="flip-notiz">${feldHtml(k, k.notiz)}</div>` : ''}
           ${lautsprecher('antwort')}
         </div>
       </div>
@@ -2648,7 +3269,10 @@ function malSitzung() {
 
   if (hoeren && s.gesprochenFuer !== s.i && !s.aufgedeckt) {
     s.gesprochenFuer = s.i;
-    sprechen(frageText(k), spracheFuer(k, 'frage'));
+    // .catch() ist Pflicht: sprechen() ist asynchron, und eine unbehandelte
+    // Ablehnung landet sonst als Seitenfehler im Fenster.
+    sprechen(frageText(k), spracheFuer(k, 'frage'), { lautschrift: lautschriftFuer(k, 'frage') })
+      .catch(e => console.warn('[Sprachausgabe]', e));
   }
   if (s.modus === 'tippen' && !s.aufgedeckt) $('#tipp-eingabe')?.focus();
 }
@@ -2754,7 +3378,9 @@ function aktionenAuffrischen() {
   karte.classList.add('gedreht');
   a.innerHTML = aktionenHtml(s, k);
   aktionenVerdrahten();
-  if (deckModi(k.deckId).includes('hoeren')) sprechen(antwortText(k), spracheFuer(k, 'antwort'));
+  if (deckModi(k.deckId).includes('hoeren'))
+    sprechen(antwortText(k), spracheFuer(k, 'antwort'), { lautschrift: lautschriftFuer(k, 'antwort') })
+      .catch(e => console.warn('[Sprachausgabe]', e));
 }
 
 function tippAuswerten() {
@@ -2878,6 +3504,10 @@ function fsrsMotor() {
 function fsrsKarteAus(k) {
   let stability = Number(k.stability) || 0;
   let difficulty = Number(k.difficulty) || 0;
+  // ts-fsrs kennt eine Mindeststabilität (S_MIN = 0,001). Ein kleinerer Wert
+  // aus einer fremden oder von Hand bearbeiteten Sicherung machte die Karte
+  // dauerhaft unbewertbar.
+  if (stability > 0 && stability < 0.001) stability = 0.001;
   if (!(difficulty >= 1 && stability > 0)) {
     if (Number(k.reps) > 0 && stability > 0) {
       // gelernt, aber difficulty fehlt/kaputt → reparieren statt verwerfen
@@ -2897,7 +3527,13 @@ function fsrsKarteAus(k) {
     reps: Number(k.reps) || 0,
     lapses: Number(k.lapses) || 0,
     state: [0, 1, 2, 3].includes(k.state) ? k.state : 0,
-    last_review: k.lastReview ? isoZuDatum(k.lastReview) : undefined
+    /* Ein Abfragedatum in der Zukunft ergibt einen negativen Abstand, und
+       ts-fsrs lehnt jede Bewertung mit `Invalid delta_t` ab — die Karte wäre
+       dauerhaft unlernbar. Das passiert ohne jedes Zutun: Uhr zurückgestellt,
+       Reise in eine westlichere Zeitzone, geänderte Tagesgrenze, Sicherung von
+       einem Gerät, das voraus war. Deshalb hier auf heute begrenzen. */
+    last_review: k.lastReview
+      ? isoZuDatum(k.lastReview > heute() ? heute() : k.lastReview) : undefined
   };
 }
 
@@ -2996,9 +3632,15 @@ function bewerten(rating) {
   s.karten[s.i] = k;
   s.zuletztBewertet = Date.now();
 
-  // Deckel bei drei Minuten: Länger sitzt niemand an einer Karteikarte —
-  // was darüber liegt, ist eine Unterbrechung und keine Lernzeit.
-  const sekunden = Math.min(180, Math.round((Date.now() - s.kartenStart) / 1000));
+  /* Deckel bei drei Minuten: Länger sitzt niemand an einer Karteikarte — was
+     darüber liegt, ist eine Unterbrechung und keine Lernzeit. Eine Messung,
+     die in den Deckel läuft, ist keine Messung: Sie geht deshalb weder in die
+     Summe noch in den Zähler ein. Sonst schleppte eine einzige Pause
+     drei Minuten in den Durchschnitt und ließe eine harmlose Karte für immer
+     als Zeitfresser dastehen. */
+  const rohSekunden = Math.round((Date.now() - s.kartenStart) / 1000);
+  const brauchbar = rohSekunden >= 0 && rohSekunden < 180;
+  const sekunden = brauchbar ? rohSekunden : 0;
   const warNeu = istNeu(k);
   let patch;
   try {
@@ -3015,7 +3657,7 @@ function bewerten(rating) {
   // Zähler dafür: Der Bestand aus Stufe 1–3 hat Wiederholungen ohne
   // Zeitmessung, und durch `reps` geteilt käme dort dauerhaft „0 s“ heraus.
   patch.zeitGesamt = (Number(k.zeitGesamt) || 0) + sekunden;
-  patch.zeitReps = (Number(k.zeitReps) || 0) + 1;
+  if (brauchbar) patch.zeitReps = (Number(k.zeitReps) || 0) + 1;
 
   // Problemkarte (KONZEPT §6.3): Wer eine Karte immer wieder vergisst, lernt
   // nicht die Sache, sondern übt das Scheitern. Sie wird ausgesetzt und zur
@@ -3253,6 +3895,28 @@ const KARTEN_FILTER = {
   ruht:    ['Ruhende',        k => !!k.suspendiert]
 };
 
+/* Durchsuchbarer Klartext einer Karte, gepuffert.
+   Ohne Puffer liefe bei jedem Tastendruck über den gesamten Bestand ein
+   Regex-Durchlauf je Feld — bei 2.000 Karten spürbar. Der Schlüssel enthält
+   die Feldlängen, damit eine geänderte Karte den Eintrag von selbst
+   verwirft; ein Wörterbuch wächst dabei nie über den Bestand hinaus. */
+const suchtextPuffer = new Map();
+function suchtextVon(k) {
+  const stempel = `${k.frage?.length || 0}:${k.antwort?.length || 0}:${k.notiz?.length || 0}:` +
+                  `${k.extra?.length || 0}:${k.mark?.length || 0}:${(k.tags || []).length}:${k.deckId}`;
+  const treffer = suchtextPuffer.get(k.id);
+  if (treffer && treffer[0] === stempel) return treffer[1];
+  const roh = [k.frage, k.antwort, k.notiz, k.extra, k.mark].map(f => String(f ?? '')).join(' ');
+  // Bewusst der billige Regex-Weg statt htmlZuText(): Für die Suche genügt
+  // es, die spitzen Klammern loszuwerden — sonst fände „b“ jedes <b>.
+  const text = (k.format === 'html'
+      ? roh.replace(/<[^>]*>/g, ' ').replace(/&(?:nbsp|amp|lt|gt|quot|#\d+);/g, ' ')
+      : roh) + ' ' + deckName(k.deckId) + ' ' + (k.tags || []).join(' ');
+  const fertig = text.toLowerCase().replace(/\s+/g, ' ');
+  suchtextPuffer.set(k.id, [stempel, fertig]);
+  return fertig;
+}
+
 function gefilterteKarten() {
   const q = S.kartenSuche.trim().toLowerCase();
   let l = S.cards;
@@ -3262,8 +3926,7 @@ function gefilterteKarten() {
   if (q) {
     const teile = q.split(/\s+/);
     l = l.filter(k => {
-      const heu = (k.frage + ' ' + k.antwort + ' ' + (k.notiz || '') + ' ' +
-                   deckName(k.deckId) + ' ' + (k.tags || []).join(' ')).toLowerCase();
+      const heu = suchtextVon(k);
       return teile.every(t => heu.includes(t));
     });
   }
@@ -3401,6 +4064,262 @@ function malKarten() {
   }));
 }
 
+/* ---------- 11a. Editor mit Auszeichnung (Stufe 5) ---------------------- */
+
+/* Umgesetzt über contenteditable und document.execCommand. execCommand gilt
+   als veraltet — es gibt aber bis heute keinen Ersatz, der ohne Framework
+   auskommt, und alle Zielbrowser unterstützen es. Die Alternative wäre eine
+   eigene Auszeichnungs-Engine gewesen; das steht in keinem Verhältnis.
+
+   Sicherheit: Was hier hineingerät, ist gleich zweimal eingedampft — beim
+   Speichern (edLesen) und beim Anzeigen (feldHtml). Doppelt, weil ein
+   Datensatz auch aus einem Import oder von einem anderen Gerät kommen kann,
+   ohne je durch diesen Editor gelaufen zu sein. */
+
+const ED_WERKZEUGE = [
+  ['bold', '<b>F</b>', 'Fett — Strg+B'],
+  ['italic', '<i>K</i>', 'Kursiv — Strg+I'],
+  ['underline', '<u>U</u>', 'Unterstrichen — Strg+U'],
+  ['strikeThrough', '<s>S</s>', 'Durchgestrichen'],
+  '|',
+  ['superscript', 'x²', 'Hochgestellt'],
+  ['subscript', 'x₂', 'Tiefgestellt'],
+  '|',
+  ['insertUnorderedList', '•', 'Aufzählung'],
+  ['insertOrderedList', '1.', 'Nummerierung'],
+  ['insertHorizontalRule', '—', 'Trennlinie'],
+  '|',
+  ['removeFormat', '<span style="text-decoration:line-through">A</span>', 'Formatierung entfernen']
+];
+/* Textfarben und Marker. Bewusst wenige und kräftige Werte: Eine freie
+   Farbwahl führt auf Karteikarten zu Farben, die im Dunkelmodus verschwinden.
+   Diese sechs sind auf beiden Hintergründen lesbar. */
+const ED_TEXTFARBEN = [
+  ['#e24b4a', 'Rot'], ['#ef9f27', 'Orange'], ['#639922', 'Grün'],
+  ['#378add', 'Blau'], ['#8e6bd6', 'Violett'], ['', 'Standard']
+];
+const ED_MARKERFARBEN = [
+  ['#fff3a3', 'Gelb'], ['#c9f0c0', 'Grün'], ['#ffd6d6', 'Rot'],
+  ['#cfe4fb', 'Blau'], ['', 'Kein Marker']
+];
+
+function edLeisteHtml() {
+  const knopf = (befehl, zeichen, titel) =>
+    `<button type="button" class="ed-knopf" data-ed="${befehl}" title="${esc(titel)}"
+             aria-label="${esc(titel)}">${zeichen}</button>`;
+  const farbwahl = (art, liste, titel, symbol) =>
+    `<span style="position:relative;display:inline-flex">
+       <button type="button" class="ed-knopf" data-edfarbe="${art}" title="${esc(titel)}"
+               aria-label="${esc(titel)}">${symbol}</button>
+       <span class="ed-palette" data-fuer="${art}" hidden
+             style="position:absolute;top:32px;left:0;z-index:9;display:flex;gap:4px;padding:6px;
+                    background:var(--bg);border:1px solid var(--border);border-radius:9px;
+                    box-shadow:var(--schatten)">
+         ${liste.map(([wert, name]) => `<button type="button" class="ed-knopf" data-setfarbe="${art}"
+             data-wert="${esc(wert)}" title="${esc(name)}" aria-label="${esc(name)}">${
+             wert ? `<span class="ed-farbe" style="background:${esc(wert)}"></span>`
+                  : '<span class="ed-farbe" style="background:transparent">⌀</span>'}</button>`).join('')}
+       </span></span>`;
+  return `<div class="ed-leiste" id="ed-leiste">
+    ${ED_WERKZEUGE.map(w => w === '|' ? '<span class="tr"></span>' : knopf(...w)).join('')}
+    <span class="tr"></span>
+    ${farbwahl('fore', ED_TEXTFARBEN, 'Textfarbe', '<span style="border-bottom:3px solid var(--akzent)">A</span>')}
+    ${farbwahl('hilite', ED_MARKERFARBEN, 'Marker',
+        '<span style="background:#fff3a3;color:#333;border-radius:3px;padding:0 3px">A</span>')}
+  </div>`;
+}
+
+/** Ein beschriftetes Eingabefeld mit Quelltext-Umschalter.
+ *  Das versteckte <input> ist der eigentliche Wertträger — nur so kommt der
+ *  Inhalt durch die Sammelmechanik von modal() (die liest input/textarea/
+ *  select, kein contenteditable). */
+function edFeldHtml(id, titel, wert, platzhalter, hoehe) {
+  return `<div class="ed-block" data-edblock="${id}">
+    <div class="ed-kopf"><span id="${id}-titel">${esc(titel)}</span>
+      <button type="button" class="ed-knopf" data-edquelle="${id}"
+              title="HTML-Quelltext anzeigen" aria-label="HTML-Quelltext anzeigen">&lt;/&gt;</button></div>
+    <div class="ed-feld" id="${id}-ed" contenteditable="true" role="textbox" aria-multiline="true"
+         aria-labelledby="${id}-titel" data-leer="${esc(platzhalter || '')}"
+         ${hoehe ? `style="min-height:${hoehe}px"` : ''}>${htmlSauber(wert)}</div>
+    <input type="hidden" id="${id}" value="${esc(htmlSauber(wert))}">
+  </div>`;
+}
+
+/** Verdrahtet Werkzeugleiste, Felder, Quelltext-Umschalter und Tag-Eingabe.
+ *  Liefert Helfer für Vorschau und Auslesen. */
+function edVerdrahten(m, feldIds) {
+  const quelleAn = new Set();
+  const feld = id => $('#' + id + '-ed', m);
+  const traeger = id => $('#' + id, m);
+  let letztesFeld = feldIds[0];
+
+  /* Wert vom sichtbaren Feld in den versteckten Träger spiegeln. Im
+     Quelltextmodus ist der sichtbare Inhalt der Quelltext selbst. */
+  const spiegeln = id => {
+    const el = feld(id); if (!el) return;
+    const roh = quelleAn.has(id) ? (el.textContent || '') : el.innerHTML;
+    traeger(id).value = htmlSauber(roh);
+  };
+
+  feldIds.forEach(id => {
+    const el = feld(id); if (!el) return;
+    el.addEventListener('input', () => spiegeln(id));
+    el.addEventListener('focus', () => { letztesFeld = id; leisteAuffrischen(); });
+    el.addEventListener('keyup', leisteAuffrischen);
+    el.addEventListener('mouseup', leisteAuffrischen);
+    /* Einfügen immer als Klartext bzw. eingedampftes HTML. Ohne diesen
+       Handler landet beim Einfügen aus Word ein Wust aus <o:p>, mso-Styles
+       und Schriftgrößen im Feld — der Sanitizer räumt ihn zwar weg, aber
+       erst beim Speichern, und bis dahin sieht die Karte falsch aus. */
+    el.addEventListener('paste', ev => {
+      ev.preventDefault();
+      const zw = ev.clipboardData;
+      const html = zw?.getData('text/html');
+      const text = zw?.getData('text/plain') || '';
+      if (quelleAn.has(id)) { document.execCommand('insertText', false, text); return; }
+      if (html) document.execCommand('insertHTML', false, htmlSauber(html));
+      else document.execCommand('insertText', false, text);
+      spiegeln(id);
+    });
+    // Quelltext-Umschalter
+    $(`[data-edquelle="${id}"]`, m)?.addEventListener('click', () => {
+      const el2 = feld(id);
+      if (quelleAn.has(id)) {
+        const quelltext = el2.textContent || '';
+        quelleAn.delete(id);
+        el2.classList.remove('quelle');
+        el2.innerHTML = htmlSauber(quelltext);
+      } else {
+        const html = htmlSauber(el2.innerHTML);
+        quelleAn.add(id);
+        el2.classList.add('quelle');
+        el2.textContent = html;
+      }
+      $(`[data-edquelle="${id}"]`, m).classList.toggle('an', quelleAn.has(id));
+      spiegeln(id);
+    });
+  });
+
+  /* Werkzeugleiste. mousedown + preventDefault, damit die Markierung im
+     Textfeld erhalten bleibt — ein normaler Klick nähme ihr vorher den
+     Fokus, und execCommand wüsste nicht mehr, worauf es wirken soll. */
+  const leiste = $('#ed-leiste', m);
+  function befehl(name, wert) {
+    const el = feld(letztesFeld);
+    if (!el || quelleAn.has(letztesFeld)) return;
+    el.focus();
+    try {
+      document.execCommand('styleWithCSS', false, true);
+      document.execCommand(name, false, wert);
+    } catch (_) {}
+    spiegeln(letztesFeld);
+    leisteAuffrischen();
+  }
+  function leisteAuffrischen() {
+    if (!leiste) return;
+    const aus = quelleAn.has(letztesFeld);
+    $$('.ed-knopf[data-ed]', leiste).forEach(b => {
+      b.disabled = aus;
+      if (aus) return b.classList.remove('an');
+      try { b.classList.toggle('an', document.queryCommandState(b.dataset.ed)); } catch (_) {}
+    });
+    $$('.ed-knopf[data-edfarbe]', leiste).forEach(b => { b.disabled = aus; });
+  }
+  leiste?.addEventListener('mousedown', ev => {
+    const b = ev.target.closest('button');
+    if (b) ev.preventDefault();
+  });
+  leiste?.addEventListener('click', ev => {
+    const cmd = ev.target.closest('[data-ed]');
+    if (cmd) return befehl(cmd.dataset.ed);
+    const oeffner = ev.target.closest('[data-edfarbe]');
+    if (oeffner) {
+      const p = $(`.ed-palette[data-fuer="${oeffner.dataset.edfarbe}"]`, leiste);
+      $$('.ed-palette', leiste).forEach(x => { if (x !== p) x.hidden = true; });
+      p.hidden = !p.hidden;
+      return;
+    }
+    const setzen = ev.target.closest('[data-setfarbe]');
+    if (setzen) {
+      const art = setzen.dataset.setfarbe, wert = setzen.dataset.wert;
+      $$('.ed-palette', leiste).forEach(x => { x.hidden = true; });
+      if (art === 'fore') befehl('foreColor', wert || 'currentColor');
+      else befehl('hiliteColor', wert || 'transparent');
+    }
+  });
+  // Tastenkürzel wirken im contenteditable von selbst (Strg+B/I/U) — der
+  // Träger muss danach nur nachgezogen werden.
+  feldIds.forEach(id => feld(id)?.addEventListener('keydown', ev => {
+    if (ev.ctrlKey || ev.metaKey) setTimeout(() => { spiegeln(id); leisteAuffrischen(); }, 0);
+  }));
+
+  return {
+    lesen: id => { spiegeln(id); return traeger(id)?.value || ''; },
+    alle: () => { const o = {}; feldIds.forEach(id => { spiegeln(id); o[id] = traeger(id)?.value || ''; }); return o; },
+    quelltextOffen: () => quelleAn.size > 0
+  };
+}
+
+/** Tag-Eingabe: Chips mit Entfernen-Knopf, Komma oder Enter legt an. */
+function edTagsHtml(tags) {
+  return `<div class="ed-block"><div class="ed-kopf"><span>Schlagwörter</span></div>
+    <div class="ed-tags" id="m-tag-wanne">
+      <input id="m-tag-eingabe" placeholder="Schlagwort, dann Enter" autocomplete="off"
+             maxlength="40" data-enter-eigen>
+    </div>
+    <input type="hidden" id="m-tags" value="${esc((tags || []).join('\u001f'))}"></div>`;
+}
+function edTagsVerdrahten(m) {
+  const wanne = $('#m-tag-wanne', m), eingabe = $('#m-tag-eingabe', m), traeger = $('#m-tags', m);
+  let liste = String(traeger.value || '').split('\u001f').map(t => t.trim()).filter(Boolean);
+  const malen = () => {
+    $$('.ed-tag', wanne).forEach(x => x.remove());
+    liste.forEach((t, i) => {
+      const chip = document.createElement('span');
+      chip.className = 'ed-tag';
+      chip.innerHTML = `${esc(t)}<button type="button" data-weg="${i}" aria-label="Entfernen">×</button>`;
+      wanne.insertBefore(chip, eingabe);
+    });
+    traeger.value = liste.join('\u001f');
+  };
+  const zufuegen = roh => {
+    String(roh).split(',').map(t => t.trim().replace(/\s+/g, '-').slice(0, 40)).filter(Boolean)
+      .forEach(t => { if (liste.length < 30 && !liste.includes(t)) liste.push(t); });
+    eingabe.value = ''; malen();
+  };
+  eingabe.addEventListener('keydown', ev => {
+    if (ev.key === 'Enter' || ev.key === ',') {
+      // Enter darf hier nicht den Speichern-Knopf des Dialogs auslösen.
+      ev.preventDefault(); ev.stopPropagation();
+      if (eingabe.value.trim()) zufuegen(eingabe.value);
+    } else if (ev.key === 'Backspace' && !eingabe.value && liste.length) {
+      liste.pop(); malen();
+    }
+  });
+  // Auch ein nicht bestätigtes Wort soll nicht verloren gehen.
+  eingabe.addEventListener('blur', () => { if (eingabe.value.trim()) zufuegen(eingabe.value); });
+  wanne.addEventListener('click', ev => {
+    const weg = ev.target.closest('[data-weg]');
+    if (weg) { liste.splice(Number(weg.dataset.weg), 1); malen(); return; }
+    if (ev.target === wanne) eingabe.focus();
+  });
+  malen();
+}
+/* Trennzeichen ist U+001F (Unit Separator): Ein Schlagwort kann es nicht
+   enthalten, weil die Eingabe alle Leerzeichen zu Bindestrichen macht und
+   Steuerzeichen gar nicht erst durchlässt. Komma oder Semikolon wären als
+   Trenner unsicher — beide kommen in Schlagwörtern durchaus vor. */
+const tagsAusWert = roh => String(roh || '').split('\u001f').map(t => t.trim()).filter(Boolean).slice(0, 30);
+
+/* Die auszeichenbaren Felder des Karteneditors, in Reihenfolge. */
+const ED_FELDER = ['m-frage', 'm-antwort', 'm-extra', 'm-mark', 'm-notiz'];
+
+/* Alle Textträger des Dialogs — für die Größenprüfung beim Speichern.
+   Firestore-Grenze ist 1 MiB je Dokument; 200.000 Zeichen lassen reichlich
+   Luft für Lernstand, Feldnamen und Auszeichnung. */
+const KARTEN_TEXTFELDER = ED_FELDER.concat(['m-cloze', 'm-cloze-antwort', 'm-cloze-notiz']);
+const KARTEN_ZEICHEN_GRENZE = 200000;
+
 async function karteBearbeiten(id) {
   let k = id ? S.cards.find(x => x.id === id) : null;
   if (id && !k) return;
@@ -3422,36 +4341,78 @@ async function karteBearbeiten(id) {
   const vorDeck = k?.deckId || (S.kartenFilterDeck !== 'alle' ? S.kartenFilterDeck : S.decks[0].id);
   const klassik = S.einstellungen.klassikModus;
   const typAlt = KARTEN_TYPEN.includes(k?.typ) ? k.typ : 'standard';
-  const antwortVorher = k ? String(k.antwort ?? '') : null;
+  const antwortVorher = k ? feldText(k, k.antwort).trim() : null;
   const abgeleitet = k ? abgeleiteteVon(k.id).length : 0;
   // Problemkarte kann auch an einer abgeleiteten Abfrage hängen (eine Lücke,
   // die Gegenrichtung). Bearbeitet wird trotzdem die Quellkarte — der
   // Wiederaufnehmen-Block muss deshalb auch dann erscheinen.
   const problemFamilie = k ? (istProblemkarte(k) || abgeleiteteVon(k.id).some(istProblemkarte)) : false;
+  // Über beimOeffnen hinaus sichtbar, weil die Knopfprüfung sie braucht.
+  let edApi = null, edZurAnsicht = () => {};
 
   const r = await modal({
     titel: k ? 'Karte bearbeiten' : 'Neue Karte',
     breit: true,
     html: `
+      <div class="ed-umschalt" id="m-ansicht">
+        <button type="button" data-ansicht="bearbeiten" class="an">Bearbeiten</button>
+        <button type="button" data-ansicht="vorschau">Vorschau</button>
+      </div>
+
+      <div id="m-seite-bearbeiten">
       <label class="feld"><span>Kartentyp</span>
         <select id="m-typ">
           <option value="standard" ${typAlt === 'standard' ? 'selected' : ''}>Frage und Antwort</option>
           <option value="cloze" ${typAlt === 'cloze' ? 'selected' : ''}>Lückentext</option>
         </select></label>
-      <label class="feld"><span id="m-frage-titel">Frage</span><textarea id="m-frage">${esc(k?.frage || '')}</textarea></label>
-      <div id="m-cloze-hilfe" hidden style="margin:-6px 0 12px">
-        <div class="row" style="gap:8px">
-          <button type="button" class="btn klein" id="m-cloze-einfuegen">Lücke aus Auswahl</button>
-          <span class="mini" id="m-cloze-zahl"></span>
-        </div>
-        <p class="mini" style="margin-top:6px">Schreibweise <code>{{c1::Lösung}}</code>, mit Hinweis
-          <code>{{c1::Lösung::Hinweis}}</code>. <strong>Jede Lücke wird eigenständig terminiert</strong> —
-          aus einem Satz mit drei Lücken werden drei Abfragen.</p>
+
+      <div id="m-reich">
+        ${edLeisteHtml()}
+        ${edFeldHtml('m-frage', 'Frage — Vorderseite', k?.format === 'html' ? (k?.frage || '') : esc(k?.frage || ''), 'Was gefragt wird …', 70)}
+        ${edFeldHtml('m-antwort', 'Antwort — Rückseite', k?.format === 'html' ? (k?.antwort || '') : esc(k?.antwort || ''), 'Was gewusst werden soll …', 70)}
+        ${edFeldHtml('m-extra', 'Extra — erscheint zusammen mit der Antwort', k?.format === 'html' ? (k?.extra || '') : esc(k?.extra || ''), 'Beispielsatz, Herleitung, Merkhilfe …')}
+        ${edFeldHtml('m-mark', 'Merker — steht oben auf beiden Seiten', k?.format === 'html' ? (k?.mark || '') : esc(k?.mark || ''), 'z. B. unregelmäßig, Prüfung, Kapitel 3')}
+        ${edFeldHtml('m-notiz', 'Notiz — nur für dich, wird nicht abgefragt', k?.format === 'html' ? (k?.notiz || '') : esc(k?.notiz || ''), '')}
       </div>
-      <label class="feld"><span id="m-antwort-titel">Antwort</span><textarea id="m-antwort">${esc(k?.antwort || '')}</textarea></label>
-      <label class="feld"><span>Notiz (optional)</span><textarea id="m-notiz" style="min-height:56px">${esc(k?.notiz || '')}</textarea></label>
+
+      <div id="m-cloze-block" hidden>
+        <label class="feld"><span>Lückentext</span><textarea id="m-cloze"
+          style="min-height:96px">${esc(k?.typ === 'cloze' ? (k?.frage || '') : '')}</textarea></label>
+        <div id="m-cloze-hilfe" style="margin:-6px 0 12px">
+          <div class="row" style="gap:8px">
+            <button type="button" class="btn klein" id="m-cloze-einfuegen">Lücke aus Auswahl</button>
+            <span class="mini" id="m-cloze-zahl"></span>
+          </div>
+          <p class="mini" style="margin-top:6px">Schreibweise <code>{{c1::Lösung}}</code>, mit Hinweis
+            <code>{{c1::Lösung::Hinweis}}</code>. <strong>Jede Lücke wird eigenständig terminiert</strong> —
+            aus einem Satz mit drei Lücken werden drei Abfragen.
+            Lückentexte bleiben bewusst unformatiert: Eine Auszeichnung mitten in
+            <code>{{c1::…}}</code> würde die Lücke zerschneiden.</p>
+        </div>
+        <label class="feld"><span>Erläuterung (optional)</span><textarea id="m-cloze-antwort"
+          style="min-height:56px">${esc(k?.typ === 'cloze' ? (k?.antwort || '') : '')}</textarea></label>
+        <label class="feld"><span>Notiz (optional)</span><textarea id="m-cloze-notiz"
+          style="min-height:56px">${esc(k?.typ === 'cloze' ? (k?.notiz || '') : '')}</textarea></label>
+      </div>
+
+      ${edTagsHtml(k?.tags)}
+
       <label class="feld"><span>Kasten</span><select id="m-deck">${S.decks.map(d =>
         `<option value="${esc(d.id)}" ${d.id === vorDeck ? 'selected' : ''}>${esc(d.name)}</option>`).join('')}</select></label>
+
+      <details class="ed-mehr" style="margin-bottom:12px">
+        <summary>Aussprache vorgeben (Lautschrift)</summary>
+        <p class="mini" style="margin:6px 0 8px">Wird an die KI-Stimme durchgereicht und erzwingt dort
+          die Aussprache — nur nötig, wenn ein Wort falsch betont wird. Schreibweise IPA,
+          z. B. <code class="ed-ipa">ˈʃasi</code> für „Chassis“. Leer lassen heißt: Stimme entscheidet.</p>
+        <div class="row" style="gap:10px">
+          <label class="feld" style="flex:1;margin:0"><span>Frageseite</span>
+            <input id="m-lautschrift" class="ed-ipa" maxlength="200" value="${esc(k?.lautschrift || '')}"></label>
+          <label class="feld" style="flex:1;margin:0"><span>Antwortseite</span>
+            <input id="m-lautschrift-antwort" class="ed-ipa" maxlength="200" value="${esc(k?.lautschriftAntwort || '')}"></label>
+        </div>
+      </details>
+
       ${k ? `<div class="row" style="justify-content:space-between;gap:10px">
         <label class="feld" style="flex:1;margin:0"><span>Fach (1–12)${klassik ? '' : ' — abgeleitet'}</span>
           ${klassik
@@ -3477,35 +4438,157 @@ async function karteBearbeiten(id) {
       </div>` : ''}
       ${abgeleitet ? `<p class="mini">Diese Karte erzeugt ${abgeleitet + 1} eigenständig
          terminierte Abfragen. Termine und Fortschritt der zusätzlichen Abfragen bleiben beim
-         Bearbeiten erhalten, solange die Lücken bzw. die Richtung bestehen bleiben.</p>` : ''}` : ''}`,
+         Bearbeiten erhalten, solange die Lücken bzw. die Richtung bestehen bleiben.</p>` : ''}` : ''}
+      </div>
+
+      <div id="m-seite-vorschau" hidden>
+        <p class="mini" style="margin:0 0 10px">So sieht die Karte beim Lernen aus.
+          Die Rückseite steht hier gleich mit darunter.</p>
+        <div class="ed-vorschau" id="m-vorschau"></div>
+      </div>`,
     knoepfe: [{ text: 'Abbrechen', wert: null }, {
       text: k ? 'Speichern' : 'Anlegen', wert: 'ok', art: 'primary',
       pruefen: () => {
         const cloze = $('#m-typ').value === 'cloze';
-        if (!$('#m-frage').value.trim()) {
+        // Im Quelltextmodus steht der Wert noch nicht im Träger — erst
+        // spiegeln, sonst prüft die Kontrolle einen veralteten Stand.
+        edApi?.alle();
+        const frage = cloze ? $('#m-cloze').value : htmlZuText($('#m-frage').value);
+        if (!String(frage).trim()) {
           toast(cloze ? 'Der Lückentext darf nicht leer sein.' : 'Die Frage darf nicht leer sein.');
+          if (!cloze) edZurAnsicht('bearbeiten');
           return false;
         }
-        if (cloze && !clozeNummern($('#m-frage').value).length) {
+        if (cloze && !clozeNummern($('#m-cloze').value).length) {
           toast('Bitte mindestens eine Lücke markieren, z. B. {{c1::Lösung}}.'); return false;
         }
-        if (!cloze && !$('#m-antwort').value.trim()) {
-          toast('Die Antwort darf nicht leer sein.'); return false;
+        if (!cloze && !htmlZuText($('#m-antwort').value).trim()) {
+          toast('Die Antwort darf nicht leer sein.'); edZurAnsicht('bearbeiten'); return false;
+        }
+        /* Firestore nimmt höchstens 1 MiB je Dokument. Ohne diese Prüfung
+           schrieb die App klaglos darüber hinaus: Der lokale Stand wurde
+           sofort aktualisiert, der Server lehnte ab, und danach zeigte die
+           Kartenliste dauerhaft etwas anderes an, als gespeichert war. Die
+           Grenze liegt bewusst deutlich darunter — Lernstand, Feldnamen und
+           die Rückwärtskopie kommen noch obendrauf. */
+        const gesamt = KARTEN_TEXTFELDER
+          .reduce((n, id) => n + ($('#' + id)?.value || '').length, 0);
+        if (gesamt > KARTEN_ZEICHEN_GRENZE) {
+          toast(`Die Karte ist mit ${gesamt.toLocaleString('de-DE')} Zeichen zu groß ` +
+                `(höchstens ${KARTEN_ZEICHEN_GRENZE.toLocaleString('de-DE')}). ` +
+                `Bitte aufteilen — das lernt sich ohnehin besser.`, 'fehler');
+          edZurAnsicht('bearbeiten');
+          return false;
         }
       }
     }],
     beimOeffnen: m => {
-      const typSel = $('#m-typ', m), frageFeld = $('#m-frage', m);
+      const typSel = $('#m-typ', m), frageFeld = $('#m-cloze', m);
+      edApi = edVerdrahten(m, ED_FELDER);
+      edTagsVerdrahten(m);
+
+      /* Umschalter Bearbeiten/Vorschau. Die Vorschau baut eine Karte aus dem
+         aktuellen Stand und schickt sie durch dieselben Anzeigefunktionen wie
+         der Lernbetrieb — sonst hieße „Vorschau“ nur „ungefähr so ähnlich“. */
+      edZurAnsicht = welche => {
+        $$('#m-ansicht button', m).forEach(b => b.classList.toggle('an', b.dataset.ansicht === welche));
+        $('#m-seite-bearbeiten', m).hidden = welche !== 'bearbeiten';
+        $('#m-seite-vorschau', m).hidden = welche !== 'vorschau';
+        if (welche === 'vorschau') vorschauMalen();
+      };
+      $('#m-ansicht', m).addEventListener('click', ev => {
+        const b = ev.target.closest('[data-ansicht]');
+        if (b) edZurAnsicht(b.dataset.ansicht);
+      });
+
+      function vorschauMalen() {
+        const cloze = typSel.value === 'cloze';
+        const w = edApi.alle();
+        const probe = cloze
+          ? { typ: 'cloze', format: 'text', frage: frageFeld.value,
+              antwort: $('#m-cloze-antwort', m).value, notiz: $('#m-cloze-notiz', m).value,
+              extra: '', mark: '', variante: 'v', quelleId: null }
+          : { typ: 'standard', format: 'html', frage: w['m-frage'], antwort: w['m-antwort'],
+              notiz: w['m-notiz'], extra: w['m-extra'], mark: w['m-mark'],
+              variante: 'v', quelleId: null };
+        // Bei Lückentexten zeigt die Vorschau die erste Lücke — stellvertretend
+        // für die Abfragen, die daraus entstehen.
+        const nummern = cloze ? clozeNummern(probe.frage) : [];
+        const probeK = cloze && nummern.length
+          ? { ...probe, quelleId: 'x', variante: 'c' + nummern[0] } : probe;
+        const marke = markHtml(probeK);
+        const extra = extraHtml(probeK);
+        const seite = (titel, inhalt, zusatz) => `<div class="vs-seite">
+          <div class="vs-marke">${esc(titel)}</div>
+          ${marke ? `<div class="vs-mark">${marke}</div>` : ''}
+          <div class="vs-text">${inhalt || '<span class="muted">— leer —</span>'}</div>
+          ${zusatz || ''}</div>`;
+        $('#m-vorschau', m).innerHTML =
+          seite(cloze && nummern.length ? `Vorderseite — Lücke ${nummern[0]} von ${nummern.length}` : 'Vorderseite',
+                frageHtml(probeK)) +
+          seite('Rückseite', antwortHtml(probeK),
+            (extra ? `<div class="vs-extra">${extra}</div>` : '') +
+            (probeK.notiz ? `<div class="vs-extra">${feldHtml(probeK, probeK.notiz)}</div>` : ''));
+      }
+
+      /* Beim Wechsel des Kartentyps den Inhalt mitnehmen.
+         Die beiden Feldsätze sind getrennt, damit ein versehentliches
+         Umschalten nichts wegwirft. Genau dadurch stand der Lückentext-Satz
+         beim Wechsel Standard → Lückentext aber leer da: Wer umschaltete,
+         musste seine Frage neu tippen, und Antwort, Notiz, Extra und Merker
+         waren nach dem Speichern weg — angekündigt nur durch „Gespeichert.“
+         Jetzt wird der Klartext einmalig übernommen, sobald das Zielfeld
+         noch leer ist. Überschrieben wird nie. */
+      let uebernommen = { cloze: false, standard: false };
+      const inhaltUebernehmen = cloze => {
+        if (cloze && !uebernommen.cloze && !frageFeld.value.trim()) {
+          uebernommen.cloze = true;
+          const w = edApi.alle();
+          frageFeld.value = htmlZuText(w['m-frage'] || '');
+          const antw = $('#m-cloze-antwort', m), notiz = $('#m-cloze-notiz', m);
+          if (!antw.value.trim()) antw.value = htmlZuText(w['m-antwort'] || '');
+          if (!notiz.value.trim()) notiz.value = htmlZuText(w['m-notiz'] || '');
+        }
+        if (!cloze && !uebernommen.standard && !htmlZuText($('#m-frage-ed', m).innerHTML).trim()) {
+          uebernommen.standard = true;
+          const setz = (id, wert) => {
+            const el = $('#' + id + '-ed', m);
+            if (el && !el.textContent.trim() && wert) {
+              el.textContent = wert;
+              el.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+          };
+          setz('m-frage', frageFeld.value);
+          setz('m-antwort', $('#m-cloze-antwort', m).value);
+          setz('m-notiz', $('#m-cloze-notiz', m).value);
+        }
+      };
+
       const aktualisieren = () => {
         const cloze = typSel.value === 'cloze';
-        $('#m-cloze-hilfe', m).hidden = !cloze;
-        $('#m-frage-titel', m).textContent = cloze ? 'Lückentext' : 'Frage';
-        $('#m-antwort-titel', m).textContent = cloze ? 'Erläuterung (optional)' : 'Antwort';
+        inhaltUebernehmen(cloze);
+        $('#m-reich', m).hidden = cloze;
+        $('#m-cloze-block', m).hidden = !cloze;
         if (cloze) {
           const n = clozeNummern(frageFeld.value);
-          $('#m-cloze-zahl', m).textContent = n.length
+          /* Alles über c20 fällt aus dem Lernbetrieb: Es entsteht keine
+             Abfrage dafür, und in jeder anderen Lücke steht die Lösung im
+             Klartext. Vorher meldete der Zähler schlicht „20 Lücken erkannt“
+             — dass fünf Fakten der Karte nie gefragt werden, erfuhr niemand.
+             Betrifft vor allem eingefügte Karten aus anderen Programmen. */
+          const roh = new Set((String(frageFeld.value).match(/\{\{c(\d{1,3})::/g) || [])
+            .map(x => Number(x.slice(3, -2))).filter(Number.isFinite));
+          const drueber = Array.from(roh).filter(x => x > 20).sort((a, b) => a - b);
+          const el = $('#m-cloze-zahl', m);
+          el.textContent = n.length
             ? `${n.length} ${n.length === 1 ? 'Lücke' : 'Lücken'} erkannt: c${n.join(' · c')}`
             : 'Noch keine Lücke markiert.';
+          if (drueber.length) {
+            el.textContent += ` — c${drueber.join(', c')} ${drueber.length === 1
+              ? 'wird' : 'werden'} nicht abgefragt (höchstens 20 Lücken je Karte).`
+              + ' Besser die Karte aufteilen.';
+            el.classList.add('warn');
+          } else el.classList.remove('warn');
         }
       };
       typSel.addEventListener('change', aktualisieren);
@@ -3531,18 +4614,54 @@ async function karteBearbeiten(id) {
       aktualisieren();
     }
   });
+  edApi = null; edZurAnsicht = () => {};
   if (r !== 'ok') return;
 
   const typNeu = KARTEN_TYPEN.includes(W('m-typ', 'standard')) ? W('m-typ', 'standard') : 'standard';
-  const werte = {
-    frage: String(W('m-frage', '')).trim(),
-    antwort: String(W('m-antwort', '')).trim(),
-    notiz: String(letzteWerte['m-notiz'] ?? '').trim(),
-    deckId: W('m-deck', vorDeck),
-    typ: typNeu
-  };
-  if (!werte.frage) return;
-  if (typNeu !== 'cloze' && !werte.antwort) return;
+  /* Lückentexte bleiben Klartext, Frage/Antwort-Karten laufen über den
+     Auszeichnungspfad. Beide Feldsätze stehen getrennt im Dialog — sonst
+     verlöre ein Wechsel des Kartentyps den jeweils anderen Inhalt, und wer
+     versehentlich umschaltet, hätte seine Eingabe weggeworfen. */
+  const werte = typNeu === 'cloze'
+    ? {
+        frage: String(letzteWerte['m-cloze'] ?? '').trim(),
+        antwort: String(letzteWerte['m-cloze-antwort'] ?? '').trim(),
+        notiz: String(letzteWerte['m-cloze-notiz'] ?? '').trim(),
+        /* Extra und Merker werden im Lückentext-Modus nicht angeboten —
+           aber sie dürfen deshalb nicht gelöscht werden. Die erste Fassung
+           setzte hier hart '' und warf damit beides weg, sobald jemand eine
+           per Karten-Check umgewandelte Karte nur öffnete und wieder
+           speicherte. Angezeigt wurden sie im Lernbetrieb weiterhin; der
+           Verlust fiel also erst beim nächsten Lernen auf, und die einzige
+           Meldung war „Gespeichert.“
+           Jetzt bleibt stehen, was auf der Karte steht. Beim Umbau einer
+           Standardkarte fragt der Block weiter unten ausdrücklich nach. */
+        extra: String(k?.extra ?? ''), mark: String(k?.mark ?? ''),
+        format: 'text',
+        deckId: W('m-deck', vorDeck), typ: typNeu
+      }
+    : {
+        // htmlSauber ein zweites Mal, obwohl der Editor schon eindampft:
+        // letzteWerte kommt aus dem DOM und wäre über die Entwicklerkonsole
+        // manipulierbar. Der Sanitizer gehört an jede Schreibstelle, nicht
+        // nur dorthin, wo im Normalfall getippt wird.
+        frage: htmlSauber(W('m-frage', '')).trim(),
+        antwort: htmlSauber(W('m-antwort', '')).trim(),
+        notiz: htmlSauber(letzteWerte['m-notiz'] ?? '').trim(),
+        extra: htmlSauber(letzteWerte['m-extra'] ?? '').trim(),
+        mark: htmlSauber(letzteWerte['m-mark'] ?? '').trim(),
+        format: 'html',
+        deckId: W('m-deck', vorDeck), typ: typNeu
+      };
+  Object.assign(werte, {
+    tags: tagsAusWert(letzteWerte['m-tags']),
+    lautschrift: String(letzteWerte['m-lautschrift'] ?? '').trim().slice(0, 200),
+    lautschriftAntwort: String(letzteWerte['m-lautschrift-antwort'] ?? '').trim().slice(0, 200)
+  });
+  // Gegen den Leerlauf prüfen, nicht gegen das Markup: „<b></b>“ ist nicht
+  // leer, enthält aber keinen Text — und eine solche Karte wäre unlernbar.
+  if (!htmlZuText(werte.frage).trim()) return;
+  if (typNeu !== 'cloze' && !htmlZuText(werte.antwort).trim()) return;
 
   if (k) {
     // Terminierung nur im Klassik-Modus über das Fach neu berechnen — im
@@ -3619,7 +4738,12 @@ async function karteBearbeiten(id) {
   // verlieren, weil die App sie für zu lang hält.
   // Nur prüfen, wenn sich der Inhalt tatsächlich geändert hat — sonst
   // erschiene der Hinweis auch beim bloßen Nachtragen einer Notiz erneut.
-  if (typNeu !== 'cloze' && werte.antwort !== antwortVorher) await kartenCheckAnbieten(k);
+  // Klartext vergleichen, nicht das Markup: Beim ersten Speichern einer
+  // Altkarte wechselt das Format von 'text' auf 'html', der Text bleibt aber
+  // derselbe — ein Vergleich der Rohwerte böte dann jedes Mal den
+  // Karten-Check an, obwohl niemand etwas geändert hat.
+  if (typNeu !== 'cloze' && htmlZuText(werte.antwort).trim() !== antwortVorher)
+    await kartenCheckAnbieten(k);
 }
 
 /** Nicht blockierender Hinweis auf schwer lernbare Karten, mit dem Angebot,
@@ -3627,7 +4751,9 @@ async function karteBearbeiten(id) {
  *  werden dann eigenständig terminierte Einzelabfragen. */
 async function kartenCheckAnbieten(k) {
   if (!k) return;
-  const pruef = kartenCheck(k.antwort);
+  // Auf dem Klartext prüfen: Auszeichnung soll weder als Länge zählen noch
+  // eine Aufzählung vortäuschen.
+  const pruef = kartenCheck(feldText(k, k.antwort));
   if (!pruef.gruende.length) return;
   // Mehr als 20 Lücken kann eine Karte nicht führen (clozeNummern). Statt
   // stillschweigend abzuschneiden wird das Angebot dann nicht gemacht.
@@ -3639,7 +4765,7 @@ async function kartenCheckAnbieten(k) {
     .replace(/\{\{c\d{1,2}::([\s\S]*?)(?:::[\s\S]*?)?\}\}/g, '$1')
     .replace(/[{}]/g, '').trim();
   const clozeText = kannTeilen
-    ? entkleiden(k.frage) + (pruef.stamm ? '\n' + entkleiden(pruef.stamm) : '') + '\n' +
+    ? entkleiden(feldText(k, k.frage)) + (pruef.stamm ? '\n' + entkleiden(pruef.stamm) : '') + '\n' +
       pruef.liste.map((t, i) => `{{c${i + 1}::${entkleiden(t)}}}`).join('\n')
     : null;
 
@@ -3663,7 +4789,10 @@ async function kartenCheckAnbieten(k) {
   // Dieselbe Rückfrage wie beim normalen Bearbeiten: Aus einer Karte mit
   // Gegenrichtung wird durch den Lückentext eine ohne — die Rückwärtsabfrage
   // verschwindet dabei samt Lernstand.
-  const werte = { frage: clozeText, typ: 'cloze' };   // antwort bleibt als Sicherungsnetz stehen
+  // format zurück auf 'text': Der erzeugte Lückentext ist Klartext, und ein
+  // stehengebliebenes 'html' würde die {{c1::…}} durch den Sanitizer jagen.
+  const werte = { frage: clozeText, typ: 'cloze', format: 'text',
+                  antwort: feldText(k, k.antwort) };   // antwort bleibt als Sicherungsnetz stehen
   const vorschau = variantenPlan({ ...k, ...werte }, deckVon(k.deckId));
   if (vorschau.entfernt && !await frage('In Lückentext umwandeln',
     `Dabei ${vorschau.entfernt === 1 ? 'entfällt eine bestehende Abfrage' :
@@ -3928,7 +5057,14 @@ function malStatistik() {
         <span class="lab">Fach ${i + 1}</span>
         <span class="spur"><span class="fuell" style="width:${Math.round(n / maxFach * 100)}%"></span></span>
         <span class="val">${n}</span></div>`).join('')}
-      <p class="mini" style="margin-top:8px">Intervalle: ${S.einstellungen.intervalle.join(' · ')} Tage</p>
+      <p class="mini" style="margin-top:8px">${S.einstellungen.klassikModus
+        ? `Intervalle: ${S.einstellungen.intervalle.join(' · ')} Tage`
+        /* Im FSRS-Modus leitet sich das Fach aus der Stabilität ab, nach festen
+           Schwellen (KONZEPT §4.3) — die selbst eingestellten Intervalle
+           haben darauf keinen Einfluss. Hier standen trotzdem sie, was die
+           Tabelle unlesbar machte, sobald jemand sie angepasst hatte. */
+        : `Fach aus der Stabilität, Schwellen: ${STANDARD_INTERVALLE.join(' · ')} Tage.
+           Die eingestellten Intervalle gelten nur im Klassik-Modus.`}</p>
     </div>
 
     <div class="box">
@@ -4068,6 +5204,58 @@ function malEinstellungen() {
     </div>
 
     <div class="box">
+      <h2>Sprachausgabe</h2>
+      <p class="mini">Für den Hörmodus und den Lautsprecher auf der Karte. Bevorzugt werden
+        vorproduzierte Aufnahmen (Google Chirp 3 HD) — sie klingen deutlich besser als die
+        eingebaute Browserstimme, sind auf jedem Gerät gleich und funktionieren offline.
+        Wofür noch keine Aufnahme vorliegt, spricht weiterhin der Browser.</p>
+
+      <label class="karo" style="margin-top:10px"><input type="checkbox" id="s-kistimme"
+        ${kiStimmeAn() ? 'checked' : ''}>
+        <span>Vorproduzierte Aufnahmen verwenden</span></label>
+
+      <label class="feld" style="margin-top:10px"><span>Sprechtempo — ${sprachTempo().toFixed(2).replace('.', ',')}×</span>
+        <input type="range" id="s-tempo" min="0.5" max="1.5" step="0.05" value="${sprachTempo()}"></label>
+      <p class="mini" style="margin-top:-8px">Gilt für beide Wege. Zum Nachsprechen von Vokabeln
+        sind 0,75× bis 0,85× meist angenehmer als Normaltempo.</p>
+
+      <h3 style="margin:18px 0 4px;font-size:14px">Stimme je Sprache</h3>
+      <p class="mini">Die Sprache einer Karte kommt vom Kasten (<em>Kästen → Bearbeiten</em>).
+        Hier wird nur festgelegt, welche Stimme sie liest. Zwei verschiedene Stimmen für Frage-
+        und Antwortsprache zu wählen, macht den Hörmodus deutlich klarer.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-top:8px">
+        ${(() => {
+          /* Nur Sprachen anbieten, die auch vorkommen — eine Liste aller
+             zwölf wäre zu 90 % totes Kapital. Ist noch kein Kasten
+             eingerichtet, bleibt Deutsch als Einstieg. */
+          const benutzt = new Set();
+          S.decks.forEach(d => { benutzt.add(deckSprache(d.id)); benutzt.add(deckSpracheAntwort(d.id)); });
+          if (!benutzt.size) benutzt.add('de-DE');
+          return Array.from(benutzt).sort().map(spr => {
+            const name = SPRACHEN.find(([c]) => c === spr)?.[1] || spr;
+            return `<label class="feld" style="margin:0"><span>${esc(name)}</span>
+              <select data-stimme="${esc(spr)}">
+                ${CHIRP_STIMMEN.map(([n, g]) => `<option value="${n}" ${stimmeFuer(spr) === n ? 'selected' : ''}>
+                  ${n} (${g === 'w' ? 'weiblich' : 'männlich'})</option>`).join('')}
+              </select></label>`;
+          }).join('');
+        })()}
+      </div>
+
+      <label class="karo" style="margin-top:12px"><input type="checkbox" id="s-bedarf"
+        ${S.einstellungen.bedarfMelden !== false ? 'checked' : ''}>
+        <span>Fehlende Aufnahmen in die gemeinsame Liste eintragen</span></label>
+      <p class="mini" style="margin-top:-4px">Damit weiß das Vorproduktions-Skript, was noch zu
+        erzeugen ist. <strong>Eingetragen wird der Kartentext</strong> — er ist damit für die
+        anderen Konten dieses Projekts lesbar. Lernstand, Termine und Statistik bleiben privat.
+        Wer das nicht möchte, nimmt den Haken heraus; die Karten sprechen dann mit der
+        Browserstimme.</p>
+
+      <button class="btn primary" data-tu="sprachSpeichern">Speichern</button>
+      <button class="btn" data-tu="sprachProbe">Probe hören</button>
+    </div>
+
+    <div class="box">
       <h2>Intervalle pro Fach</h2>
       <p class="mini">Tage bis zur nächsten Abfrage im Klassik-Modus. Im FSRS-Modus hat diese
          Tabelle keinen Einfluss — die Fach-Anzeige verwendet dort feste Schwellen
@@ -4164,6 +5352,15 @@ function malEinstellungen() {
 
   verdrahten(ziel);
   diagnoseMalen();
+  // Das Verzeichnis der Aufnahmen einmal anstoßen, damit die Diagnose eine
+  // Zahl nennen kann statt „noch nicht nachgesehen“.
+  if (!audioVerzeichnisGeladen()) audioVerzeichnisLaden().then(diagnoseMalen);
+  // Beschriftung des Tempo-Reglers mitziehen — ein Schieber ohne Zahl daneben
+  // ist auf dem Handy nicht bedienbar.
+  $('#s-tempo')?.addEventListener('input', ev => {
+    const b = ev.target.closest('.feld')?.querySelector('span');
+    if (b) b.textContent = 'Sprechtempo — ' + Number(ev.target.value).toFixed(2).replace('.', ',') + '×';
+  });
   $('#s-theme').addEventListener('change', ev => {
     themeWunsch = ev.target.value;
     S.einstellungen.theme = themeWunsch;
@@ -4226,7 +5423,10 @@ function diagnoseMalen() {
   d.innerHTML = `
     HAN CROCO <code>${esc(VERSION)}</code> · Projekt: <code>${esc(CFG.projectId)}</code><br>
     Firebase-SDK: <code>${esc(SDK_VERSION)}</code> · FSRS: <code>${esc(FSRS?.FSRSVersion || 'ts-fsrs')}</code><br>
-    Sprachausgabe: ${sprachAusgabeDa() ? 'verfügbar' : 'in diesem Browser nicht verfügbar'}<br>
+    Browserstimme: ${sprachAusgabeDa() ? 'verfügbar' : 'in diesem Browser nicht verfügbar'} ·
+    Aufnahmen: ${audioVerzeichnisGeladen()
+      ? (audioVerzeichnis?.size ? audioVerzeichnis.size + ' vorproduziert' : 'noch keine erzeugt')
+      : 'noch nicht nachgesehen'}${kiStimmeAn() ? '' : ' (abgeschaltet)'}<br>
     Verbindung: ${statusZustand.offen ? 'Änderungen unterwegs'
       : navigator.onLine ? 'online' : 'offline'}<br>
     Daten: ${S.decks.length} Kästen · ${quellen} Karten${
@@ -4332,9 +5532,10 @@ function dateiWaehlen(endung) {
 
 /* --- 14a. Export --- */
 
-async function exportJson() {
-  await reviewsLaden();          // sonst wäre der Verlauf in der Sicherung leer
-  const daten = {
+/** Der Inhalt der Sicherung, ohne Download. Eigene Funktion, damit die
+ *  Abnahmeprüfung den Datensatz begutachten kann, ohne eine Datei anzufassen. */
+function exportDaten() {
+  return {
     app: 'HAN CROCO', appAlt: 'Lernkartei 2', version: 2, programmVersion: VERSION,
     exportiertAm: new Date().toISOString(),
     konto: S.email,
@@ -4343,6 +5544,13 @@ async function exportJson() {
     cards: S.cards,
     reviews: S.reviews
   };
+}
+
+async function exportJson() {
+  /* Mit `true`, sonst enthält die Sicherung nur die letzten 70 Tage — der
+     Knopf heißt „Alles als JSON sichern“ und muss auch alles liefern. */
+  await reviewsLaden(true);
+  const daten = exportDaten();
   const name = `han-croco-${heute()}.json`;
   dateiHerunterladen(name, JSON.stringify(daten, null, 2));
   toast('Sicherung heruntergeladen: ' + name);
@@ -4363,8 +5571,11 @@ function csvBauen(karten) {
     + karten.filter(istQuellkarte).map(k =>
     // Bei L\u00FCckentexten steht die L\u00F6sung in der Frage-Spalte; ohne Ersatz in
     // der Antwort-Spalte w\u00FCrde die Zeile beim Wiedereinlesen verworfen.
-    [k.frage,
-     k.antwort || (k.typ === 'cloze'
+    // Auszeichnung fliegt raus: CSV ist ein Klartextformat, und ein <b> in
+    // der Zelle w\u00E4re beim Wiedereinlesen als Klartext Teil der Frage.
+    // Wer die Auszeichnung behalten will, nimmt die JSON-Sicherung.
+    [feldText(k, k.frage),
+     feldText(k, k.antwort) || (k.typ === 'cloze'
        ? clozeNummern(k.frage).map(n => clozeLoesung(k.frage, n)).join(' \u00B7 ') : ''),
      deckName(k.deckId)].map(csvFeld).join(';')).join('\r\n');
 }
@@ -4933,7 +6144,26 @@ function karteNormalisieren(k, deckId, ivListe) {
     frage: String(q.frage ?? q.front ?? '').trim(),
     antwort: String(q.antwort ?? q.back ?? '').trim(),
     notiz: String(q.notiz ?? '').trim(),
-    tags: Array.isArray(q.tags) ? q.tags.map(t => String(t).slice(0, 60)).slice(0, 30) : [],
+    // Stufe 5. Die Aliase decken den Anki-Export ab, wo die Felder Extra
+    // bzw. Marker heißen.
+    extra: String(q.extra ?? q.Extra ?? '').trim(),
+    mark: String(q.mark ?? q.Mark ?? '').trim(),
+    lautschrift: String(q.lautschrift ?? '').trim().slice(0, 200),
+    lautschriftAntwort: String(q.lautschriftAntwort ?? '').trim().slice(0, 200),
+    // Fremde Daten gelten grundsätzlich als Klartext. Nur wer ausdrücklich
+    // 'html' mitschickt — also eine eigene Sicherung aus Stufe 5 — bekommt
+    // den Auszeichnungspfad. Andernfalls würde ein Anki-Export mit rohem
+    // Markup unbesehen als HTML gedeutet.
+    format: q.format === 'html' ? 'html' : 'text',
+    /* Anki exportiert Schlagwörter als eine leerzeichengetrennte
+       Zeichenkette, nicht als Liste — vorher fielen sie kommentarlos weg.
+       Steuerzeichen werden entfernt, weil U+001F intern als Trennzeichen
+       dient und ein importiertes Schlagwort sonst beim Bearbeiten in zwei
+       zerfiele. */
+    tags: (Array.isArray(q.tags) ? q.tags
+            : typeof q.tags === 'string' ? q.tags.split(/[\s,;]+/) : [])
+          .map(t => String(t).replace(/[\u0000-\u001f]/g, '').trim().slice(0, 60))
+          .filter(Boolean).slice(0, 30),
     typ: KARTEN_TYPEN.includes(q.typ) ? q.typ : 'standard',
     // Stufe 3: Zugehörigkeit zur Quellkarte mitnehmen, sonst würden aus
     // Rückwärtsabfragen beim Import eigenständige Karten ohne Inhalt.
@@ -4945,7 +6175,9 @@ function karteNormalisieren(k, deckId, ivListe) {
     difficulty: unberuehrt ? 0
       : (Number.isFinite(schwRoh) && schwRoh >= 1 ? Math.min(10, Math.round(schwRoh)) : 5),
     due: isoOder(q.faellig ?? q.due, heute()),
-    lastReview: zuletzt,
+    // Ein Abfragedatum aus der Zukunft (Sicherung von einem Gerät, das voraus
+    // war) macht die Karte für ts-fsrs unbewertbar — hier gleich begrenzen.
+    lastReview: zuletzt && zuletzt > heute() ? heute() : zuletzt,
     reps,
     lapses,
     state: [0, 1, 2, 3].includes(q.state) ? q.state : (reps ? 2 : 0),
@@ -5193,6 +6425,16 @@ async function importSchreiben(geparst, modus, ivUebernehmen, einstUebernehmen) 
     const deckKommtNeu = new Set(geparst.decks.map(d => d.id));
     S.decks.forEach(d => { if (!deckKommtNeu.has(d.id)) ops.push(['del', FB.doc(colDecks(), d.id)]); });
     S.cards.forEach(k => { if (!kommtNeu.has(k.id)) ops.push(['del', FB.doc(colCards(), k.id)]); });
+    /* Auch die Tagesstatistik. Sonst ergäbe „Ersetzen“ eine Mischung: neue
+       Karten, aber der alte Lernverlauf — die Statistik nennt dann Abfragen
+       für Kästen, die es nicht mehr gibt. */
+    await reviewsLaden(true);
+    const reviewsNeu = new Set((geparst.reviews || [])
+      .map(r => String(r.datum || r.id || '').slice(0, 10)));
+    (S.reviews || []).forEach(r => {
+      const tag = String(r.datum || r.id || '').slice(0, 10);
+      if (tag && !reviewsNeu.has(tag)) ops.push(['del', FB.doc(colReviews(), tag)]);
+    });
   }
 
   // Kästen: bei Zusammenführen gleichnamige wiederverwenden
@@ -5228,9 +6470,23 @@ async function importSchreiben(geparst, modus, ivUebernehmen, einstUebernehmen) 
   const einstellungenPatch = {};
   if (ivUebernehmen && geparst.intervalle)
     einstellungenPatch.intervalle = geparst.intervalle.slice(0, 12);
-  if (geparst.meta && (geparst.meta.streak || geparst.meta.lastLearnDate)) {
-    einstellungenPatch.streak = geparst.meta.streak || 0;
-    einstellungenPatch.lastLearnDate = geparst.meta.lastLearnDate || null;
+  /* Streak und Lerndatum gehören zu den Einstellungen und dürfen ohne den
+     Haken nicht angerührt werden. Vorher überschrieb jede Sicherung sie —
+     auch eine aus fremdem Konto, bei der der Haken bewusst leer ist. Der
+     Streak war damit endgültig weg, samt der davon abhängigen Abzeichen.
+     Beim Zusammenführen gewinnt zudem der höhere Stand: Wer eine ältere
+     Sicherung einspielt, soll seine Serie nicht verlieren. */
+  /* Beim Altbestand aus der Vorgängerversion gibt es keinen Haken — dort ist
+     die Übernahme der ganze Zweck des Vorgangs. */
+  const metaUebernehmen = einstUebernehmen || !geparst.einstellungen;
+  if (metaUebernehmen && geparst.meta && (geparst.meta.streak || geparst.meta.lastLearnDate)) {
+    const alt = modus === 'replace' ? 0 : (Number(S.einstellungen.streak) || 0);
+    const neu = Number(geparst.meta.streak) || 0;
+    einstellungenPatch.streak = Math.max(alt, neu);
+    const altDatum = modus === 'replace' ? null : (S.einstellungen.lastLearnDate || null);
+    const neuDatum = geparst.meta.lastLearnDate || null;
+    einstellungenPatch.lastLearnDate =
+      (altDatum && neuDatum) ? (altDatum > neuDatum ? altDatum : neuDatum) : (altDatum || neuDatum);
   }
   if (geparst.einstellungen && einstUebernehmen) {
     Object.assign(einstellungenPatch, geparst.einstellungen);
@@ -5312,8 +6568,14 @@ const AKTION = {
     if (!k) return;
     const seite = was === 'antwort' ? 'antwort' : 'frage';
     const text = seite === 'antwort' ? antwortText(k) : frageText(k);
-    if (!sprechen(text, spracheFuer(k, seite)))
-      toast('Dieser Browser bietet keine Sprachausgabe an.', 'fehler');
+    // Eine leere Kartenseite ist kein Fehler der Sprachausgabe — vorher stand
+    // dort trotzdem „Dieser Browser bietet keine Sprachausgabe an“.
+    if (!String(text || '').trim()) return toast('Auf dieser Seite steht nichts zum Vorlesen.');
+    // sprechen() ist asynchron (es sieht erst im Verzeichnis nach). Der
+    // Hinweis darf deshalb erst fallen, wenn beide Wege gescheitert sind.
+    sprechen(text, spracheFuer(k, seite), { lautschrift: lautschriftFuer(k, seite) })
+      .then(ok => { if (!ok) toast('Dieser Browser bietet keine Sprachausgabe an.', 'fehler'); })
+      .catch(e => console.warn('[Sprachausgabe]', e));
   },
   abbrechen: () => sitzungBeenden(false),
   nochmal: () => { sitzung = null; letzteSitzung = null; malLernen(); },
@@ -5493,7 +6755,7 @@ const AKTION = {
     if (!karten.length) return toast('Dieser Kasten ist leer.');
     dateiHerunterladen(`han-croco-${dateiTeil(deckName(id))}-${heute()}.csv`,
       csvBauen(karten), 'text/csv');
-    toast('CSV heruntergeladen.');
+    toast('CSV heruntergeladen \u2014 nur Frage, Antwort und Kasten.');
   },
 
   /* Karten */
@@ -5753,6 +7015,44 @@ const AKTION = {
     toast('Tagespensum gespeichert.');
   },
 
+  sprachSpeichern: () => {
+    const kiStimme = $('#s-kistimme')?.checked !== false;
+    const tempoRoh = Number($('#s-tempo')?.value);
+    const sprachTempoNeu = Number.isFinite(tempoRoh) && tempoRoh >= 0.5 && tempoRoh <= 1.5
+      ? Math.round(tempoRoh * 20) / 20 : 0.95;
+    const bedarfMelden = $('#s-bedarf')?.checked !== false;
+    const stimmen = { ...(S.einstellungen.stimmen || {}) };
+    $$('[data-stimme]').forEach(sel => {
+      if (CHIRP_STIMMEN.some(([n]) => n === sel.value)) stimmen[sel.dataset.stimme] = sel.value;
+    });
+    const patch = { kiStimme, sprachTempo: sprachTempoNeu, bedarfMelden, stimmen };
+    Object.assign(S.einstellungen, patch);
+    schreibe(FB.setDoc(refEinstellungen(), patch, { merge: true }), 'Sprachausgabe');
+    /* Der Puffer der gemeldeten Schlüssel wird NICHT geleert. Eine andere
+       Stimme ergibt andere Schlüssel — die stehen ohnehin noch nicht drin.
+       Ein Leeren würde nur dafür sorgen, dass der gesamte Bestand erneut
+       gemeldet und damit erneut geschrieben wird. */
+    toast('Sprachausgabe gespeichert.');
+    malEinstellungen();
+  },
+  sprachProbe: () => {
+    /* Die Probe läuft bewusst über denselben Weg wie der Lernbetrieb —
+       inklusive Verzeichnis-Nachschlag. Nur so hört man, was man bekommt,
+       und nicht, was gemeint war. */
+    const erste = S.decks[0] ? deckSprache(S.decks[0].id) : 'de-DE';
+    const proben = {
+      'de-DE': 'Der Merkstoff sitzt erst, wenn er mehrfach abgerufen wurde.',
+      'en-US': 'Spaced repetition works because forgetting is predictable.',
+      'en-GB': 'Spaced repetition works because forgetting is predictable.',
+      'fr-FR': 'La répétition espacée repose sur la courbe de l’oubli.',
+      'es-ES': 'La repetición espaciada se basa en la curva del olvido.',
+      'it-IT': 'La ripetizione dilazionata si basa sulla curva dell’oblio.'
+    };
+    sprechen(proben[erste] || proben['de-DE'], erste)
+      .then(ok => { if (!ok) toast('Keine Sprachausgabe verfügbar.', 'fehler'); })
+      .catch(e => console.warn('[Sprachausgabe]', e));
+  },
+
   /* Import / Export */
   altBrowser: async () => {
     const roh = altdatenImBrowser();
@@ -5796,7 +7096,11 @@ const AKTION = {
         <option value="alle">Alle Kästen zusammen (${S.cards.length} Karten)</option>
         ${S.decks.map(d => `<option value="${esc(d.id)}">${esc(d.name)} (${kartenVon(d.id).length})</option>`).join('')}
         </select></label><p class="mini">Format: Frage;Antwort;Kasten, mit \u00DCberschriftzeile \u2014
-          so l\u00E4sst sich die Datei sp\u00E4ter wieder einlesen, ohne dass die K\u00E4sten verschmelzen.</p>`,
+          so l\u00E4sst sich die Datei sp\u00E4ter wieder einlesen, ohne dass die K\u00E4sten verschmelzen.</p>
+        <div class="hinweis" style="margin-top:8px"><strong>CSV ist kein Backup.</strong>
+          Drei Spalten, mehr nicht \u2014 es fehlen Notiz, Extra, Merker, Schlagw\u00F6rter,
+          Lautschrift, die Formatierung, der Kartentyp und der gesamte Lernstand.
+          F\u00FCr eine vollst\u00E4ndige Sicherung nimm <em>Alles als JSON sichern</em>.</div>`,
       knoepfe: [{ text: 'Abbrechen', wert: null }, { text: 'Herunterladen', wert: 'ok', art: 'primary' }]
     });
     if (r !== 'ok') return;
@@ -5806,7 +7110,7 @@ const AKTION = {
     dateiHerunterladen(
       `han-croco-${wahl === 'alle' ? 'alle' : dateiTeil(deckName(wahl))}-${heute()}.csv`,
       csvBauen(karten), 'text/csv');
-    toast('CSV heruntergeladen.');
+    toast('CSV heruntergeladen \u2014 nur Frage, Antwort und Kasten.');
   },
   impCsv: async () => {
     const d = await dateiWaehlen('.csv,.txt,.tsv,text/csv,text/tab-separated-values');
@@ -6155,7 +7459,13 @@ document.addEventListener('keydown', e => {
    alleSeitenMalen() griffe nicht mehr, sodass die nächste
    Firestore-Aktualisierung mitten in der Sitzung den Startbildschirm
    darüberzeichnet. */
-window.addEventListener('pagehide', sprechenStoppen);
+window.addEventListener('pagehide', () => {
+  sprechenStoppen();
+  // Die Liste der gemeldeten Schlüssel wird gepuffert geschrieben. Ohne
+  // dieses Nachziehen ginge die letzte Meldung vor dem Schließen verloren —
+  // beim nächsten Start würde sie erneut geschrieben.
+  bedarfJetztSichern();
+});
 
 /* Nach einer Unterbrechung — Anruf, Bildschirmsperre, App-Wechsel — zählt
    die Zeit auf der aktuellen Karte neu. Sonst flössen zwölf Minuten
@@ -6164,6 +7474,26 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && sitzung?.aktiv) sitzung.kartenStart = Date.now();
   if (document.visibilityState === 'hidden') sprechenStoppen();
 });
+
+/* ---------- 16b. Prüfhaken ---------------------------------------------- */
+
+/* Ein kleines Fenster in den Modulbereich, damit die Abnahmeprüfungen die
+   reinen Funktionen einzeln aufrufen können — allen voran den Sanitizer.
+   Ohne diesen Haken ließe sich XSS nur über die Oberfläche prüfen, also
+   immer nur an den Stellen, an die man beim Testschreiben gerade denkt.
+
+   Unbedenklich: Es sind ausschließlich Funktionen, die ohnehin im Browser
+   des angemeldeten Nutzers laufen. Sie eröffnen keinen Zugriff, den die
+   Entwicklerkonsole nicht ohnehin hätte, und die Security Rules gelten
+   unabhängig davon auf dem Server. */
+window.__T = {
+  htmlSauber, htmlZuText, feldHtml, feldText, textAufraeumen,
+  audioSchluessel, sprechen, sprechenStoppen, stimmeFuer,
+  audioVerzeichnisLaden, textHaeppchen, tagsAusWert,
+  karteNormalisieren, deckNormalisieren, exportDaten,
+  frageText, antwortText, frageHtml, antwortHtml,
+  version: VERSION
+};
 
 /* ---------- 17. Los ----------------------------------------------------- */
 
