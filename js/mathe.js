@@ -21,6 +21,7 @@
 import { BEREICHE, bereichVon, setVon, bereicheLaden } from './mathe-sets.js';
 import { setAufgaben, antwortStimmt, tastenFuer } from './mathe-erzeuger.js';
 import { termStimmt, kanonisch, termTasten } from './mathe-term.js';
+import * as MK from './mathe-meister.js';
 
 /* Ringmaße. Sie stammen aus dem vermessenen Vorbild: 24 Punkte im Abstand
    von genau 15°, Punktdurchmesser 0,110 des Ringradius — die Punkte
@@ -61,6 +62,7 @@ export function matheStarten(w) {
   let ansicht = { bereich: null, modus: 'test' };
   let lauf = null;
   let ringTakt = null;          // requestAnimationFrame / setInterval
+  let mkWahl = [];              // gewählte Zusatzbereiche der Meisterklasse
   let ringIntervall = null;
 
   const ziel = () => $('#seite-mathe');
@@ -81,6 +83,18 @@ export function matheStarten(w) {
   padding:14px 16px;font:inherit;color:var(--txt);cursor:pointer}
 .ma-bereich:hover{border-color:var(--border2)}
 .ma-bereich[disabled]{opacity:.55;cursor:default}
+.ma-meister{margin-top:8px;border-color:var(--akzent);background:var(--akzent-bg)}
+.ma-meister .ma-bereich-nr{background:var(--akzent);color:#fff}
+.mk-themen{display:grid;gap:4px}
+.mk-thema{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:9px;
+  background:var(--bg3);font-size:13.5px}
+.mk-thema.sitzt{background:var(--bewertung-3-bg)}
+.mk-thema.wackelt{background:var(--faellig-bg)}
+.mk-thema.fehlt{background:var(--bewertung-1-bg)}
+.mk-marke{flex:none;font-size:11.5px;font-weight:700;color:var(--txt2)}
+.mk-thema.sitzt .mk-marke{color:var(--bewertung-3)}
+.mk-thema.wackelt .mk-marke{color:var(--faellig)}
+.mk-thema.fehlt .mk-marke{color:var(--bewertung-1)}
 .ma-bereich b{display:block;font-size:15px}
 .ma-bereich span{display:block;font-size:13px;color:var(--txt3)}
 .ma-bereich-nr{flex:none;width:34px;height:34px;border-radius:50%;background:var(--bg3);
@@ -160,8 +174,35 @@ export function matheStarten(w) {
   const leererStand = () => {
     const o = {};
     BEREICHE.forEach(b => { o[b.id] = { sets: {}, aktuell: 1 }; });
+    o.meisterklasse = { laeufe: [] };
     return o;
   };
+
+  /** Läufe der Meisterklasse auf Form bringen. Werte aus Firestore kommen
+   *  von außen — auch aus einer alten oder von Hand veränderten Sicherung. */
+  function meisterNormalisieren(roh) {
+    const liste = Array.isArray(roh?.laeufe) ? roh.laeufe : [];
+    return { laeufe: liste.slice(-20).map(l => ({
+      datum: typeof l?.datum === 'string' ? l.datum.slice(0, 10) : null,
+      wahl: Array.isArray(l?.wahl) ? l.wahl.filter(x => MK.WAHLBEREICHE.includes(x)) : [],
+      index: zahl(l?.index, 0, 1000, 0),
+      sekunden: zahl(l?.sekunden, 0, 86400, 0),
+      richtig: zahl(l?.richtig, 0, 9999, 0),
+      gesamt: zahl(l?.gesamt, 0, 9999, 0),
+      abgebrochen: !!l?.abgebrochen,
+      themen: themenNormalisieren(l?.themen)
+    })).filter(l => l.gesamt > 0) };
+  }
+  function themenNormalisieren(roh) {
+    const o = {};
+    Object.entries(roh || {}).forEach(([id, e]) => {
+      if (!MK.themaVon(id)) return;
+      o[id] = { n: zahl(e?.n, 0, 9999, 0), fehler: zahl(e?.fehler, 0, 9999, 0),
+                sekunden: Math.max(0, Math.min(86400, Number(e?.sekunden) || 0)),
+                par: Math.max(0, Math.min(86400, Number(e?.par) || 0)) };
+    });
+    return o;
+  }
 
   function standNormalisieren(roh) {
     const sets = {};
@@ -203,7 +244,10 @@ export function matheStarten(w) {
       const stand = leererStand();
       try {
         const snap = await FB.getDocs(w.colMathe());
-        snap.docs.forEach(d => { if (stand[d.id]) stand[d.id] = standNormalisieren(d.data()); });
+        snap.docs.forEach(d => {
+          if (d.id === 'meisterklasse') stand.meisterklasse = meisterNormalisieren(d.data());
+          else if (stand[d.id]) stand[d.id] = standNormalisieren(d.data());
+        });
         geladen = true; ladefehler = false;
       } catch (e) {
         /* Ohne Netz und ohne Zwischenspeicher bleibt der Stand leer. Rechnen
@@ -299,8 +343,27 @@ export function matheStarten(w) {
         Bedingung. Im Übungsmodus läuft keine Uhr.</p>
       <div class="ma-bereiche">
         ${BEREICHE.map(b => bereichKachel(b)).join('')}
-      </div>`;
+      </div>
+      ${meisterKachelHtml()}`;
     verdrahten(z);
+  }
+
+  /** Die Meisterklasse steht unter den sechs Bereichen — sie ist keiner,
+   *  sondern eine Prüfung quer durch alle. */
+  function meisterKachelHtml() {
+    const stand = daten?.meisterklasse;
+    const beste = Math.max(0, ...(stand?.laeufe || []).map(l => Number(l.index) || 0));
+    const n = (stand?.laeufe || []).length;
+    return `
+      <button class="ma-bereich ma-meister" data-tu="matheMeister">
+        <span class="ma-bereich-nr">★</span>
+        <span style="flex:1;min-width:0">
+          <b>Meisterklasse</b>
+          <span>Eine Prüfung quer durch alles — und danach steht da, was noch fehlt</span>
+        </span>
+        ${n ? `<span class="ma-bereich-stand"><b>${beste.toFixed(0)}</b> Index<br>
+          <span class="mini">${n} ${n === 1 ? 'Prüfung' : 'Prüfungen'}</span></span>` : ''}
+      </button>`;
   }
 
   function bereichKachel(b) {
@@ -379,6 +442,159 @@ export function matheStarten(w) {
   }
 
   /* ---------------------------------------------------------------------
+     Ansicht 2b — die Meisterklasse
+     --------------------------------------------------------------------- */
+
+  const MK_DECKEL_MS = 15 * 60 * 1000;
+
+  function malMeister() {
+    const z = ziel();
+    const themen = MK.bauplanThemen(mkWahl);
+    const je = MK.aufgabenJeThema(themen);
+    const gesamt = themen.length * je;
+    const stand = daten?.meisterklasse || { laeufe: [] };
+    const laeufe = (stand.laeufe || []).slice().reverse();
+    const beste = laeufe.length ? Math.max(...laeufe.map(l => Number(l.index) || 0)) : null;
+    const bilanzen = laeufe.slice(0, 5).map(l => l.themen || {});
+    const dia = bilanzen.length ? MK.diagnose(bilanzen) : [];
+
+    z.innerHTML = `
+      <div class="spread">
+        <h1 style="margin:0">Meisterklasse</h1>
+        <button class="btn" data-tu="matheZurueck">Alle Bereiche</button>
+      </div>
+      <p class="mini" style="margin-top:4px">Eine Prüfung quer durch alles. Jedes Mal neu
+        gewürfelt — vergleichbar bleibt sie über den <strong>Index</strong>.</p>
+
+      <div class="box mt">
+        <h2 style="margin:0 0 6px">Was geprüft wird</h2>
+        <p class="mini" style="margin:0 0 10px">Fest dabei sind die Bereiche 1 bis 4.
+          Was du kannst, darfst du dazunehmen:</p>
+        <div class="row">
+          ${MK.WAHLBEREICHE.map(id => {
+            const b = BEREICHE.find(x => x.id === id);
+            const an = mkWahl.includes(id);
+            return `<label class="karo" style="flex:1 1 240px">
+              <input type="checkbox" data-tu="matheMkWahl" data-id="${esc(id)}" ${an ? 'checked' : ''}>
+              <span>${esc(b?.name || id)}</span></label>`;
+          }).join('')}
+        </div>
+        <p class="mini mt">${themen.length} Themen · <strong>${gesamt} Aufgaben</strong> ·
+          etwa 10 Minuten · spätestens nach 15 Minuten ist Schluss</p>
+        <div class="row mt">
+          <button class="btn primary gross" data-tu="matheMkStarten">Prüfung starten</button>
+          ${beste != null ? `<span class="mini">Beste bisher: <strong>Index
+            ${beste.toFixed(0)}</strong></span>` : ''}
+        </div>
+      </div>
+
+      ${laeufe.length ? `
+        <div class="box">
+          <h2 style="margin:0 0 8px">Bisherige Prüfungen</h2>
+          <table class="daten"><thead><tr><th>Datum</th>
+            <th style="text-align:right">Index</th><th style="text-align:right">richtig</th>
+            <th style="text-align:right">Zeit</th></tr></thead><tbody>
+            ${laeufe.slice(0, 8).map(l => `<tr>
+              <td>${esc(l.datum || '—')}</td>
+              <td style="text-align:right"><strong>${(Number(l.index) || 0).toFixed(0)}</strong></td>
+              <td style="text-align:right">${l.richtig}/${l.gesamt}</td>
+              <td style="text-align:right">${esc(zeitText(l.sekunden))}</td></tr>`).join('')}
+          </tbody></table>
+        </div>` : ''}
+
+      ${dia.length ? diagnoseHtml(dia, bilanzen.length) : ''}`;
+    verdrahten(z);
+  }
+
+  function diagnoseHtml(dia, anzahlLaeufe) {
+    const b = MK.belastbarkeit(anzahlLaeufe);
+    const plan = MK.uebungsplan(dia);
+    return `
+      <div class="box">
+        <h2 style="margin:0 0 4px">Was noch nicht sitzt</h2>
+        <p class="mini" style="margin:0 0 10px">${esc(b.text)}</p>
+        <div class="mk-themen">
+          ${dia.filter(d => d.stufe !== 'sitzt').map(d => `<div class="mk-thema ${esc(d.stufe)}">
+            <span style="flex:1">${esc(d.thema.name)}</span>
+            <span class="mini">${d.fehler ? d.fehler + (d.fehler === 1 ? ' Fehler · ' : ' Fehler · ') : ''}${
+              d.verhaeltnis.toFixed(1)} × Soll</span>
+            <span class="mk-marke">${esc(MK.EINSTUFUNG[d.stufe].name)}</span>
+          </div>`).join('')}
+          ${(() => {
+            /* Die Themen, die sitzen, in EINE Zeile. Achtzehn Zeilen, von
+               denen sechzehn „sitzt" sagen, begraben genau das, worum es
+               geht — und das ist das, was nicht sitzt. */
+            const gut = dia.filter(d => d.stufe === 'sitzt');
+            if (!gut.length) return '';
+            return `<div class="mk-thema sitzt">
+              <span style="flex:1">${gut.length === dia.length
+                ? 'Alles sitzt — quer durch alle Themen'
+                : gut.length + (gut.length === 1 ? ' Thema sitzt' : ' Themen sitzen')
+                  + ': ' + esc(gut.map(d => d.thema.name).join(' · '))}</span>
+              <span class="mk-marke">sitzt</span></div>`;
+          })()}
+        </div>
+        ${plan.length ? `
+          <h3 style="margin:16px 0 6px">Das würde ich als Nächstes üben</h3>
+          <div class="row">
+            ${plan.map(p => `<button class="btn klein" data-tu="matheMkUeben"
+              data-id="${esc(p.bereich + ':' + p.setNr)}">${esc(p.thema.name)} —
+              Set ${p.setNr}</button>`).join('')}
+          </div>
+          <p class="mini mt">Ausgewählt sind die <strong>Schlüsselsets</strong> der
+            schwächsten Themen — die tragen alles andere.</p>` : ''}
+      </div>`;
+  }
+
+  function meisterStarten() {
+    const themen = MK.bauplanThemen(mkWahl);
+    const je = MK.aufgabenJeThema(themen);
+    const startwert = Math.floor(Math.random() * 1e9) + 1;
+    let bloecke;
+    try { bloecke = MK.ziehen(themen, je, startwert); }
+    catch (e) { console.error(e); return toast('Die Prüfung ließ sich nicht aufbauen.', 'fehler'); }
+    const aufgaben = bloecke.flatMap(b => b.aufgaben);
+    if (!aufgaben.length) return toast('Keine Aufgaben gefunden.', 'fehler');
+
+    lauf = {
+      meister: true, wahl: mkWahl.slice(), bloecke,
+      bereichId: 'meisterklasse', nr: 0, modus: 'test',
+      set: { titel: 'Meisterklasse', aufgaben: aufgaben.length },
+      pruefart: aufgaben[0].pruefart,
+      aufgaben,
+      zustand: aufgaben.map(() => 'offen'),
+      offen: aufgaben.map((_, i) => i),
+      eingabe: '',
+      start: Date.now(),
+      zeiten: [], antworten: [],
+      letzteAntwortZeit: Date.now(),
+      fehler: 0, schatten: null, unterbrochen: false,
+      aktiv: true, ende: null
+    };
+    malLauf();
+    mkUhrStarten();
+  }
+
+  /* Der Deckel: Nach fünfzehn Minuten ist Schluss, egal wo man steht. Der
+     Index ist auch aus einer halben Prüfung berechenbar; die Diagnose wird
+     entsprechend gekennzeichnet. */
+  let mkUhr = null;
+  function mkUhrStarten() {
+    clearInterval(mkUhr);
+    const takt = () => {
+      if (!lauf?.meister || !lauf.aktiv) return mkUhrStoppen();
+      const rest = MK_DECKEL_MS - (Date.now() - lauf.start);
+      const el = $('#ma-restzeit');
+      if (el) el.textContent = rest > 0 ? zeitText(rest / 1000) + ' übrig' : '';
+      if (rest <= 0) { lauf.abgelaufen = true; laufBeenden(); }
+    };
+    /* Einmal sofort, sonst stünde die erste Sekunde lang „Aufgaben" da. */
+    takt();
+    mkUhr = setInterval(takt, 1000);
+  }
+  function mkUhrStoppen() { clearInterval(mkUhr); mkUhr = null; }
+
+  /* ---------------------------------------------------------------------
      Ansicht 3 — der Lauf
      --------------------------------------------------------------------- */
 
@@ -421,18 +637,28 @@ export function matheStarten(w) {
   function malLauf() {
     const z = ziel();
     const l = lauf;
-    const tasten = tastenListe(l.aufgaben, l.pruefart);
+    /* Bei der Meisterklasse wechseln die Prüfarten mitten im Lauf. Der
+       Tastenblock richtet sich deshalb nach dem laufenden THEMENBLOCK —
+       darum kommen die Aufgaben eines Themas auch zusammenhängend, und nur
+       die Reihenfolge der Themen wird gewürfelt. */
+    const block = l.meister ? mkBlockVon(l, l.offen[0]) : null;
+    const tasten = tastenListe(block ? block.aufgaben : l.aufgaben,
+      block ? block.aufgaben[0].pruefart : l.pruefart);
+    l.tastenSchluessel = block ? block.thema.id + ':' + block.pruefart : '';
     z.innerHTML = `
       <div class="ma-kopf">
-        <div><strong>Set ${l.nr}</strong> <span class="mini">${esc(l.set.titel)}</span></div>
+        <div>${l.meister
+          ? `<strong>Meisterklasse</strong> <span class="mini" id="ma-thema">${
+              esc(l.bloecke[0]?.thema.name || '')}</span>`
+          : `<strong>Set ${l.nr}</strong> <span class="mini">${esc(l.set.titel)}</span>`}</div>
         <button class="btn" data-tu="matheAbbrechen">Abbrechen</button>
       </div>
       <div class="ma-lauf">
-        ${ringHtml(l.aufgaben.length)}
+        ${ringHtml(l.meister ? l.bloecke.length : l.aufgaben.length)}
         <div class="ma-aufgabe" id="ma-aufgabe"></div>
         ${tastenHtml(tasten)}
-        ${FORM_HINWEIS[l.pruefart] ? `<p class="mini" style="margin:0">
-          ${esc(FORM_HINWEIS[l.pruefart])}</p>` : ''}
+        ${FORM_HINWEIS[block ? block.pruefart : l.pruefart] ? `<p class="mini" style="margin:0">
+          ${esc(FORM_HINWEIS[block ? block.pruefart : l.pruefart])}</p>` : ''}
         <p class="mini" style="margin:0">${l.modus === 'test'
           ? (l.schatten ? 'Der Schatten zeigt, wie weit dein bester Lauf hier war.'
                         : 'Erster Testlauf — ab jetzt gibt es eine Bestzeit zum Jagen.')
@@ -460,7 +686,8 @@ export function matheStarten(w) {
           stroke-dasharray="${RING_U.toFixed(2)}" stroke-dashoffset="${RING_U.toFixed(2)}"></circle>
         <g id="ma-punkte">${punkte}</g>
       </svg>
-      <div class="ma-ring-mitte"><b id="ma-zaehler">0/${n}</b><span>Aufgaben</span></div>
+      <div class="ma-ring-mitte"><b id="ma-zaehler">0/${n}</b>
+        <span id="ma-restzeit">Aufgaben</span></div>
     </div>`;
   }
 
@@ -514,21 +741,64 @@ export function matheStarten(w) {
 
   /* --- Ring und Aufgabe zeichnen ---------------------------------------- */
 
+  /** Zu welchem Themenblock gehört die Aufgabe mit diesem Index? */
+  function mkBlockVon(l, index) {
+    if (!l?.meister || index === undefined) return null;
+    let n = 0;
+    for (const b of l.bloecke) {
+      if (index < n + b.aufgaben.length) return b;
+      n += b.aufgaben.length;
+    }
+    return l.bloecke[l.bloecke.length - 1] || null;
+  }
+
   function ringZeichnen() {
     const l = lauf;
     if (!l) return;
     const g = $('#ma-punkte');
     if (!g) return;
     const rp = Number($('#ma-ring')?.dataset.rp) || 5;
-    const dran = l.offen[0];
     const kinder = g.children;
+    const fertig = l.zustand.filter(x => x === 'fertig').length;
+
+    if (l.meister) {
+      /* Ein Punkt je THEMA, nicht je Aufgabe: Bei über hundert Aufgaben
+         wären die Punkte 1,1 px groß und überlappten. So bleibt der Ring
+         lesbar — und er zeigt genau das, worüber hinterher geredet wird. */
+      let n = 0, laufend = -1;
+      const dran = l.offen[0];
+      for (let bi = 0; bi < l.bloecke.length; bi++) {
+        const b = l.bloecke[bi];
+        const von = n, bis = n + b.aufgaben.length;
+        n = bis;
+        const zust = l.zustand.slice(von, bis);
+        const offen = zust.filter(x => x === 'offen').length;
+        const falsch = zust.filter(x => x === 'falsch').length;
+        const c = kinder[bi];
+        if (!c) continue;
+        if (dran !== undefined && dran >= von && dran < bis) laufend = bi;
+        const klasse = offen === zust.length ? 'offen'
+                     : offen > 0 ? 'offen'
+                     : falsch ? 'falsch' : 'fertig';
+        c.setAttribute('class', 'ma-p ' + klasse + (laufend === bi ? ' dran' : ''));
+        c.setAttribute('r', (laufend === bi ? rp * 1.3 : rp).toFixed(2));
+      }
+      const zael = $('#ma-zaehler');
+      if (zael) zael.textContent = (fertig + l.zustand.filter(x => x === 'falsch').length)
+        + '/' + l.aufgaben.length;
+      const th = $('#ma-thema');
+      const b = mkBlockVon(l, dran);
+      if (th && b) th.textContent = b.thema.name;
+      return;
+    }
+
+    const dran = l.offen[0];
     for (let i = 0; i < kinder.length; i++) {
       const c = kinder[i];
       const ist = l.zustand[i];
       c.setAttribute('class', 'ma-p ' + ist + (i === dran ? ' dran' : ''));
       c.setAttribute('r', (i === dran ? rp * 1.3 : rp).toFixed(2));
     }
-    const fertig = l.zustand.filter(x => x === 'fertig').length;
     const zael = $('#ma-zaehler');
     if (zael) zael.textContent = fertig + '/' + l.aufgaben.length;
     schattenZeichnen();
@@ -602,10 +872,11 @@ export function matheStarten(w) {
   function zifferTippen(z) {
     const l = lauf;
     if (!l?.aktiv) return;
-    const lang = ['term', 'dezimal', 'bruch', 'prozent'].includes(l.pruefart);
-    const grenze = lang ? 32 : l.pruefart === 'rest' ? 10 : 7;
+    const art = l.aufgaben[l.offen[0]]?.pruefart || l.pruefart;
+    const lang = ['term', 'dezimal', 'bruch', 'prozent'].includes(art);
+    const grenze = lang ? 32 : art === 'rest' ? 10 : 7;
     if (l.eingabe.length >= grenze) return;
-    if (l.pruefart === 'vergleich') { l.eingabe = z; aufgabeZeichnen(); return; }
+    if (art === 'vergleich') { l.eingabe = z; aufgabeZeichnen(); return; }
     if (z === ',' && !lang && l.eingabe.includes(',')) return;
     if (z === '−' && !lang && l.eingabe) return;   // Vorzeichen nur vorne
     if (z === 'R' && l.eingabe.includes('R')) return;
@@ -629,7 +900,8 @@ export function matheStarten(w) {
     if (!l.eingabe) return;
 
     const i = l.offen[0];
-    const urteil = antwortPruefen(l.eingabe, l.aufgaben[i].a, l.pruefart);
+    const urteil = antwortPruefen(l.eingabe, l.aufgaben[i].a,
+      l.aufgaben[i].pruefart || l.pruefart);
     /* `null` heißt: nicht verstanden. Das ist ausdrücklich KEIN Fehler —
        eine Notationsmarotte darf nie einen Lauf kosten. Die Aufgabe bleibt
        stehen, die Uhr läuft weiter. */
@@ -642,20 +914,43 @@ export function matheStarten(w) {
     const richtig = urteil;
     l.eingabe = '';
 
+    /* Zeit für DIESE Aufgabe — die Grundlage des Index. */
+    const jetzt = Date.now();
+    const sekunden = Math.max(0, (jetzt - (l.letzteAntwortZeit || l.start)) / 1000);
+    l.letzteAntwortZeit = jetzt;
+
     if (richtig) {
       // Eine zuvor falsch beantwortete Aufgabe bleibt als „falsch“ markiert,
       // bis sie sitzt — jetzt sitzt sie.
       l.zustand[i] = 'fertig';
       l.offen.shift();
-      l.zeiten.push((Date.now() - l.start) / 1000);
+      l.zeiten.push((jetzt - l.start) / 1000);
     } else {
       l.zustand[i] = 'falsch';
       l.fehler++;
       l.offen.shift();
-      l.offen.push(i);          // kommt wieder — der Lauf endet nie an einem Fehler
+      /* In der Meisterklasse kommt eine falsche Aufgabe NICHT wieder: Eine
+         Prüfung misst, sie übt nicht. Nur so bleibt die Aufgabenzahl fest —
+         und nur dann ist die Abdeckung je Thema für alle gleich. */
+      if (!l.meister) l.offen.push(i);
+    }
+
+    if (l.meister) {
+      const auf = l.aufgaben[i];
+      l.antworten.push({ thema: auf.thema, par: auf.par, richtig, sekunden });
     }
 
     if (!l.offen.length) return laufBeenden();
+    /* Wechselt das Thema, wechselt der Tastenblock — dann muss der ganze
+       Bildschirm neu, sonst stünden die alten Tasten da. */
+    if (l.meister) {
+      const b = mkBlockVon(l, l.offen[0]);
+      /* Beim Themenwechsel wird der ganze Bildschirm neu gebaut — dann muss
+         auch die Uhr wieder in das NEUE Anzeigefeld schreiben. */
+      if (b && b.thema.id + ':' + b.pruefart !== l.tastenSchluessel) {
+        malLauf(); mkUhrStarten(); return;
+      }
+    }
     ringZeichnen();
     aufgabeZeichnen();
   }
@@ -698,6 +993,8 @@ export function matheStarten(w) {
     const dauer = (Date.now() - l.start) / 1000;
     l.ende = { dauer, sauber: l.fehler === 0 };
 
+    if (l.meister) return meisterBeenden(l, dauer);
+
     if (l.modus === 'test') {
       const alt = standVon(l.bereichId, l.nr);
       const n = l.aufgaben.length;
@@ -730,6 +1027,65 @@ export function matheStarten(w) {
       tagesStatistik(dauer);
     }
     malAbschluss();
+  }
+
+  /** Auswertung der Meisterklasse: Index, Bilanz je Thema, Speicher. */
+  function meisterBeenden(l, dauer) {
+    mkUhrStoppen();
+    const erg = MK.indexRechnen(l.antworten);
+    const bilanz = MK.themenBilanz(l.antworten);
+    l.ende = { ...l.ende, ...erg, abgelaufen: !!l.abgelaufen, themen: bilanz };
+
+    if (ladefehler || !geladen) {
+      toast('Ohne Verbindung zum Stand — diese Prüfung wird nicht gewertet.', 'fehler');
+    } else {
+      const stand = daten.meisterklasse || (daten.meisterklasse = { laeufe: [] });
+      const eintrag = {
+        datum: heute(), wahl: l.wahl, index: erg.index, sekunden: erg.sekunden,
+        richtig: erg.richtig, gesamt: erg.gesamt, abgebrochen: !!l.abgelaufen,
+        themen: bilanz
+      };
+      /* Die letzten zwanzig reichen: Für die Diagnose zählen die letzten
+         fünf, für den Verlauf will niemand hundert Zeilen sehen. */
+      stand.laeufe = stand.laeufe.concat([eintrag]).slice(-20);
+      schreibe(FB.setDoc(FB.doc(w.colMathe(), 'meisterklasse'),
+        { laeufe: stand.laeufe }, { merge: false }), 'Meisterklasse');
+      tagesStatistik(dauer);
+      w.streakPflegen();
+    }
+    malMeisterAbschluss();
+  }
+
+  function malMeisterAbschluss() {
+    const l = lauf, e = l.ende;
+    const stand = daten?.meisterklasse || { laeufe: [] };
+    const vorher = (stand.laeufe || []).slice(0, -1);
+    const bisher = vorher.length ? Math.max(...vorher.map(x => Number(x.index) || 0)) : null;
+    const bilanzen = (stand.laeufe || []).slice(-5).map(x => x.themen || {});
+    const dia = MK.diagnose(bilanzen);
+
+    ziel().innerHTML = `
+      <div class="ma-kopf">
+        <div><strong>Meisterklasse</strong></div>
+        <button class="btn" data-tu="matheMeister">Zur Übersicht</button>
+      </div>
+      <div class="ma-abschluss">
+        <div class="ma-zeit">${e.index.toFixed(0)}</div>
+        <p class="mini" style="margin-top:2px">Index${
+          bisher != null ? ` · beste bisher ${bisher.toFixed(0)}` : ''}${
+          e.index > (bisher ?? -1) && vorher.length ? ' — <strong>neue Bestleistung</strong>' : ''}</p>
+        <p style="margin-top:10px">${e.richtig} von ${e.gesamt} richtig ·
+          ${esc(zeitText(e.sekunden))}${e.abgelaufen
+            ? ' · <strong>Zeit abgelaufen</strong> — der Rest wurde nicht geprüft' : ''}</p>
+        <p class="mini">Index 100 hieße: quer durch alles genau das Tempo, das ein Stern
+          verlangt, und nichts falsch.</p>
+        <div class="row mt" style="justify-content:center">
+          <button class="btn primary" data-tu="matheMkStarten">Noch einmal</button>
+          <button class="btn" data-tu="matheMeister">Übersicht</button>
+        </div>
+      </div>
+      ${dia.length ? diagnoseHtml(dia, bilanzen.length) : ''}`;
+    verdrahten(ziel());
   }
 
   /** Zeit zählt als Lernzeit (Tagesring, Streak), Läufe zählen NICHT als
@@ -805,6 +1161,19 @@ export function matheStarten(w) {
     matheZumRaster() { lauf = null; malen(); },
     matheModus(_, el) { ansicht.modus = el?.checked ? 'uebung' : 'test'; },
     matheStarten(nr) { laufStarten(Number(nr)); },
+    matheMeister()   { lauf = null; ansicht.bereich = 'meisterklasse'; malen(); },
+    matheMkStarten() { meisterStarten(); },
+    matheMkWahl(id, el) {
+      if (el?.checked) { if (!mkWahl.includes(id)) mkWahl.push(id); }
+      else mkWahl = mkWahl.filter(x => x !== id);
+      malMeister();
+    },
+    matheMkUeben(id) {
+      const [bereich, nr] = String(id).split(':');
+      lauf = null; ansicht.bereich = bereich; ansicht.modus = 'test';
+      malen();
+      laufStarten(Number(nr));
+    },
     matheZiffer(z)   { zifferTippen(String(z)); },
     matheWeg()       { wegTippen(); },
     matheOk()        { bestaetigen(); },
@@ -814,7 +1183,10 @@ export function matheStarten(w) {
         'Der angefangene Lauf wird verworfen. Bestzeiten bleiben, wie sie sind.',
         'Verwerfen', 'gefahr')) return;
       ringTaktStoppen();
+      mkUhrStoppen();
+      const warMeister = lauf.meister;
       lauf = null;
+      if (warMeister) ansicht.bereich = 'meisterklasse';
       malen();
     }
   });
@@ -835,7 +1207,9 @@ export function matheStarten(w) {
        nichts zu suchen hatte, und kostete beim Bestätigen einen Fehler. */
     if (e.key.length === 1 && '+*/^()|<>=xXrRsScCtTlLeEnNπ√,'.includes(e.key)) {
       const z = e.key === 'X' ? 'x' : (e.key === 'r' || e.key === 'R') ? 'R' : e.key;
-      const erlaubt = new Set(tastenListe(lauf.aufgaben, lauf.pruefart).zeichen);
+      const b = lauf.meister ? mkBlockVon(lauf, lauf.offen[0]) : null;
+      const erlaubt = new Set(tastenListe(b ? b.aufgaben : lauf.aufgaben,
+        b ? b.pruefart : lauf.pruefart).zeichen);
       if (erlaubt.has(z)) { zifferTippen(z); return true; }
       // Buchstaben einer Mehrzeichentaste (sin, cos, ln) einzeln zulassen
       const mehr = [...erlaubt].filter(t => t.length > 1);
@@ -880,7 +1254,8 @@ export function matheStarten(w) {
     }
     datenLaden();                       // still nachladen, falls beim ersten Mal nichts kam
     if (lauf?.aktiv) return malLauf();
-    if (lauf?.ende) return malAbschluss();
+    if (lauf?.ende) return lauf.meister ? malMeisterAbschluss() : malAbschluss();
+    if (ansicht.bereich === 'meisterklasse') return malMeister();
     if (ansicht.bereich) return malRaster();
     malUebersicht();
   }
@@ -898,6 +1273,7 @@ export function matheStarten(w) {
     __T: {
       setAufgaben, antwortStimmt, tastenFuer, BEREICHE, bereicheLaden,
       naechstesSet, standVon, zeitText, sterneGesamt, tastenListe, antwortPruefen,
+      MK, meisterStarten, mkWahl: () => mkWahl, mkSetzen: w => { mkWahl = w; },
       lauf: () => lauf,
       ansicht: () => ansicht,
       daten: () => daten,
