@@ -95,12 +95,30 @@ export function matheStarten(w) {
 .mk-thema.sitzt .mk-marke{color:var(--bewertung-3)}
 .mk-thema.wackelt .mk-marke{color:var(--faellig)}
 .mk-thema.fehlt .mk-marke{color:var(--bewertung-1)}
-.ma-bereich b{display:block;font-size:15px}
-.ma-bereich span{display:block;font-size:13px;color:var(--txt3)}
+/* Die Regeln müssen auf den MITTLEREN Block zielen, nicht auf jedes span in
+   der Kachel. ".ma-bereich span" (Gewicht 0-1-1) schlug sonst
+   ".ma-bereich-nr" (0-1-0): Der Kreis wurde zum Block, align-items und
+   justify-content liefen ins Leere und die Ziffer saß gemessen 13,4 px links
+   und 7,5 px über der Mitte — dazu in 13 px statt der vorgesehenen Größe.
+   Ebenso zerriss ".ma-bereich b{display:block}" die rechte Spalte in drei
+   Zeilen: „0“, „★“, „0 von 100 begonnen“. */
+.ma-bereich-txt{flex:1;min-width:0}
+.ma-bereich-txt b{display:block;font-size:15px}
+.ma-bereich-txt > span{display:block;font-size:13px;color:var(--txt3)}
 .ma-bereich-nr{flex:none;width:34px;height:34px;border-radius:50%;background:var(--bg3);
-  display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--txt2)}
-.ma-bereich-stand{flex:none;text-align:right;font-size:13px;color:var(--txt2);
-  font-variant-numeric:tabular-nums}
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;line-height:1;color:var(--txt2)}
+.ma-bereich-stand{flex:none;text-align:right;font-size:13px;line-height:1.4;
+  color:var(--txt2);font-variant-numeric:tabular-nums}
+.ma-bereich-stand b{font-size:15px}
+/* „0 von 100 begonnen“ ist auf einem 390 px breiten Telefon rund 130 px
+   breit und drückt „Plus, minus, Einmaleins bis 100“ auf drei Zeilen. Dort
+   steht dieselbe Zahl kurz. */
+.ma-stand-kurz{display:none}
+@media (max-width:560px){
+  .ma-stand-lang{display:none}
+  .ma-stand-kurz{display:inline}
+}
 
 .ma-raster{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;max-width:420px;margin:14px 0}
 .ma-feld{aspect-ratio:1;border:1px solid var(--border);background:var(--bg3);border-radius:7px;
@@ -357,12 +375,13 @@ export function matheStarten(w) {
     return `
       <button class="ma-bereich ma-meister" data-tu="matheMeister">
         <span class="ma-bereich-nr">★</span>
-        <span style="flex:1;min-width:0">
+        <span class="ma-bereich-txt">
           <b>Meisterklasse</b>
           <span>Eine Prüfung quer durch alles — und danach steht da, was noch fehlt</span>
         </span>
         ${n ? `<span class="ma-bereich-stand"><b>${beste.toFixed(0)}</b> Index<br>
           <span class="mini">${n} ${n === 1 ? 'Prüfung' : 'Prüfungen'}</span></span>` : ''}
+        <!-- „n Prüfungen“ ist kurz genug, dafür braucht es keine Handyfassung. -->
       </button>`;
   }
 
@@ -373,12 +392,13 @@ export function matheStarten(w) {
     return `
       <button class="ma-bereich" ${fertig ? `data-tu="matheBereich" data-id="${esc(b.id)}"` : 'disabled'}>
         <span class="ma-bereich-nr">${b.nr}</span>
-        <span style="flex:1;min-width:0">
+        <span class="ma-bereich-txt">
           <b>${esc(b.name)}</b>
           <span>${fertig ? esc(b.kurz) : 'kommt in einem der nächsten Schritte'}</span>
         </span>
         ${fertig ? `<span class="ma-bereich-stand"><b>${sterne}</b> ★<br>
-          <span class="mini">${angefasst} von ${b.sets.length} begonnen</span></span>` : ''}
+          <span class="mini ma-stand-lang">${angefasst} von ${b.sets.length} begonnen</span
+          ><span class="mini ma-stand-kurz">${angefasst}/${b.sets.length}</span></span>` : ''}
       </button>`;
   }
 
@@ -1146,8 +1166,15 @@ export function matheStarten(w) {
 
   function zeitText(s) {
     const v = Math.max(0, Number(s) || 0);
-    if (v < 60) return v.toFixed(1).replace('.', ',') + ' s';
-    return Math.floor(v / 60) + ':' + String(Math.round(v % 60)).padStart(2, '0') + ' min';
+    /* Erst runden, dann aufteilen. Vorher lief die Restzeit der
+       Meisterklasse jede Minute für eine halbe Sekunde auf „14:60 min“:
+       Math.floor(899,6/60) ist 14 und Math.round(899,6 % 60) ist 60.
+       Dasselbe gilt für die Zehntelanzeige — 59,96 s soll „1:00 min“
+       heißen und nicht „60,0 s“. */
+    const zehntel = Math.round(v * 10) / 10;
+    if (zehntel < 60) return zehntel.toFixed(1).replace('.', ',') + ' s';
+    const ganz = Math.round(v);
+    return Math.floor(ganz / 60) + ':' + String(ganz % 60).padStart(2, '0') + ' min';
   }
 
   /* ---------------------------------------------------------------------
