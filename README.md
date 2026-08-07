@@ -1145,6 +1145,26 @@ einsammeln"** holt sie zurück.
 
 ---
 
+## Einheitliche Darstellung (ab 7.4)
+
+Karteikasten und Lernbox sind **linksbündig** — Frage wie Antwort, in allen
+Abfragemodi. Vorher war der Karteikasten mittig gesetzt, was bei einer
+Antwort über mehr als eine Zeile als Treppe erschien. Senkrecht wird die
+Karte weiter zentriert: Sie hat 230 px Mindesthöhe, eine kurze Antwort soll
+nicht oben kleben.
+
+Zwischen Karteikarte und Knopfzeile liegen 14 px, in beiden Reitern
+dasselbe Maß. Bei geöffneter Bildschirmtastatur (Resthöhe unter 380 px)
+fällt der Abstand kleiner aus, damit „Prüfen" nicht hinter die Navileiste
+rutscht.
+
+Wer eigene Aufzählungen auf Karten schreibt: Sie laufen als Block über die
+volle Kartenbreite, nicht mehr als eingeschobener Kasten.
+
+Die Einzelheiten dieser Runde stehen in `FORMATIERUNG.md`.
+
+---
+
 ## Bewusst nicht enthalten
 
 Alle vier Stufen aus `KONZEPT.md` sind umgesetzt. Nicht gebaut wurde, was

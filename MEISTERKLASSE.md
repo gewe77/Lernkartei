@@ -1,6 +1,7 @@
 # Meisterklasse — Konzept
 
-> **Stand 7. August 2026 — gebaut und ausgeliefert (Version 7.3).**
+> **Stand 7. August 2026 — gebaut und ausgeliefert (Version 7.3,
+> Formatierungsrunde in 7.4).**
 > Umgesetzt nach deinen Entscheidungen: feste Aufgabenzahl mit
 > 15-Minuten-Deckel, Bereiche 1–4 fest und 5/6 wahlweise dazu, jedes Mal neu
 > gewürfelt (keine festen Formen).

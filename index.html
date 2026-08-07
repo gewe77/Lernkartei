@@ -196,12 +196,21 @@ nav button.aktiv{background:var(--akzent-bg);color:var(--akzent);font-weight:700
   min-height:230px;
 }
 .flip-karte.gedreht{transform:rotateY(180deg)}
+/* Linksbündig, nicht mittig: Der Karteikasten stand auf `center`, die
+   Lernbox auf `start` — dieselbe Karte sah je nach Reiter anders aus, und
+   eine umbrechende Antwort begann gemessen 23 px vom linken Rand entfernt
+   in einer Treppe. Beide Oberflächen laufen jetzt linksbündig.
+   Senkrecht wird weiter zentriert: Die Seite hat 230 px Mindesthöhe, eine
+   kurze Antwort soll nicht oben kleben. */
 .flip-seite{
   position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
   border:1px solid var(--border2);border-radius:var(--radius2);background:var(--bg);
   padding:26px 22px;display:flex;flex-direction:column;justify-content:center;
-  align-items:center;text-align:center;overflow:auto;box-shadow:var(--schatten);
+  align-items:stretch;text-align:left;overflow:auto;box-shadow:var(--schatten);
 }
+/* Ohne align-self würde die Merker-Pille als Flexkind auf volle Breite
+   gezogen und wäre keine Pille mehr. */
+.flip-seite > .flip-mark{align-self:flex-start}
 .flip-seite.hinten{transform:rotateY(180deg);background:var(--bg2)}
 .flip-text{font-size:20px;font-weight:600;white-space:pre-wrap;word-break:break-word;max-width:100%}
 .flip-seite.hinten .flip-text{font-weight:500}
@@ -383,7 +392,11 @@ nav button.nav-laeuft::after{
 .flip-extra{margin-top:12px;padding-top:10px;border-top:1px dashed var(--border2);
   font-size:14.5px;color:var(--txt2);line-height:1.5;white-space:pre-wrap;text-align:left}
 .flip-text b,.flip-text strong{font-weight:700}
-.flip-text ul,.flip-text ol{margin:6px 0;padding-left:24px;text-align:left;display:inline-block}
+/* display:inline-block war der Trick, um eine Liste in einer MITTIG
+   gesetzten Karte trotzdem links auszurichten. Seit die Karte linksbündig
+   läuft, ist ein Block das Richtige — sonst bliebe die Liste so schmal wie
+   ihr längster Eintrag und ein Umbruch säße falsch. */
+.flip-text ul,.flip-text ol{margin:6px 0;padding-left:24px;display:block}
 .flip-text hr{border:0;border-top:1px solid var(--border2);margin:10px 0}
 
 /* ===== Lernbox (Stufe 6) ================================================ */
@@ -399,8 +412,12 @@ nav button.nav-laeuft::after{
 .nav-zahl{display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;
   padding:0 4px;margin-left:5px;border-radius:9px;background:var(--akzent);color:#fff;
   font-size:10.5px;font-weight:700;line-height:1}
+/* margin-bottom ist kein Schönheitsmaß: Ohne sie lag die Knopfzeile
+   gemessen mit 0 px Abstand direkt an der Karte — „Antwort zeigen“ sah aus
+   wie ein Teil der Karteikarte. 14 px ist dasselbe Maß, das die Bühne des
+   Karteikastens (.flip-buehne) schon hat. */
 .ueb-karte{border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);
-  padding:20px 22px;margin-top:14px;box-shadow:var(--schatten)}
+  padding:20px 22px;margin:14px 0;box-shadow:var(--schatten)}
 .ueb-kopf{display:flex;align-items:center;justify-content:space-between;gap:10px;
   font-size:12px;font-weight:600;color:var(--txt3);margin-bottom:12px}
 .ueb-treffer{display:inline-flex;gap:4px;align-items:center}
@@ -429,6 +446,10 @@ nav button.nav-laeuft::after{
    Höhe schlicht ignorieren und der Balken bliebe unsichtbar. */
 .balken .fuell{display:block;height:100%;background:var(--blue);border-radius:5px;min-width:2px;transition:width .3s}
 .balken .val{width:44px;flex:none;text-align:right;font-variant-numeric:tabular-nums;color:var(--txt2)}
+/* Nur die Bewertungsbalken der Abschlussseite brauchen die breite Spalte —
+   „Fach 12“ in der Statistik passt weiter in 62 px. */
+.bew-balken .lab{width:96px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:400px){ .bew-balken .lab{width:88px;font-size:12px} }
 .tage{display:flex;align-items:flex-end;gap:3px;height:110px;margin-top:6px}
 .tage > div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%}
 .tage .saeule{width:100%;background:var(--blue);border-radius:4px 4px 0 0;min-height:2px}
@@ -617,6 +638,12 @@ pre.code{
   #seitenleiste{display:none}
   main{padding-bottom:12px}
   #ueb-aktionen{position:static;background:none;border:0;padding:10px 0 0}
+  /* Bei offener Bildschirmtastatur zählt jeder Pixel: Die 14 px Luft ober-
+     und unterhalb der Karte schoben das Eingabefeld gemessen 2 px unter die
+     Navileiste. Die Aktionszeile bringt hier ohnehin 10 px eigenes Polster
+     mit — zusammen mit den 4 px unten bleiben es 14 px Abstand zu den
+     Knöpfen, nur eben nicht doppelt gezählt. */
+  .ueb-karte{margin:6px 0 4px;padding:14px 16px}
   #seite-ueben{padding-bottom:12px}
   #modal{max-height:calc(100vh - 96px);margin-top:12px}
   table.daten{font-size:12.5px}
@@ -714,7 +741,7 @@ pre.code{
 /* Programmversion. Bei jeder ausgelieferten Änderung hochzählen — sie steht
    in der Seitenleiste, auf dem Anmeldebildschirm und in der Diagnose, damit
    sich Rückfragen einem Stand zuordnen lassen. */
-const VERSION = '7.3';
+const VERSION = '7.4';
 
 const $  = (s, w = document) => w.querySelector(s);
 const $$ = (s, w = document) => Array.from(w.querySelectorAll(s));
@@ -3062,6 +3089,9 @@ const ABZEICHEN_EINHEIT = {
   sterne:         ['Set unter 60 Sekunden', 'Sets unter 60 Sekunden']
 };
 const abzeichenEinheit = (art, n) => (ABZEICHEN_EINHEIT[art] || ['', ''])[n === 1 ? 0 : 1];
+/* Dieselbe Sorgfalt schuldet die App auch den Kennzahlen: Bei einer Serie
+   von einem Tag stand dort dreimal „1 Tage in Folge“. */
+const tageWort = n => (Number(n) === 1 ? 'Tag' : 'Tage');
 /* Beim ersten Ziel zählt, was erreichbar ist: die Reihenfolge der Arten
    entscheidet, wenn noch bei allem der Fortschritt 0 ist. Vorher gewann
    alphabetisch „fach“ — die App schlug einem leeren Konto als Erstes
@@ -3408,7 +3438,7 @@ function malLernen() {
       </div>
       <div class="dash-kennzahlen">
         <div class="dash-kennzahl"><b>${dran}</b><span>${modus === 'heute' ? 'heute fällig' : 'fällig gesamt'}</span></div>
-        <div class="dash-kennzahl"><b>${e.streak || 0}</b><span>Tage Streak</span></div>
+        <div class="dash-kennzahl"><b>${e.streak || 0}</b><span>${tageWort(e.streak || 0)} Streak</span></div>
         <div class="dash-kennzahl"><b>${gewaehlt.length}</b><span>Karten gewählt</span></div>
       </div>
       ${ab.letztes || ab.naechstes ? `<div style="flex:none">
@@ -4286,7 +4316,8 @@ function malAbschluss() {
     <div style="text-align:center;padding:26px 0">
       <div style="font-size:44px;line-height:1">🎉</div>
       <h1 style="margin-top:12px">${offenN ? 'Sitzung beendet' : 'Sitzung abgeschlossen!'}</h1>
-      <p class="muted">${s.bewertet} von ${s.gesamt} Karten bewertet${offenN ? ` · ${offenN} offen` : ''}</p>
+      <p class="muted">${s.bewertet} von ${s.gesamt} ${
+        s.gesamt === 1 ? 'Karte' : 'Karten'} bewertet${offenN ? ` · ${offenN} offen` : ''}</p>
     </div>
     ${s.neueAbzeichen?.length ? `<div class="box" style="text-align:center">
       <h2 style="margin-bottom:10px">${s.neueAbzeichen.length === 1 ? 'Neues Abzeichen' : 'Neue Abzeichen'}</h2>
@@ -4294,17 +4325,20 @@ function malAbschluss() {
         ${s.neueAbzeichen.map(a => abzeichenHtml(a)).join('')}</div>
     </div>` : ''}
     <div class="kennzahlen">
-      <div class="kennzahl"><b>${s.bewertet}</b><span>Karten</span></div>
+      <div class="kennzahl"><b>${s.bewertet}</b><span>${s.bewertet === 1 ? 'Karte' : 'Karten'}</span></div>
       <div class="kennzahl"><b>${min}</b><span>Minuten</span></div>
       <div class="kennzahl"><b>${proKarte}s</b><span>pro Karte</span></div>
-      <div class="kennzahl"><b>${S.einstellungen.streak || 0}</b><span>Tage Streak</span></div>
+      <div class="kennzahl"><b>${S.einstellungen.streak || 0}</b><span>${tageWort(S.einstellungen.streak || 0)} Streak</span></div>
     </div>
     <div class="box mt">
       ${[1, 2, 3, 4].map(r => {
         const n = s.zaehler[r], p = s.bewertet ? Math.round(n / s.bewertet * 100) : 0;
         const farbe = ['var(--bewertung-1)', 'var(--bewertung-2)', 'var(--bewertung-3)', 'var(--bewertung-4)'][r - 1];
+        /* Vorher: `t.slice(0, 6) + '.'` — das ergab „1 Nicht .“, „3 Gewuss.“
+           und „4 Sehr l.“. Die Namen stehen jetzt ganz da, die Beschriftung
+           ist dafür eine Spur breiter. */
         const t = ['Nicht gewusst', 'Schwer', 'Gewusst', 'Sehr leicht'][r - 1];
-        return `<div class="balken"><span class="lab">${r} ${t.slice(0, 6)}.</span>
+        return `<div class="balken bew-balken"><span class="lab">${r} ${t}</span>
           <span class="spur"><span class="fuell" style="width:${p}%;background:${farbe}"></span></span>
           <span class="val">${n}</span></div>`;
       }).join('')}
@@ -4750,7 +4784,7 @@ function malUebungsKarte(ziel) {
                u.stufe === 'antwort' ? antwortHtml(k) : esc(gezeigt)}</div>`
           : ''}
       ${u.stufe === 'antwort' && extraHtml(k) ? `<div class="flip-extra">${extraHtml(k)}</div>` : ''}
-      ${u.stufe === 'antwort' ? `<div class="row" style="justify-content:center;margin-top:14px">
+      ${u.stufe === 'antwort' ? `<div class="row mt">
         <button class="btn klein" data-tu="lernboxZudecken">Zudecken und selbst wiedergeben</button>
       </div>` : ''}
     </div>
@@ -4947,7 +4981,7 @@ function malKaesten() {
         <div class="haupt">
           <div class="frage">${esc(d.name)}</div>
           <div class="row mini" style="gap:6px;margin-top:4px">
-            <span class="badge">${k.length} Karten</span>
+            <span class="badge">${k.length} ${k.length === 1 ? 'Karte' : 'Karten'}</span>
             ${f ? `<span class="badge faellig">${f} fällig</span>` : ''}
             ${neu ? `<span class="badge neu">${neu} neu</span>` : ''}
           </div>
@@ -6151,7 +6185,7 @@ function malStatistik() {
       <div class="kennzahl"><b style="color:var(--orange)">${heuteGenau.length}</b><span>heute fällig</span></div>
       <div class="kennzahl"><b>${ueberf}</b><span>überfällig</span></div>
       <div class="kennzahl"><b style="color:var(--blue)">${neu}</b><span>noch nie gelernt</span></div>
-      <div class="kennzahl"><b style="color:var(--green)">${S.einstellungen.streak || 0}</b><span>Tage in Folge</span></div>
+      <div class="kennzahl"><b style="color:var(--green)">${S.einstellungen.streak || 0}</b><span>${tageWort(S.einstellungen.streak || 0)} in Folge</span></div>
       ${ruht ? `<div class="kennzahl"><b>${ruht}</b><span>ruhend</span></div>` : ''}
       ${probleme.length ? `<div class="kennzahl"><b style="color:var(--bewertung-1)">${probleme.length}</b><span>Problemkarten</span></div>` : ''}
     </div>
@@ -8412,7 +8446,8 @@ const AKTION = {
     const r = await modal({
       titel: 'Als CSV sichern',
       html: `<label class="feld"><span>Kasten</span><select id="m-deck">
-        <option value="alle">Alle Kästen zusammen (${S.cards.length} Karten)</option>
+        <option value="alle">Alle Kästen zusammen (${S.cards.length} ${
+          S.cards.length === 1 ? 'Karte' : 'Karten'})</option>
         ${S.decks.map(d => `<option value="${esc(d.id)}">${esc(d.name)} (${kartenVon(d.id).length})</option>`).join('')}
         </select></label><p class="mini">Format: Frage;Antwort;Kasten, mit \u00DCberschriftzeile \u2014
           so l\u00E4sst sich die Datei sp\u00E4ter wieder einlesen, ohne dass die K\u00E4sten verschmelzen.</p>
