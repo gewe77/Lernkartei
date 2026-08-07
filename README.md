@@ -64,7 +64,8 @@ geänderte Tagesgrenze) bleibt lernbar.
 
 | Datei | Zweck |
 |---|---|
-| `index.html` | die komplette App — HTML, CSS, JavaScript in einer Datei |
+| `index.html` | der Hauptteil der App — HTML, CSS, JavaScript |
+| `js/` | ab Stufe 7: eigenständige Module. Bisher liegt dort die **Mathematik** (`mathe.js`, `mathe-sets.js`, `mathe-erzeuger.js`). Fehlt der Ordner, fehlt nur der Reiter — der Rest läuft weiter |
 | `firebase-config.js` | Zugangsdaten des Firebase-Projekts, die einzige Datei mit projektspezifischen Werten — optional auch der gemeinsame Abzeichensatz |
 | `firestore.rules` | Security Rules, in die Firebase-Konsole zu kopieren |
 | `README.md` | diese Anleitung |
@@ -159,7 +160,10 @@ Fehlt der Eintrag, scheitert die Anmeldung mit `auth/unauthorized-domain`.
 
 1. `index.html`, `firebase-config.js`, `firestore.rules`, `README.md` ins
    Repo `gewe77/Lernkartei` legen — die alte `index.html` wird ersetzt.
-   Ab Stufe 5 kommen `audio/` (mit `manifest.json`) und `werkzeuge/` dazu.
+   Ab Stufe 5 kommen `audio/` (mit `manifest.json`) und `werkzeuge/` dazu,
+   ab Stufe 7 der Ordner `js/`. **Wichtig:** `js/` muss mit hochgeladen
+   werden — GitHub Pages liefert nur, was im Repo liegt, und ohne den
+   Ordner verschwindet der Reiter „Mathematik“ kommentarlos.
 2. **Settings → Pages**: Source *Deploy from a branch*, Branch `main`, Ordner `/ (root)`.
 3. Ein bis zwei Minuten warten, dann https://gewe77.github.io/Lernkartei/ öffnen.
 

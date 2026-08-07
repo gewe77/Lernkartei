@@ -49,6 +49,8 @@ service cloud.firestore {
     //   users/{uid}/decks/{deckId}       Kästen
     //   users/{uid}/cards/{cardId}       Karten (flach, nicht verschachtelt)
     //   users/{uid}/reviews/{YYYY-MM-DD} Tagesstatistik
+    //   users/{uid}/mathe/{bereich}       Mathematik-Stand, ein Dokument
+    //                                     je Bereich (Stufe 7)
     //
     // Ein einziger rekursiver Block deckt das Wurzeldokument und sämtliche
     // Unterebenen ab. Damit greift die uid-Trennung auch für Unterordner, die
