@@ -294,7 +294,7 @@ export const BEREICHE = [
   { id: 'grundoperationen', nr: 1, name: 'Grundoperationen',
     kurz: 'Plus, minus, Einmaleins bis 100', sets: setsBereich1() },
   { id: 'zehntausend', nr: 2, name: 'Zahlenraum 10 000',
-    kurz: 'Großes Einmaleins, Quadratzahlen, Teilen mit Rest', sets: [] },
+    kurz: 'Großes Einmaleins, Quadratzahlen, Teilen mit Komma', sets: [] },
   { id: 'groessen', nr: 3, name: 'Größen',
     kurz: 'Umwandeln, Vergleichen, Ergänzen', sets: [] },
   { id: 'sekundarstufe', nr: 4, name: 'Sekundarstufe',

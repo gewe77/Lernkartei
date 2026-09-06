@@ -32,9 +32,9 @@ erzeugerAnmelden({
     return raum;
   },
 
-  /** Vorübung zum Teilen mit Rest: die größte Zahl der Reihe unterhalb einer
-   *  Schranke. `7er-Reihe ≤ 50` → 49. Wer das sofort sieht, hat den Rest
-   *  geschenkt. */
+  /** Die groesste Zahl einer Reihe unterhalb einer Schranke: `7er-Reihe ≤ 50`
+   *  → 49. Der Kern jeder Divisionsschaetzung — wer das sofort sieht, weiss
+   *  auch sofort, wo das Ergebnis ungefaehr liegt. */
   naechstKleiner(r, saat) {
     const raum = [];
     for (const teiler of spanne(r.b, saat + 1)) {
@@ -48,16 +48,32 @@ erzeugerAnmelden({
     return raum;
   },
 
-  /** Teilen mit Rest: `53 : 7` → `7 R 4`. Zwei Zahlen in einer Antwort,
-   *  getrennt durch die R-Taste. */
-  restTeilen(r, saat) {
+  /** Teilen mit Komma: `72 : 5` → `14,4`.
+   *
+   *  Nur AUFGEHENDE Divisionen: Das Ergebnis muss sich mit hoechstens zwei
+   *  Nachkommastellen exakt hinschreiben lassen. Gerundet wird nicht — sonst
+   *  gaebe es zu `72 : 7` mehrere vertretbare Antworten, und eine Pruefung,
+   *  die zwei Antworten gelten laesst, misst nichts mehr.
+   *
+   *  Der Preis, offen benannt: Teiler wie 3, 6, 7 und 9 kommen nur dort vor,
+   *  wo es glatt aufgeht. Die Sets nennen ihre Teiler deshalb ausdruecklich
+   *  (`teiler`), statt sie aus einer Spanne zu ziehen — sonst bestuenden
+   *  ganze Sets aus lauter ganzzahligen Ergebnissen und das Komma, um das es
+   *  hier geht, kaeme gar nicht vor. */
+  dezimalTeilen(r, saat) {
     const raum = [];
-    for (const teiler of spanne(r.b, saat + 1)) {
-      if (teiler < 2) continue;
+    const teiler = r.teiler || spanne(r.b, saat + 1);
+    for (const b of teiler) {
+      if (b < 2) continue;
       for (const a of spanne(r.a, saat)) {
-        const rest = a % teiler;
-        if (rest === 0) continue;                 // ohne Rest ist es keine Restaufgabe
-        raum.push({ t: `${a} : ${teiler}`, a: `${Math.floor(a / teiler)} R ${rest}` });
+        if ((a * 100) % b) continue;              // mehr als zwei Nachkommastellen
+        const hundertstel = Math.round(a * 100 / b);
+        const ganz = Math.floor(hundertstel / 100);
+        const rest = hundertstel - ganz * 100;
+        const text = rest === 0 ? String(ganz)
+          : rest % 10 === 0 ? `${ganz},${rest / 10}`
+          : `${ganz},${String(rest).padStart(2, '0')}`;
+        raum.push({ t: `${a} : ${b}`, a: text });
       }
     }
     return raum;
@@ -302,22 +318,25 @@ const BLOECKE = [
       { art: 'naechstKleiner', a: [40, 100], b: [3, 9] },
       { art: 'naechstKleiner', a: [10, 100], b: [2, 12] }][i] },
 
-  /* 97–100 · Teilen mit Rest ---------------------------------------------- */
-  { von: 97, bis: 100, aufgaben: 16, pruefart: 'rest', titel: i => [
-      'Teilen mit Rest: Reihen 2 bis 5', 'Teilen mit Rest: Reihen 6 bis 9',
-      'Teilen mit Rest bis 100', 'Teilen mit Rest, gemischt'][i],
+  /* 97–100 · Teilen mit Komma --------------------------------------------- */
+  { von: 97, bis: 100, aufgaben: 16, pruefart: 'dezimal', titel: i => [
+      'Teilen mit Komma: durch 2, 4 und 5', 'Teilen mit Komma: durch 8, 16 und 25',
+      'Teilen mit Komma: durch 20, 40 und 50', 'Teilen mit Komma, gemischt'][i],
     regel: i => [
-      { art: 'restTeilen', a: [7, 60], b: [2, 5] },
-      { art: 'restTeilen', a: [13, 80], b: [6, 9] },
-      { art: 'restTeilen', a: [20, 100], b: [3, 9] },
-      { art: 'restTeilen', a: [10, 100], b: [2, 12] }][i] }
+      { art: 'dezimalTeilen', a: [7, 99], teiler: [2, 4, 5] },
+      { art: 'dezimalTeilen', a: [12, 200], teiler: [8, 16, 25] },
+      { art: 'dezimalTeilen', a: [30, 500], teiler: [20, 40, 50] },
+      { art: 'gemischt', regeln: [
+        { art: 'dezimalTeilen', a: [7, 99], teiler: [2, 4, 5] },
+        { art: 'dezimalTeilen', a: [12, 200], teiler: [8, 25] },
+        { art: 'dezimalTeilen', a: [30, 500], teiler: [20, 50] }] }][i] }
 ];
 
 const VORAUSSETZUNG = nr =>
   nr >= 65 && nr <= 74 ? 49          // großes Einmaleins ← Zehner-Einmaleins
   : nr >= 75 && nr <= 82 ? 65        // Quadratzahlen     ← 11er-Reihe
   : nr >= 83 && nr <= 92 ? 69        // große Rechnungen  ← Zerlegen
-  : nr >= 97 ? 93                    // Teilen mit Rest   ← nächstkleinere Zahl
+  : nr >= 97 ? 89                    // Teilen mit Komma  ← Große Division
   : nr >= 9 && nr <= 16 ? 35         // Übergang          ← Ergänzen auf 1000
   : null;
 

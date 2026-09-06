@@ -77,6 +77,9 @@ export function matheStarten(w) {
     const st = document.createElement('style');
     st.id = 'mathe-stil';
     st.textContent = `
+/* Die Zeile war so hoch wie ihr Text — gemessen 20 px. Getroffen wird die
+   ganze Zeile, also darf sie auch daumenhoch sein. */
+.ma-schalter{display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer}
 .ma-bereiche{display:grid;gap:12px;margin-top:16px}
 .ma-bereich{display:flex;gap:14px;align-items:center;width:100%;text-align:left;
   border:1px solid var(--border);background:var(--bg2);border-radius:var(--radius);
@@ -134,8 +137,11 @@ export function matheStarten(w) {
 .ma-legende i{width:11px;height:11px;border-radius:3px;display:inline-block;vertical-align:-1px;
   margin-right:5px;border:1px solid var(--border)}
 
+/* dvh statt vh: Auf Android-Chrome ist 100vh die Höhe OHNE Adresszeile.
+   Mit 72vh wurde die Laufansicht dadurch höher als der sichtbare Bereich —
+   der Tastenblock samt Bestätigungstaste stand unter der Bildkante. */
 .ma-lauf{display:flex;flex-direction:column;align-items:center;gap:16px;padding-top:6px;
-  justify-content:center;min-height:min(72vh,620px)}
+  justify-content:center;min-height:min(72vh,620px);min-height:min(72dvh,620px)}
 @media (max-height:820px){ .ma-lauf{min-height:0;gap:12px} }
 .ma-ring{position:relative;width:210px;height:210px;flex:none}
 .ma-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
@@ -249,7 +255,40 @@ export function matheStarten(w) {
         zuletzt: typeof e.zuletzt === 'string' ? e.zuletzt.slice(0, 10) : null
       };
     });
-    return { sets, aktuell: zahl(roh?.aktuell, 1, 100, 1) };
+    return { sets, aktuell: zahl(roh?.aktuell, 1, 100, 1),
+             umbau: zahl(roh?.umbau, 0, 999, 0) };
+  }
+
+/* Sets, die mit einer Fassung etwas ANDERES abfragen als vorher. Ihre
+   Bestzeiten und Sterne stünden sonst für eine Aufgabenart, die es nicht mehr
+   gibt — eine Bestzeit für „53 : 7 = 7 R 4“ sagt nichts über „72 : 5 = 14,4“.
+   Sie werden genau einmal geräumt, erkennbar an der Umbaunummer im
+   gespeicherten Stand. */
+  const UMBAU = 75;
+  const UMBAU_SETS = { zehntausend: [97, 98, 99, 100] };
+
+  function umbauAnwenden(stand) {
+    let etwasGeraeumt = false;
+    for (const [bereichId, nrn] of Object.entries(UMBAU_SETS)) {
+      const b = stand[bereichId];
+      if (!b || (b.umbau || 0) >= UMBAU) continue;
+      const patch = {};
+      nrn.forEach(nr => {
+        if (!b.sets[String(nr)]) return;
+        delete b.sets[String(nr)];
+        patch[String(nr)] = { versuche: 0, fehlerGesamt: 0, sauber: false,
+                              stern: false, beste: null, zuletzt: null };
+      });
+      b.umbau = UMBAU;
+      /* Auch ohne geräumte Sets die Nummer festhalten — sonst liefe die
+         Prüfung bei jedem Start erneut. */
+      schreibe(FB.setDoc(FB.doc(w.colMathe(), bereichId),
+        Object.keys(patch).length ? { sets: patch, umbau: UMBAU } : { umbau: UMBAU },
+        { merge: true }), 'Zahlenakrobat umgebaut');
+      if (Object.keys(patch).length) etwasGeraeumt = true;
+    }
+    if (etwasGeraeumt) toast('Die Division rechnet jetzt mit Komma statt mit Rest — '
+      + 'die Bestzeiten dieser vier Sets fangen neu an.');
   }
 
   function datenLaden() {
@@ -267,6 +306,9 @@ export function matheStarten(w) {
           else if (stand[d.id]) stand[d.id] = standNormalisieren(d.data());
         });
         geladen = true; ladefehler = false;
+        /* Nur bei erfolgreichem Laden umbauen: Auf einem leeren Ersatzstand
+           würde der merge sonst löschen, was gar nicht gelesen wurde. */
+        umbauAnwenden(stand);
       } catch (e) {
         /* Ohne Netz und ohne Zwischenspeicher bleibt der Stand leer. Rechnen
            geht trotzdem — aber es darf DANN NICHTS GESCHRIEBEN WERDEN:
@@ -430,7 +472,7 @@ export function matheStarten(w) {
           Set ${hemmt.nr} („${esc(hemmt.titel)}“) festigen.</span>` : ''}
         <div class="row mt">
           <button class="btn primary" data-tu="matheStarten" data-id="${naechste}">Losrechnen</button>
-          <label class="mini" style="display:flex;align-items:center;gap:6px">
+          <label class="mini ma-schalter">
             <input type="checkbox" id="ma-uebung" ${ansicht.modus === 'uebung' ? 'checked' : ''}
               data-tu="matheModus"> Übungsmodus (ohne Uhr)
           </label>
@@ -576,6 +618,25 @@ export function matheStarten(w) {
     const aufgaben = bloecke.flatMap(b => b.aufgaben);
     if (!aufgaben.length) return toast('Keine Aufgaben gefunden.', 'fehler');
 
+    /* Aufwärmen quer durch eine Prüfung, die durch achtzehn Themen springt:
+       drei Aufgaben aus dem Set, mit dem es gleich losgeht. Was in der
+       Prüfung vorkommt, wird ausgeschlossen — sonst wärmte man sich an der
+       Aufgabe auf, die gleich zählt. */
+    let warm = null;
+    if (aufwaermenAn()) {
+      const erst = bloecke[0]?.aufgaben[0];
+      const set = erst ? setVon(erst.bereich, erst.setNr) : null;
+      if (set) {
+        try {
+          const drin = new Set(aufgaben.map(a => a.t));
+          warm = setAufgaben(set.regel, set.aufgaben, startwert + 4241)
+            .filter(a => !drin.has(a.t)).slice(0, AUFWAERMEN_N)
+            .map(a => ({ ...a, pruefart: set.pruefart || 'zahl' }));
+          if (!warm.length) warm = null;
+        } catch (_) { warm = null; }
+      }
+    }
+
     lauf = {
       meister: true, wahl: mkWahl.slice(), bloecke,
       bereichId: 'meisterklasse', nr: 0, modus: 'test',
@@ -585,6 +646,7 @@ export function matheStarten(w) {
       zustand: aufgaben.map(() => 'offen'),
       offen: aufgaben.map((_, i) => i),
       eingabe: '',
+      warm, warmIndex: 0,
       start: Date.now(),
       zeiten: [], antworten: [],
       letzteAntwortZeit: Date.now(),
@@ -592,7 +654,8 @@ export function matheStarten(w) {
       aktiv: true, ende: null
     };
     malLauf();
-    mkUhrStarten();
+    /* Die Fünfzehn-Minuten-Uhr läuft erst mit der ersten gezählten Aufgabe. */
+    if (!istAufwaermen(lauf)) mkUhrStarten();
   }
 
   /* Der Deckel: Nach fünfzehn Minuten ist Schluss, egal wo man steht. Der
@@ -618,6 +681,28 @@ export function matheStarten(w) {
      Ansicht 3 — der Lauf
      --------------------------------------------------------------------- */
 
+/* Aufwärmen: drei ungezählte Aufgaben aus demselben Set, ohne Uhr.
+   Das Par des Zahlenakrobaten stammt aus tempo60 — dort hat man das Set
+   vorher geübt. Ein Testlauf trifft einen kalt, und der Kaltstart geht voll
+   in die Zeit. Das Aufwärmen senkt die Messlatte nicht, es gleicht die
+   Bedingungen an. Der Übungsmodus bekommt keines: der IST eines. */
+  const AUFWAERMEN_N = 3;
+  const aufwaermenAn = () => S.einstellungen?.matheAufwaermen !== false;
+  const istAufwaermen = l => !!(l?.warm && l.warmIndex < l.warm.length);
+
+  /** Vom Aufwärmen in den gezählten Lauf. Erst hier beginnt die Zeitmessung. */
+  function aufwaermenBeenden() {
+    const l = lauf;
+    if (!l) return;
+    l.warm = null;
+    l.warmIndex = 0;
+    l.eingabe = '';
+    l.start = Date.now();
+    l.letzteAntwortZeit = l.meister ? Date.now() : null;
+    malLauf();
+    if (l.meister) mkUhrStarten();
+  }
+
   function laufStarten(nr) {
     const bereichId = ansicht.bereich;
     const s = setVon(bereichId, nr);
@@ -630,8 +715,18 @@ export function matheStarten(w) {
       ? s.nr
       : (s.nr * 1000 + Math.floor(Math.random() * 997) + 1);
 
-    let aufgaben;
-    try { aufgaben = setAufgaben(s.regel, s.aufgaben, startwert); }
+    /* Drei Aufgaben MEHR ziehen und die letzten drei zum Aufwärmen nehmen.
+       Die ersten `s.aufgaben` sind dadurch bitgleich mit einem Lauf ohne
+       Aufwärmen — setAufgaben mischt den Raum mit dem Startwert und schneidet
+       erst danach zu. Nur so bleibt die Bestzeit vergleichbar, und die
+       Aufwärmaufgaben kommen im gezählten Lauf nicht noch einmal vor. */
+    const warmAn = modus === 'test' && aufwaermenAn();
+    let aufgaben, warm = null;
+    try {
+      const alle = setAufgaben(s.regel, s.aufgaben + (warmAn ? AUFWAERMEN_N : 0), startwert);
+      aufgaben = alle.slice(0, s.aufgaben);
+      if (warmAn) warm = alle.slice(s.aufgaben);
+    }
     catch (e) { console.error(e); return toast('Dieses Set lässt sich nicht aufbauen.', 'fehler'); }
 
     const e = standVon(bereichId, nr);
@@ -643,6 +738,7 @@ export function matheStarten(w) {
       zustand: aufgaben.map(() => 'offen'),
       offen: aufgaben.map((_, i) => i),
       eingabe: '',
+      warm, warmIndex: 0,
       start: Date.now(),
       zeiten: [],
       fehler: 0,
@@ -661,28 +757,41 @@ export function matheStarten(w) {
        Tastenblock richtet sich deshalb nach dem laufenden THEMENBLOCK —
        darum kommen die Aufgaben eines Themas auch zusammenhängend, und nur
        die Reihenfolge der Themen wird gewürfelt. */
-    const block = l.meister ? mkBlockVon(l, l.offen[0]) : null;
-    const tasten = tastenListe(block ? block.aufgaben : l.aufgaben,
-      block ? block.aufgaben[0].pruefart : l.pruefart);
-    l.tastenSchluessel = block ? block.thema.id + ':' + block.pruefart : '';
+    const warm = istAufwaermen(l);
+    const block = (!warm && l.meister) ? mkBlockVon(l, l.offen[0]) : null;
+    /* Beim Aufwärmen richtet sich der Tastenblock nach den AUFWÄRMAUFGABEN —
+       sonst stünde dort das Alphabet des gezählten Laufs und die Antwort
+       ließe sich womöglich gar nicht eintippen. */
+    const tastenBasis = warm ? l.warm : block ? block.aufgaben : l.aufgaben;
+    const tastenArt = warm ? (l.warm[0].pruefart || l.pruefart)
+      : block ? block.aufgaben[0].pruefart : l.pruefart;
+    const tasten = tastenListe(tastenBasis, tastenArt);
+    l.tastenSchluessel = warm ? 'warm' : block ? block.thema.id + ':' + block.pruefart : '';
     z.innerHTML = `
       <div class="ma-kopf">
         <div>${l.meister
           ? `<strong>Meisterklasse</strong> <span class="mini" id="ma-thema">${
-              esc(l.bloecke[0]?.thema.name || '')}</span>`
+              esc(warm ? 'Aufwärmen' : (l.bloecke[0]?.thema.name || ''))}</span>`
           : `<strong>Set ${l.nr}</strong> <span class="mini">${esc(l.set.titel)}</span>`}</div>
         <button class="btn" data-tu="matheAbbrechen">Abbrechen</button>
       </div>
       <div class="ma-lauf">
-        ${ringHtml(l.meister ? l.bloecke.length : l.aufgaben.length)}
+        ${/* Auch beim Aufwärmen der RICHTIGE Ring: Drei Punkte auf einem
+              Kreis von 46 sehen nicht aus wie ein Ring, sondern wie drei
+              verirrte Punkte. So steht schon da, was gleich zu füllen ist. */
+          ringHtml(l.meister ? l.bloecke.length : l.aufgaben.length)}
         <div class="ma-aufgabe" id="ma-aufgabe"></div>
         ${tastenHtml(tasten)}
-        ${FORM_HINWEIS[block ? block.pruefart : l.pruefart] ? `<p class="mini" style="margin:0">
-          ${esc(FORM_HINWEIS[block ? block.pruefart : l.pruefart])}</p>` : ''}
-        <p class="mini" style="margin:0">${l.modus === 'test'
-          ? (l.schatten ? 'Der Schatten zeigt, wie weit dein bester Lauf hier war.'
-                        : 'Erster Testlauf — ab jetzt gibt es eine Bestzeit zum Jagen.')
-          : 'Übungsmodus: keine Uhr, keine Wertung.'}</p>
+        ${FORM_HINWEIS[tastenArt] ? `<p class="mini" style="margin:0">
+          ${esc(FORM_HINWEIS[tastenArt])}</p>` : ''}
+        ${warm
+          ? `<p class="mini" style="margin:0">Aufwärmen — zählt nicht, keine Uhr.
+               Die Zeit läuft erst ab der ersten gezählten Aufgabe.</p>
+             <button class="btn klein" data-tu="matheWarmUeberspringen">Überspringen</button>`
+          : `<p class="mini" style="margin:0">${l.modus === 'test'
+              ? (l.schatten ? 'Der Schatten zeigt, wie weit dein bester Lauf hier war.'
+                            : 'Erster Testlauf — ab jetzt gibt es eine Bestzeit zum Jagen.')
+              : 'Übungsmodus: keine Uhr, keine Wertung.'}</p>`}
       </div>`;
     verdrahten(z);
     ringZeichnen();
@@ -728,10 +837,11 @@ export function matheStarten(w) {
       if (alle.length > 20) console.warn('[Zahlenakrobat] Tastenblock zu groß:', alle.length);
       return { zeichen: alle };
     }
+    /* Die Prüfart `rest` und mit ihr die R-Taste sind mit Fassung 7.5
+       entfallen — der Zahlenakrobat rechnet Division jetzt mit Komma
+       (siehe mathe-b2.js, Sets 97–100). */
     const t = tastenFuer(aufgaben);
-    const zusatz = t.extra.slice();
-    if (pruefart === 'rest' && !zusatz.includes('R')) zusatz.push('R');
-    return { zeichen: t.ziffern.slice(1).concat(['0']).concat(zusatz) };
+    return { zeichen: t.ziffern.slice(1).concat(['0']).concat(t.extra) };
   }
 
   function tastenHtml(liste) {
@@ -777,6 +887,18 @@ export function matheStarten(w) {
     if (!l) return;
     const g = $('#ma-punkte');
     if (!g) return;
+    if (istAufwaermen(l)) {
+      const rpW = Number($('#ma-ring')?.dataset.rp) || 5;
+      for (let i = 0; i < g.children.length; i++) {
+        g.children[i].setAttribute('class', 'ma-p offen');
+        g.children[i].setAttribute('r', rpW.toFixed(2));
+      }
+      const z = $('#ma-zaehler');
+      if (z) z.textContent = 'noch ' + (l.warm.length - l.warmIndex);
+      const r = $('#ma-restzeit');
+      if (r) r.textContent = 'Aufwärmen';
+      return;
+    }
     const rp = Number($('#ma-ring')?.dataset.rp) || 5;
     const kinder = g.children;
     const fertig = l.zustand.filter(x => x === 'fertig').length;
@@ -831,7 +953,7 @@ export function matheStarten(w) {
     const el = document.querySelector('.ma-schatten');
     if (!el) return;
     const l = lauf;
-    if (!l?.schatten) { el.style.opacity = 0; return; }
+    if (!l?.schatten || istAufwaermen(l)) { el.style.opacity = 0; return; }
     el.style.opacity = '';
     const t = (Date.now() - l.start) / 1000;
     const z = l.schatten;
@@ -858,9 +980,10 @@ export function matheStarten(w) {
     const l = lauf;
     const wurzel = $('#ma-aufgabe');
     if (!l || !wurzel) return;
+    const warm = istAufwaermen(l) ? l.warm[l.warmIndex] : null;
     const i = l.offen[0];
-    if (i === undefined) return;
-    const text = String(l.aufgaben[i].t);
+    if (!warm && i === undefined) return;
+    const text = String(warm ? warm.t : l.aufgaben[i].t);
     const feld = `<span class="ma-feldchen${l.eingabe ? '' : ' leer'}" id="ma-eingabe"`
       + ` role="textbox" aria-label="Antwort">${esc(l.eingabe) || '&nbsp;'}</span>`;
     wurzel.innerHTML = text.includes('▢')
@@ -918,6 +1041,21 @@ export function matheStarten(w) {
        Fehlgriff auf die große Taste einen Fehler, ohne dass jemand
        gerechnet hätte. */
     if (!l.eingabe) return;
+
+    /* Aufwärmen: nichts wird gezählt, nichts gemessen. Eine falsche Antwort
+       zeigt die richtige und geht weiter — hier soll niemand hängenbleiben,
+       hier soll man ankommen. */
+    if (istAufwaermen(l)) {
+      const w = l.warm[l.warmIndex];
+      const u = antwortPruefen(l.eingabe, w.a, w.pruefart || l.pruefart);
+      l.eingabe = '';
+      if (u === null) { aufgabeZeichnen(); return toast('Schreibweise nicht erkannt — noch einmal.'); }
+      if (!u) toast('Richtig wäre: ' + w.a);
+      l.warmIndex++;
+      if (!istAufwaermen(l)) return aufwaermenBeenden();
+      malLauf();
+      return;
+    }
 
     const i = l.offen[0];
     const urteil = antwortPruefen(l.eingabe, l.aufgaben[i].a,
@@ -996,12 +1134,6 @@ export function matheStarten(w) {
     if (pruefart === 'prozent') {
       if (e.includes('/') || e.includes(',')) return null;
       return termStimmt(e, erwartet);
-    }
-    if (pruefart === 'rest') {
-      const norm = x => String(x).toUpperCase().replace(/\s+/g, '')
-        .replace(/[−–—]/g, '-').replace(/REST/g, 'R');
-      if (!/R/.test(norm(e))) return null;          // ohne Rest ist es keine Antwort
-      return norm(e) === norm(erwartet);
     }
     return antwortStimmt(e, erwartet);
   }
@@ -1203,6 +1335,7 @@ export function matheStarten(w) {
     },
     matheZiffer(z)   { zifferTippen(String(z)); },
     matheWeg()       { wegTippen(); },
+    matheWarmUeberspringen() { if (istAufwaermen(lauf)) aufwaermenBeenden(); },
     matheOk()        { bestaetigen(); },
     async matheAbbrechen() {
       if (!lauf?.aktiv) { lauf = null; return malen(); }
@@ -1222,9 +1355,40 @@ export function matheStarten(w) {
      Tastatur — am Rechner wird getippt, nicht geklickt
      --------------------------------------------------------------------- */
 
+  /* Der Hauptknopf des gerade sichtbaren Bildschirms. Deklarativ gesucht
+     statt je Ansicht aufgezaehlt: So bleibt die Tastatur richtig, auch wenn
+     eine Ansicht spaeter einen anderen Knopf bekommt. */
+  function hauptknopfDruecken() {
+    const z = ziel();
+    if (!z) return false;
+    const b = [...z.querySelectorAll('button.btn.primary')]
+      .find(x => !x.disabled && x.offsetParent !== null);
+    if (!b) return false;
+    b.click();
+    return true;
+  }
+
+  /** Eine Ebene zurueck: Abschluss zum Raster, Raster zur Uebersicht. */
+  function eineEbeneZurueck() {
+    const b = ziel()?.querySelector(
+      '[data-tu="matheZurueck"],[data-tu="matheZumRaster"],[data-tu="matheMeister"]');
+    if (!b || b.disabled) return false;
+    b.click();
+    return true;
+  }
+
   function taste(e) {
-    if (!lauf?.aktiv) return false;
     if (e.ctrlKey || e.metaKey || e.altKey) return false;
+    /* Ausserhalb eines Laufs endete die Tastaturbedienung bisher mit der
+       letzten Aufgabe: Fuer „Noch einmal", „Set 12" oder „Pruefung starten"
+       musste die Hand zur Maus — in einem Programm, das auf Zeit laeuft.
+       Enter loest jetzt den Hauptknopf des Bildschirms aus, Escape geht eine
+       Ebene zurueck statt gleich in den Karteikasten zu springen. */
+    if (!lauf?.aktiv) {
+      if (e.key === 'Enter') return hauptknopfDruecken();
+      if (e.key === 'Escape') return eineEbeneZurueck();
+      return false;
+    }
     if (/^[0-9]$/.test(e.key)) { zifferTippen(e.key); return true; }
     if (e.key === ',' || e.key === '.') { zifferTippen(','); return true; }
     if (e.key === '-') { zifferTippen('−'); return true; }

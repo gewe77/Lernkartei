@@ -50,7 +50,7 @@ export const THEMEN = [
   T('zt-ergaenzen',  'Ergänzen im Tausenderraum',    'zehntausend', 27, 48),
   T('zt-einmaleins', 'Großes Einmaleins',            'zehntausend', 49, 74),
   T('zt-quadrat',    'Quadratzahlen',                'zehntausend', 75, 82),
-  T('zt-division',   'Große Division, Teilen mit Rest','zehntausend', 83, 100),
+  T('zt-division',   'Große Division und Teilen mit Komma','zehntausend', 83, 100),
 
   /* Bereich 3 — Größen */
   T('gr-laenge',  'Längen und Flächen',    'groessen',  7, 28, [[80, 100]]),
