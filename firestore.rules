@@ -1,148 +1,84 @@
 rules_version = '2';
 
-// ===========================================================================
-// Lernkartei 2 — Firestore Security Rules
-// ---------------------------------------------------------------------------
-// Leitgedanke: Ein Konto sieht ausschließlich seine eigenen Daten.
-// Es gibt keine geteilten Kästen, keine Querzugriffe, keine öffentlichen
-// Bereiche. Alles, was nicht ausdrücklich erlaubt ist, ist verboten —
-// Firestore verweigert jeden Pfad, für den keine allow-Regel zutrifft.
-//
-// Deployen:  Firebase-Konsole → Firestore Database → Regeln → einfügen →
-//            "Veröffentlichen".  Oder: firebase deploy --only firestore:rules
-// ===========================================================================
+/* HAN CROCO — Sicherheitsregeln
+   ---------------------------------------------------------------------------
+   Zwei Bereiche:
+
+   1. users/{uid}/…  gehört genau einem Konto. Niemand sonst kommt heran,
+      auch nicht lesend.
+
+   2. audioBedarf/…  ist ABSICHTLICH gemeinsam. Dort meldet die App, welcher
+      Kartentext noch keine Aufnahme hat, damit das Erzeugungsskript weiß, was
+      zu tun ist. Der Preis: Kartentexte aus diesem Dokument sind für alle
+      angemeldeten Konten dieses Projekts lesbar — und zwei davon gehören
+      Kindern. Wer das nicht will, nimmt in den Einstellungen den Haken
+      „Fehlende Aufnahmen in die gemeinsame Liste eintragen" heraus.
+
+      Deshalb hier so eng wie möglich:
+        · `get` ja, `list` NEIN — ein Massenabzug der ganzen Sammlung in einer
+          Abfrage ist damit gesperrt. Wer einen Eintrag lesen will, muss
+          seinen Schlüssel schon kennen (er ist ein Hash über den Text).
+        · `create` ja, `update`/`delete` NEIN — ein vorhandener Eintrag lässt
+          sich weder verändern noch löschen. Die App rechnet damit: Ein
+          abgelehnter Zweitversuch heißt „steht schon da" und wird geschluckt.
+        · Die Feldform wird geprüft, damit der Eintrag keine Ablage wird.
+   --------------------------------------------------------------------------- */
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // -- Hilfsfunktionen ---------------------------------------------------
-
-    // Angemeldet und der Pfad gehört genau diesem Konto?
-    function istEigentuemer(uid) {
-      return request.auth != null
-          && request.auth.uid == uid;
+    function angemeldet() {
+      return request.auth != null && request.auth.uid != null;
     }
 
-    // Nur echte E-Mail/Passwort-Anmeldungen. Schließt anonyme Anmeldungen und
-    // andere Provider aus, falls die je versehentlich aktiviert werden.
-    function istPasswortKonto() {
-      return request.auth.token.firebase.sign_in_provider == 'password';
+    /* Optionale weitere Verengung: Nur diese drei Kennungen dürfen überhaupt
+       etwas. Die Kennungen stehen in der Firebase-Konsole unter
+       Authentication → Users. Auskommentiert, weil die App auch ohne läuft
+       und ein Tippfehler hier alle drei Konten aussperrt.
+
+    function istErlaubtesKonto() {
+      return request.auth.uid in [
+        'HIER-UID-EINS', 'HIER-UID-ZWEI', 'HIER-UID-DREI'
+      ];
+    }
+    */
+
+    /* --- 1. Der eigene Bestand ------------------------------------------ */
+
+    match /users/{uid}/{rest=**} {
+      allow read, write: if angemeldet() && request.auth.uid == uid;
     }
 
-    // Optionale zusätzliche Absperrung auf genau drei Konten.
-    // Vorgehen: die drei UIDs aus Firebase-Konsole → Authentication → Users
-    // kopieren, unten eintragen und in den Regeln " && istErlaubtesKonto()"
-    // hinter istEigentuemer(uid) ergänzen.
-    //
-    // function istErlaubtesKonto() {
-    //   return request.auth.uid in [
-    //     'UID_KONTO_1',
-    //     'UID_KONTO_2',
-    //     'UID_KONTO_3'
-    //   ];
-    // }
+    /* --- 2. Die gemeinsame Liste fehlender Aufnahmen -------------------- */
 
-    // -- Nutzerdaten -------------------------------------------------------
-    //
-    //   users/{uid}                      (Wurzeldokument, meist leer)
-    //   users/{uid}/settings/app         Einstellungen inkl. Intervalle
-    //   users/{uid}/decks/{deckId}       Kästen
-    //   users/{uid}/cards/{cardId}       Karten (flach, nicht verschachtelt)
-    //   users/{uid}/reviews/{YYYY-MM-DD} Tagesstatistik
-    //   users/{uid}/mathe/{bereich}       Mathematik-Stand, ein Dokument
-    //                                     je Bereich (Stufe 7)
-    //
-    // Ein einziger rekursiver Block deckt das Wurzeldokument und sämtliche
-    // Unterebenen ab. Damit greift die uid-Trennung auch für Unterordner, die
-    // in späteren Stufen dazukommen, ohne dass die Regeln nachgezogen werden
-    // müssen.
+    match /audioBedarf/{schluessel} {
 
-    match /users/{uid} {
-      allow read, write: if istEigentuemer(uid) && istPasswortKonto();
-
-      match /{dokument=**} {
-        allow read, write: if istEigentuemer(uid) && istPasswortKonto();
-      }
-    }
-
-    // -- Sammelliste für die Sprachausgabe (Stufe 5) -----------------------
-    //
-    //   audioBedarf/{hash}   { text, sprache, stimme, lautschrift, gemeldetAm }
-    //
-    // Der EINZIGE gemeinsame Bereich dieses Projekts, und er ist bewusst eng
-    // geschnitten. Zweck: Die App meldet, welcher Text noch keine
-    // vorproduzierte Aufnahme hat. Das Skript sprache-erzeugen.mjs liest die
-    // Liste ab, erzeugt die MP3-Dateien und räumt die erledigten Einträge weg
-    // (mit einem Dienstkonto, das an den Regeln vorbei arbeitet).
-    //
-    // Was hier drinsteht, ist für alle drei Konten lesbar: der Kartentext.
-    // Lernstand, Termine, Statistik und die Zuordnung Text -> Karte bleiben
-    // außen vor — die Dokument-ID ist ein Hash des Textes, nicht die
-    // Karten-ID, und ein Konto ist nirgends vermerkt.
-    //
-    // Ein Eintrag ist inhaltlich unveränderlich: `update` ist nur zulässig,
-    // wenn Text, Sprache, Stimme und Lautschrift unverändert bleiben, und
-    // `delete` gar nicht. Sonst könnte ein Konto den Text eines anderen
-    // überschreiben und damit steuern, was das Skript an Google schickt.
-    //
-    // Warnung zum Kontingent: Diese Sammlung hat keine Mengenbegrenzung. Ein
-    // angemeldetes Konto kann beliebig viele Dokumente anlegen, und das
-    // Tageskontingent des kostenlosen Tarifs (20.000 Schreibvorgänge) gilt
-    // PROJEKTWEIT. Wer das ausschließen will, aktiviert istErlaubtesKonto()
-    // oben und ergänzt es unten hinter istAngemeldet().
-
-    match /audioBedarf/{hash} {
-      function istAngemeldet() {
-        return request.auth != null && istPasswortKonto();
-      }
-      // Feldprüfung: genau diese Schlüssel, nichts anderes, und der Text
-      // begrenzt — sonst ließe sich die Sammlung als Ablage missbrauchen.
-      function istGueltigerBedarf() {
+      function formStimmt() {
         return request.resource.data.keys().hasOnly(
                  ['text', 'sprache', 'stimme', 'lautschrift', 'gemeldetAm'])
             && request.resource.data.text is string
             && request.resource.data.text.size() > 0
             && request.resource.data.text.size() <= 900
             && request.resource.data.sprache is string
-            && request.resource.data.sprache.matches('^[a-z]{2}(-[A-Z]{2})?$')
+            && request.resource.data.sprache.size() <= 12
             && request.resource.data.stimme is string
-            && request.resource.data.stimme.size() <= 30
-            && request.resource.data.stimme.matches('^[A-Za-z]+$')
+            && request.resource.data.stimme.size() <= 40
             && request.resource.data.lautschrift is string
             && request.resource.data.lautschrift.size() <= 200
-            // Ohne Längen- und Formprüfung war gemeldetAm das Schlupfloch:
-            // ein String bis zur Dokumentgrenze von 1 MB, also genau die
-            // Ablage, die dieser Block ausschließen sollte.
             && request.resource.data.gemeldetAm is string
-            && request.resource.data.gemeldetAm.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+            && request.resource.data.gemeldetAm.size() == 10;
       }
 
-      // Bewusst `get` statt `read`: `read` schlösse `list` ein, und damit
-      // könnte ein Konto den gesamten Textbestand der anderen beiden in
-      // einer einzigen Abfrage herunterladen. Die App schlägt immer nur
-      // einzelne Schlüssel nach; das Skript arbeitet mit einem Dienstkonto
-      // an den Regeln vorbei und braucht die Erlaubnis hier nicht.
-      allow get:    if istAngemeldet();
-      allow list:   if false;
-      allow create: if istAngemeldet() && istGueltigerBedarf();
-      // Eine inhaltsgleiche Wiedervorlage ist erlaubt — sonst lehnt Firestore
-      // jede zweite Meldung desselben Textes ab (setDoc auf ein vorhandenes
-      // Dokument ist ein `update`, nicht ein `create`). Der Text selbst
-      // bleibt unveränderlich: Ein Konto kann nicht umschreiben, was das
-      // Skript als Nächstes an Google schickt.
-      allow update: if istAngemeldet() && istGueltigerBedarf()
-                    && request.resource.data.text        == resource.data.text
-                    && request.resource.data.sprache     == resource.data.sprache
-                    && request.resource.data.stimme      == resource.data.stimme
-                    && request.resource.data.lautschrift == resource.data.lautschrift;
-      allow delete: if false;
+      /* `get`, nicht `read`: `read` deckte auch `list` ab, und dann ließe
+         sich die ganze Sammlung in einer Abfrage abziehen. */
+      allow get:    if angemeldet();
+      allow create: if angemeldet() && formStimmt();
+      allow update, delete: if false;
     }
 
-    // -- Alles andere ------------------------------------------------------
-    // Ausdrücklich verboten. Diese Regel ist technisch nicht nötig (ohne
-    // allow gilt ohnehin "verboten"), steht aber als sichtbare Absicht da.
+    /* --- 3. Alles andere ------------------------------------------------ */
 
-    match /{pfad=**} {
+    match /{document=**} {
       allow read, write: if false;
     }
   }

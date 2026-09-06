@@ -105,13 +105,18 @@ label.feld > span{display:block;font-size:13px;font-weight:600;color:var(--txt2)
 .karo input{flex:none}
 
 /* ===== Navigation: Seitenleiste (Desktop) / Bottom-Bar (Mobil) ========== */
-#app{display:flex;min-height:100vh}
+/* dvh statt vh: Android-Chrome zählt zu 100vh die Fläche UNTER der
+   einklappbaren Adresszeile mit. Die Seite ist dadurch höher als das, was
+   man sieht — beim Scrollen springt der Inhalt, und am Fuß steht ein
+   Streifen Leere. `dvh` misst, was gerade wirklich sichtbar ist; die
+   vh-Zeile davor bleibt als Rückfallebene für alte Browser stehen. */
+#app{display:flex;min-height:100vh;min-height:100dvh}
 #topbar-mobil{
   display:none;position:sticky;top:0;z-index:40;background:var(--bg);
   border-bottom:1px solid var(--border);padding:12px 16px;
 }
 #seitenleiste{
-  position:sticky;top:0;align-self:flex-start;height:100vh;
+  position:sticky;top:0;align-self:flex-start;height:100vh;height:100dvh;
   width:220px;flex:none;display:flex;flex-direction:column;gap:4px;
   padding:20px 14px;border-right:1px solid var(--border);background:var(--bg);
 }
@@ -149,7 +154,10 @@ nav button.aktiv{background:var(--akzent-bg);color:var(--akzent);font-weight:700
 .liste-item .frage{font-weight:600;word-break:break-word}
 .liste-item .antwort{color:var(--txt2);font-size:13.5px;margin-top:2px;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
-.liste-item .werkzeuge{display:flex;gap:5px;flex:none}
+/* Mit dem vierten Knopf („Lernstand zurücksetzen", Fassung 7.5) sprengte die
+   Werkzeugleiste auf einem 412 px breiten Telefon die Kachel um gemessen
+   45 px. Sie darf jetzt umbrechen und rechtsbündig nachrücken. */
+.liste-item .werkzeuge{display:flex;gap:5px;flex:none;flex-wrap:wrap;justify-content:flex-end}
 .badge{
   display:inline-block;font-size:11.5px;font-weight:600;padding:2px 7px;
   border-radius:99px;background:var(--bg3);color:var(--txt2);white-space:nowrap;
@@ -470,7 +478,7 @@ table.daten td.num,table.daten th.num{text-align:right;font-variant-numeric:tabu
 }
 #modal{
   background:var(--bg);border-radius:var(--radius2);width:100%;max-width:480px;
-  max-height:88vh;overflow:auto;padding:20px;box-shadow:0 12px 48px rgba(0,0,0,.3);
+  max-height:88vh;max-height:88dvh;overflow:auto;padding:20px;box-shadow:0 12px 48px rgba(0,0,0,.3);
 }
 #modal h2{margin-bottom:14px}
 /* Die Knopfleiste klebt am unteren Rand des Dialogs. Auf dem Handy war der
@@ -557,8 +565,8 @@ pre.code{
   .nav-ico{font-size:17px}
   .statuszeile{flex:none;padding:0 6px}
   #status-text{display:none}
-  #toast{bottom:86px}
-  .wrap{padding:14px 12px 96px}
+  #toast{bottom:calc(86px + env(safe-area-inset-bottom))}
+  .wrap{padding:14px 12px calc(96px + env(safe-area-inset-bottom))}
   .bew span{font-size:10.5px}
   .bew small{display:none}
   .flip-text{font-size:18px}
@@ -590,6 +598,23 @@ pre.code{
      die Navileiste beginnt bei 602 — der Tipp traf die Navigation. */
   #seite-ueben{padding-bottom:16px}
   #seite-ueben select{min-height:48px}
+  /* Auf dem Telefon sind Eingabefelder und Auswahllisten die einzigen
+     Bedienelemente, die unter Apples Mindestmaß von 44 px blieben — gemessen
+     37 bis 38 px. Ein Knopf daneben ist 48 px hoch; das sah nicht nur
+     ungleich aus, es traf sich auch schlechter. */
+  input:not([type=checkbox]):not([type=radio]):not([type=range]),
+  select{min-height:44px}
+  /* Eine Zeile mit Kontrollkästchen ist so hoch wie ihr Text — gemessen 27
+     bis 37 px. Getroffen wird aber die ganze Zeile, also darf sie auch so
+     hoch sein, wie ein Daumen es braucht. */
+  .karo{min-height:44px}
+  /* Der Löschknopf „×" war 34 px breit bei 48 px Höhe — hoch genug, aber zu
+     schmal. */
+  .btn.klein.gefahr{min-width:44px}
+  /* Das Auswahlkästchen in der Kartenliste war 13×13 px. 24 px ist die
+     übliche Größe für ein Listenkästchen; die vollen 44 px würden die Zeile
+     sprengen, und daneben steht mit „Bearbeiten" ein großes Ziel. */
+  .liste-item > input[type=checkbox]{width:24px;height:24px}
 
   /* Die Werkzeugleiste des Karteneditors hatte 30 × 29 px große Ziele, die
      Quelltext-Knöpfe sogar 36 × 22. Die Leiste wächst dadurch auf drei
@@ -611,17 +636,24 @@ pre.code{
      Kleben, und die Zeile blieb auf halber Bildhöhe stehen — gemessen
      y=395 von 667, also außerhalb dessen, was der Daumen einhändig
      erreicht. */
-  #ueb-aktionen{position:fixed;left:0;right:0;bottom:78px;z-index:5;
+  /* Die Navileiste wächst um `env(safe-area-inset-bottom)` — auf einem
+     Telefon mit Gestensteuerung sind das rund 24 px. Eine feste 78 lässt die
+     Aktionszeile genau um diesen Betrag UNTER die Navileiste rutschen, und
+     zwar nur auf echten Geräten: Am Schreibtisch ist der Wert 0, dort fällt
+     es nie auf. */
+  #ueb-aktionen{position:fixed;left:0;right:0;
+    bottom:calc(78px + env(safe-area-inset-bottom));z-index:5;
     padding:10px 14px 12px;background:var(--bg);
     border-top:1px solid var(--border)}
-  #seite-ueben{padding-bottom:150px}
+  #seite-ueben{padding-bottom:calc(150px + env(safe-area-inset-bottom))}
   /* „Konnte ich“ ist der häufigste Knopf und soll allein in der unteren
      Zeile stehen, nicht zufällig dort landen. */
   #ueb-aktionen .row{gap:8px}
   /* „Sitzung starten“ stand 133 px unter der Bildkante — erst Zielring,
      Kennzahlen, Abzeichen, Fachbalken und Kastenliste. Der wichtigste Knopf
      der App läuft jetzt am unteren Rand mit. */
-  #seite-lernen .start-klebt{position:sticky;bottom:82px;z-index:2;
+  #seite-lernen .start-klebt{position:sticky;
+    bottom:calc(82px + env(safe-area-inset-bottom));z-index:2;
     background:linear-gradient(to bottom, transparent, var(--bg) 22%);
     padding:14px 0 4px}
 }
@@ -645,7 +677,7 @@ pre.code{
      Knöpfen, nur eben nicht doppelt gezählt. */
   .ueb-karte{margin:6px 0 4px;padding:14px 16px}
   #seite-ueben{padding-bottom:12px}
-  #modal{max-height:calc(100vh - 96px);margin-top:12px}
+  #modal{max-height:calc(100vh - 96px);max-height:calc(100dvh - 96px);margin-top:12px}
   table.daten{font-size:12.5px}
   table.daten th,table.daten td{padding:6px 5px}
 }
@@ -741,7 +773,7 @@ pre.code{
 /* Programmversion. Bei jeder ausgelieferten Änderung hochzählen — sie steht
    in der Seitenleiste, auf dem Anmeldebildschirm und in der Diagnose, damit
    sich Rückfragen einem Stand zuordnen lassen. */
-const VERSION = '7.4';
+const VERSION = '7.5';
 
 const $  = (s, w = document) => w.querySelector(s);
 const $$ = (s, w = document) => Array.from(w.querySelectorAll(s));
@@ -937,6 +969,8 @@ const STANDARD_EINSTELLUNGEN = () => ({
   lernboxAbstand: 2,      // so viele andere Karten müssen dazwischenliegen
   lernboxNeue: true,      // neue Karten einführen, bevor sie terminiert werden
   lernboxTippen: false,   // Antwort eintippen statt selbst berichten
+  // Stufe 7 — Zahlenakrobat
+  matheAufwaermen: true,  // drei ungezählte Aufgaben vor jedem Testlauf
   // Stufe 5 — Sprachausgabe
   kiStimme: true,         // vorproduzierte Aufnahmen bevorzugen
   stimmen: {},            // Sprache -> Chirp-3-Stimme, z. B. { 'en-GB': 'Charon' }
@@ -2971,6 +3005,11 @@ const LERNBOX_STUFEN = [
   ['zugedeckt', 'Zugedeckt — jetzt selbst']
 ];
 
+/* Auf diesen Stufen darf getippt werden: solange die ganze Antwort NICHT
+   dasteht. `antwort` ist ausgenommen — dort wird abgetippt (siehe
+   uebungAbtippPruefen), und das ist eine andere Rechnung. */
+const TIPPBARE_STUFEN = ['frage', 'buchstaben', 'wort', 'zugedeckt'];
+
 /** Der Text, der auf der aktuellen Stufe zu sehen ist. */
 function lernboxStufenText(k, stufe) {
   const antwort = antwortText(k);
@@ -4796,19 +4835,29 @@ function malUebungsKarte(ziel) {
     <div id="ueb-aktionen">${uebungAktionenHtml(u, tippen)}</div>`;
 
   verdrahten(ziel);
-  if (tippen && (u.stufe === 'frage' || u.stufe === 'zugedeckt') && !u.urteil) {
+  /* Die Tippstufen sind eine ANZEIGE-Eigenschaft, kein Bedienzustand. Vorher
+     stand hier nur `frage` und `zugedeckt`: Wer den Tipp nahm, verlor Feld,
+     Fokus und Enter-Handler und musste aufdecken — ausgerechnet die Krücke
+     für den Fall, dass man es fast weiß, nahm einem das Tippen weg. */
+  if (tippen && TIPPBARE_STUFEN.includes(u.stufe) && !u.urteil) {
     const feld = $('#ueb-eingabe');
     feld?.focus();
     feld?.addEventListener('keydown', ev => {
       if (ev.key === 'Enter') { ev.preventDefault(); uebungTippPruefen(); }
     });
   }
+  /* Das Abtippfeld bekommt KEINEN Fokus von selbst: Auf dem Telefon führe
+     das dazu, dass die Bildschirmtastatur die eben aufgedeckte Antwort
+     verdeckt, ehe man sie gelesen hat. Enter prüft trotzdem. */
+  $('#ueb-abtipp')?.addEventListener('keydown', ev => {
+    if (ev.key === 'Enter') { ev.preventDefault(); uebungAbtippPruefen(); }
+  });
 }
 
 function uebungAktionenHtml(u, tippen) {
   const t = [];
   if (u.stufe === 'frage' || u.stufe === 'buchstaben' || u.stufe === 'wort') {
-    if (tippen && u.stufe === 'frage' && !u.urteil) {
+    if (tippen && !u.urteil) {
       t.push(`<div class="tipp-zeile">
         <input id="ueb-eingabe" type="text" autocomplete="off" autocapitalize="off"
                autocorrect="off" spellcheck="false" placeholder="Antwort eintippen …"
@@ -4853,6 +4902,18 @@ function uebungAktionenHtml(u, tippen) {
        keine Tipper an (`ueb-sperre`, reines CSS ohne Zeitgeber, setzt sich
        bei jedem Neuzeichnen zurück). Ein Nachtipp läuft damit ins Leere,
        ein bewusster Tipp danach kommt an. */
+    /* Abtippen der sichtbaren Antwort. Abschreiben bindet Motorik und
+       Schriftbild ein — für Vokabeln und Rechtschreibung stärker als bloßes
+       Wiedererkennen. Angeboten wird es nur, wo es auch zumutbar ist: Wer
+       drei Sätze abtippen soll, tippt gar nicht. */
+    if (abtippbar(u)) {
+      t.push(`<div class="tipp-zeile abtipp-zeile">
+        <input id="ueb-abtipp" type="text" autocomplete="off" autocapitalize="off"
+               autocorrect="off" spellcheck="false" placeholder="Antwort abtippen …"
+               aria-label="Antwort abtippen">
+        <button class="btn primary" data-tu="lernboxAbtippen">Prüfen</button>
+      </div>`);
+    }
     t.push(`<div class="row ueb-sperre" style="gap:8px;justify-content:center">
       <button class="btn primary" data-tu="lernboxJa">Konnte ich</button>
       <button class="btn" data-tu="lernboxNein">Konnte ich nicht</button>
@@ -4875,6 +4936,43 @@ function uebungAktionenHtml(u, tippen) {
     }
   }
   return t.join('');
+}
+
+/* Ab dieser Länge wird das Abtippen nicht mehr angeboten. Gemessen an dem,
+   was ein Vierzehnjähriger noch abtippt, ohne die Karte wegzulegen. */
+const ABTIPP_MAX = 120;
+
+/** Lässt sich die Antwort dieser Karte sinnvoll abtippen? */
+function abtippbar(u) {
+  if (!u || u.urteil) return false;
+  const k = S.cards.find(x => x.id === u.aktuell);
+  if (!k) return false;
+  const t = antwortText(k).trim();
+  return !!t && t.length <= ABTIPP_MAX;
+}
+
+/** Abtippen der SICHTBAREN Antwort. Anders als beim Abfragen zählt hier nur
+ *  „richtig“: Wer die Antwort vor Augen hat, hat sich bei einem Tippfehler
+ *  nicht erinnert, sondern verschrieben — das ist keine Wertung wert, aber
+ *  auch kein Treffer. Ein Fehlversuch kostet deshalb nichts, er sagt nur
+ *  Bescheid. */
+function uebungAbtippPruefen() {
+  const u = uebung;
+  if (!u?.aktiv || u.urteil || u.stufe !== 'antwort') return;
+  const k = S.cards.find(x => x.id === u.aktuell);
+  if (!k) return;
+  const feld = $('#ueb-abtipp');
+  const eingabe = feld?.value ?? '';
+  const art = antwortPruefen(eingabe, antwortText(k));
+  if (art === 'leer') { toast('Erst abtippen, dann prüfen.'); feld?.focus(); return; }
+  if (art !== 'richtig') {
+    /* Kein Urteil, keine Strafe — die Antwort steht ja da. */
+    toast(art === 'fast' ? 'Fast — schau noch einmal genau hin.' : 'So steht es nicht da.');
+    feld?.select();
+    return;
+  }
+  toast('Richtig abgetippt.');
+  uebungBewerten(true);
 }
 
 /** Auswertung beim Tippen — dieselbe Toleranz wie im Karteikasten. */
@@ -5005,6 +5103,8 @@ function malKaesten() {
         <div class="werkzeuge">
           <button class="btn klein" data-tu="deckBearbeiten" data-id="${esc(d.id)}">Bearbeiten</button>
           <button class="btn klein" data-tu="deckCsv" data-id="${esc(d.id)}">CSV</button>
+          <button class="btn klein" data-tu="deckZuruecksetzen" data-id="${esc(d.id)}"
+            title="Fach, Termin und Zähler auf Anfang — die Karten bleiben">Zurücksetzen</button>
           <button class="btn klein gefahr" data-tu="deckLoeschen" data-id="${esc(d.id)}">Löschen</button>
         </div></div>`;
     }).join('') : `<div class="leer">Noch keine Kästen.</div>`}</div>`;
@@ -6487,6 +6587,18 @@ function malEinstellungen() {
     </div>
 
     <div class="box">
+      <h2>Zahlenakrobat</h2>
+      <label class="karo"><input type="checkbox" id="s-ma-warm"
+        ${e.matheAufwaermen !== false ? 'checked' : ''}>
+        <span>Vor jedem Testlauf drei Aufgaben zum Aufwärmen</span></label>
+      <p class="mini" style="margin-top:-4px">Drei ungezählte Aufgaben aus demselben Set,
+        ohne Uhr — danach beginnt die Messung. Das senkt die Messlatte nicht, es gleicht die
+        Bedingungen an: Die Sollzeit stammt aus Läufen, bei denen man das Set vorher geübt
+        hatte. Überspringen geht jederzeit; der Übungsmodus bekommt kein Aufwärmen.</p>
+      <button class="btn primary" data-tu="matheSpeichern">Speichern</button>
+    </div>
+
+    <div class="box">
       <h2>Sprachausgabe</h2>
       <p class="mini">Für den Hörmodus und den Lautsprecher auf der Karte. Bevorzugt werden
         vorproduzierte Aufnahmen (Google Chirp 3 HD) — sie klingen deutlich besser als die
@@ -7594,6 +7706,7 @@ function altdatenDeuten(roh) {
         if (q.lernboxAusloeser === '1' || q.lernboxAusloeser === '12') raus.lernboxAusloeser = q.lernboxAusloeser;
         if (typeof q.lernboxNeue === 'boolean') raus.lernboxNeue = q.lernboxNeue;
         if (typeof q.lernboxTippen === 'boolean') raus.lernboxTippen = q.lernboxTippen;
+        if (typeof q.matheAufwaermen === 'boolean') raus.matheAufwaermen = q.matheAufwaermen;
         if (Number.isFinite(Number(q.zielMinuten))) raus.zielMinuten = zahl(q.zielMinuten, 1, 600, 15);
         if (Number.isFinite(Number(q.zielKarten))) raus.zielKarten = zahl(q.zielKarten, 1, 2000, 30);
         if (['minuten', 'karten'].includes(q.zielEinheit)) raus.zielEinheit = q.zielEinheit;
@@ -7902,6 +8015,7 @@ const AKTION = {
   lernboxJa:         () => uebungBewerten(true),
   lernboxNein:       () => uebungBewerten(false),
   lernboxTippPruefen: () => uebungTippPruefen(),
+  lernboxAbtippen:    () => uebungAbtippPruefen(),
   /* Ohne Zeitsperre warf ein Doppeltipp zwei Karten aus der Box: malLernbox()
      zeichnet sofort neu, und der nächste Listeneintrag rückt auf dieselbe
      Stelle. Gemessen: 6 Karten vor dem Doppeltipp, 4 danach. */
@@ -8087,6 +8201,35 @@ const AKTION = {
     }
     lernAuswahl?.delete(id);
     toast('Kasten gelöscht.');
+  },
+  /* Einen Kasten von vorn lernen, ohne ihn zu verlieren. Vorher gab es dafür
+     nur den Umweg über Löschen und Neu-Einlesen — dabei gehen Notiz, Extra,
+     Merker, Lautschrift und Schlagwörter mit. Hier bleibt der Karteninhalt
+     unangetastet, es fällt nur der Lernstand. */
+  deckZuruecksetzen: async id => {
+    const d = S.decks.find(x => x.id === id); if (!d) return;
+    const karten = kartenVon(id);
+    if (!karten.length) return toast('Dieser Kasten ist leer.');
+    const n = karten.length;
+    if (!await frage('Lernstand zurücksetzen',
+      `Der Lernstand von <strong>${n}</strong> ${n === 1 ? 'Karte' : 'Karten'} in
+       „${esc(d.name)}“ geht auf Anfang: Fach 1, heute fällig, alle Zähler auf null.
+       <br><br>Die Karten selbst bleiben, wie sie sind — Frage, Antwort, Notiz,
+       Extra, Merker und Schlagwörter werden nicht angerührt. Auch die
+       Sitzungsstatistik vergangener Tage bleibt stehen; die hängt an Tagen,
+       nicht an Karten.`,
+      'Zurücksetzen', 'gefahr')) return;
+
+    const patch = {
+      fach: 1, stability: 0, difficulty: 0, reps: 0, lapses: 0, state: 0,
+      leech: false, leechBasis: 0, suspendiert: false,
+      lastReview: null, due: heute(), zeitGesamt: 0, zeitReps: 0,
+      uebung: null, uebungTag: null, uebungFertig: null
+    };
+    karten.forEach(k => Object.assign(k, patch));
+    variantenOpsSchreiben(karten.map(k => ['merge', k.id, patch]), 'Lernstand zurücksetzen');
+    toast(`Lernstand zurückgesetzt — ${n} ${n === 1 ? 'Karte' : 'Karten'} in Fach 1.`);
+    malKaesten();
   },
   deckCsv: id => {
     const karten = kartenVon(id);
@@ -8367,6 +8510,13 @@ const AKTION = {
     toast('Lernbox gespeichert.');
     malEinstellungen();
     lernboxZaehlerMalen();
+  },
+  matheSpeichern: () => {
+    const patch = { matheAufwaermen: $('#s-ma-warm')?.checked !== false };
+    Object.assign(S.einstellungen, patch);
+    schreibe(FB.setDoc(refEinstellungen(), patch, { merge: true }), 'Zahlenakrobat');
+    toast('Zahlenakrobat gespeichert.');
+    malEinstellungen();
   },
   sprachSpeichern: () => {
     const kiStimme = $('#s-kistimme')?.checked !== false;
@@ -8777,10 +8927,14 @@ document.addEventListener('keydown', e => {
   if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
   if (!$('#modal-bg').hidden) return;
 
+  /* Im Lauf schluckt der Zahlenakrobat alles. Ausserhalb eines Laufs darf er
+     trotzdem mitreden, solange sein Reiter offen ist — Enter loest dort den
+     Hauptknopf aus, Escape geht eine Ebene zurueck. */
   if (MATHE?.laeuft()) {
     if (MATHE.taste(e)) { e.preventDefault(); return; }
     return;
   }
+  if (S.seite === 'mathe' && MATHE?.taste(e)) { e.preventDefault(); return; }
 
   if (uebung?.aktiv) {
     if (lernboxTaste(e)) { e.preventDefault(); return; }
@@ -8863,6 +9017,13 @@ window.__T = {
   /* Stufe 7: Fenster in das Mathematik-Modul. Als Getter, weil window.__T
      schon steht, bevor start() das Modul geladen hat. */
   get mathe() { return MATHE?.__T || null; },
+  /* Zustand der laufenden Runde bzw. Sitzung — als Getter, weil beide
+     jederzeit neu gesetzt werden. Nur lesen, nichts steuern. */
+  get uebung() { return uebung; },
+  /* Abfragemodi eines Kastens — die Prüfung muss abwarten können, bis eine
+     Änderung über onSnapshot wirklich in S.decks angekommen ist. */
+  deckModi: id => (S.decks.find(d => d.id === (id || 'd1'))?.modi || []).slice(),
+  get sitzung() { return sitzung; },
   aktion: AKTION,
   version: VERSION
 };
