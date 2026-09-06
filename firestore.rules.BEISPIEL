@@ -1,0 +1,94 @@
+rules_version = '2';
+
+/* ===========================================================================
+   ACHTUNG — REKONSTRUIERT, NICHT DAS ORIGINAL.
+   Diese Fassung wurde aus dem Datenmodell neu geschrieben, nachdem die
+   ausgelieferte Datei verlorenging. Sie ist inhaltlich richtig, kann aber von
+   deiner veröffentlichten Fassung abweichen. Vergleiche sie in der
+   Firebase-Konsole (Firestore → Regeln), BEVOR du sie veröffentlichst.
+   Die Datei heißt `.BEISPIEL`, damit sie beim Auspacken nichts überschreibt.
+   =========================================================================== */
+
+/* HAN CROCO — Sicherheitsregeln
+   ---------------------------------------------------------------------------
+   Zwei Bereiche:
+
+   1. users/{uid}/…  gehört genau einem Konto. Niemand sonst kommt heran,
+      auch nicht lesend.
+
+   2. audioBedarf/…  ist ABSICHTLICH gemeinsam. Dort meldet die App, welcher
+      Kartentext noch keine Aufnahme hat, damit das Erzeugungsskript weiß, was
+      zu tun ist. Der Preis: Kartentexte aus diesem Dokument sind für alle
+      angemeldeten Konten dieses Projekts lesbar — und zwei davon gehören
+      Kindern. Wer das nicht will, nimmt in den Einstellungen den Haken
+      „Fehlende Aufnahmen in die gemeinsame Liste eintragen" heraus.
+
+      Deshalb hier so eng wie möglich:
+        · `get` ja, `list` NEIN — ein Massenabzug der ganzen Sammlung in einer
+          Abfrage ist damit gesperrt. Wer einen Eintrag lesen will, muss
+          seinen Schlüssel schon kennen (er ist ein Hash über den Text).
+        · `create` ja, `update`/`delete` NEIN — ein vorhandener Eintrag lässt
+          sich weder verändern noch löschen. Die App rechnet damit: Ein
+          abgelehnter Zweitversuch heißt „steht schon da" und wird geschluckt.
+        · Die Feldform wird geprüft, damit der Eintrag keine Ablage wird.
+   --------------------------------------------------------------------------- */
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function angemeldet() {
+      return request.auth != null && request.auth.uid != null;
+    }
+
+    /* Optionale weitere Verengung: Nur diese drei Kennungen dürfen überhaupt
+       etwas. Die Kennungen stehen in der Firebase-Konsole unter
+       Authentication → Users. Auskommentiert, weil die App auch ohne läuft
+       und ein Tippfehler hier alle drei Konten aussperrt.
+
+    function istErlaubtesKonto() {
+      return request.auth.uid in [
+        'HIER-UID-EINS', 'HIER-UID-ZWEI', 'HIER-UID-DREI'
+      ];
+    }
+    */
+
+    /* --- 1. Der eigene Bestand ------------------------------------------ */
+
+    match /users/{uid}/{rest=**} {
+      allow read, write: if angemeldet() && request.auth.uid == uid;
+    }
+
+    /* --- 2. Die gemeinsame Liste fehlender Aufnahmen -------------------- */
+
+    match /audioBedarf/{schluessel} {
+
+      function formStimmt() {
+        return request.resource.data.keys().hasOnly(
+                 ['text', 'sprache', 'stimme', 'lautschrift', 'gemeldetAm'])
+            && request.resource.data.text is string
+            && request.resource.data.text.size() > 0
+            && request.resource.data.text.size() <= 900
+            && request.resource.data.sprache is string
+            && request.resource.data.sprache.size() <= 12
+            && request.resource.data.stimme is string
+            && request.resource.data.stimme.size() <= 40
+            && request.resource.data.lautschrift is string
+            && request.resource.data.lautschrift.size() <= 200
+            && request.resource.data.gemeldetAm is string
+            && request.resource.data.gemeldetAm.size() == 10;
+      }
+
+      /* `get`, nicht `read`: `read` deckte auch `list` ab, und dann ließe
+         sich die ganze Sammlung in einer Abfrage abziehen. */
+      allow get:    if angemeldet();
+      allow create: if angemeldet() && formStimmt();
+      allow update, delete: if false;
+    }
+
+    /* --- 3. Alles andere ------------------------------------------------ */
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

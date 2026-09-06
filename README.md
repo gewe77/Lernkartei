@@ -10,16 +10,63 @@ Pages, mit Firebase (Anmeldung + Firestore) als einzigem Server.
 > `han-croco-7-4.zip`, falls du sie noch hast — sie ist ausführlicher,
 > besonders bei Einrichtung, Sprachausgabe und Datenmodell.
 
+## Beim Auspacken — bitte zuerst lesen
+
+Dieses Paket enthält **keine** Datei, die deine eigene Einrichtung
+überschreiben kann. Drei Dateien gehören dir und stehen deshalb nur als
+Beispiel bzw. gar nicht darin:
+
+| Datei | im Paket | warum |
+|---|---|---|
+| `firebase-config.js` | **nein**, nur `firebase-config.BEISPIEL.js` | enthält deine Zugangsdaten |
+| `audio/manifest.json` | **nein** | listet deine vorproduzierten Aufnahmen |
+| `firestore.rules` | **nein**, nur `firestore.rules.BEISPIEL` | ist in der Firebase-Konsole veröffentlicht |
+
+**Beim allerersten Einrichten** einmal kopieren:
+
+```bash
+cp firebase-config.BEISPIEL.js firebase-config.js
+cp firestore.rules.BEISPIEL   firestore.rules
+```
+
+und `firebase-config.js` ausfüllen. Danach kannst du jedes weitere Paket
+gefahrlos darüber auspacken.
+
+**Falls doch einmal etwas überschrieben wurde:**
+
+```bash
+git restore firebase-config.js audio/manifest.json firestore.rules
+# schon eingecheckt? dann aus dem Stand davor:
+git restore --source=HEAD~1 -- firebase-config.js audio/manifest.json firestore.rules
+```
+
+Ohne Git: Die Werte für `firebase-config.js` stehen in der Firebase-Konsole
+unter *Projekteinstellungen → Meine Apps → Web-App → Konfiguration*. Und das
+Audio-Verzeichnis lässt sich aus dem Ordner neu aufbauen, ohne dass etwas neu
+erzeugt oder bezahlt wird:
+
+```bash
+node werkzeuge/manifest-neu.mjs
+```
+
+Solange noch nichts gepusht ist, liefert die laufende Seite die alten Dateien
+übrigens weiter aus — `https://<konto>.github.io/<repo>/firebase-config.js`
+im Browser öffnen und die Werte abschreiben, ist oft der schnellste Weg.
+
+---
+
 ## Dateien
 
 | Datei | wofür |
 |---|---|
 | `index.html` | die ganze App: Oberfläche, Karteikasten, Lernbox, Kästen, Karten, Statistik, Einstellungen |
-| `firebase-config.js` | **musst du ausfüllen** — Zugangsdaten deines Firebase-Projekts |
-| `firestore.rules` | die Sicherheitsregeln, in der Firebase-Konsole zu veröffentlichen |
+| `firebase-config.BEISPIEL.js` | Vorlage — einmal nach `firebase-config.js` kopieren und ausfüllen |
+| `firestore.rules.BEISPIEL` | die Sicherheitsregeln, in der Firebase-Konsole zu veröffentlichen |
 | `js/mathe*.js` | der Zahlenakrobat: Oberfläche, Aufgabenerzeuger, Termrechner, Meisterklasse und sechs Bereiche zu je hundert Sets |
 | `audio/` | vorproduzierte Aussprache-Aufnahmen samt `manifest.json` |
 | `werkzeuge/sprache-erzeugen.mjs` | erzeugt diese Aufnahmen auf deinem Rechner (Google Chirp 3) |
+| `werkzeuge/manifest-neu.mjs` | baut `audio/manifest.json` aus dem Ordner neu auf, ohne etwas zu erzeugen |
+| `werkzeuge/packen.sh` | baut das Auslieferungspaket und weigert sich, deine Dateien mit einzupacken |
 | `test/` | Prüfstand, läuft mit Node und Playwright gegen eine Firebase-Attrappe |
 
 Die `js/`-Module werden zur Laufzeit nachgeladen, jedes einzeln und in
@@ -32,7 +79,8 @@ try/catch. Fehlt oder klemmt eines, fehlt genau ein Bereich — nicht die App.
 3. Firestore anlegen, `firestore.rules` veröffentlichen.
 4. Die eigene Domain (`…github.io`) unter *Authentication → Settings →
    Authorized domains* freigeben.
-5. Die Werte aus der Firebase-Konsole in `firebase-config.js` eintragen.
+5. `cp firebase-config.BEISPIEL.js firebase-config.js` und die Werte aus der
+   Firebase-Konsole eintragen.
 6. Alles ins Repository, GitHub Pages einschalten.
 
 Der `apiKey` in `firebase-config.js` ist **kein Geheimnis** — er benennt das

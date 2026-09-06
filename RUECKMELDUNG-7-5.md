@@ -201,6 +201,41 @@ bei 24 px, weil daneben mit „Bearbeiten" ein großes Ziel steht.
 
 ---
 
+## Nachtrag 6.9.2026 — ein Auslieferungsfehler und was daraus folgt
+
+Das erste Paket 7.5 enthielt drei Dateien, die **dir** gehören und beim
+Auspacken über dein Repository deine Fassung überschrieben haben:
+
+| Datei | was drin war | Folge |
+|---|---|---|
+| `firebase-config.js` | Platzhalter | **die App startete nicht** — das hast du gemeldet |
+| `audio/manifest.json` | leer | alle vorproduzierten Aufnahmen hätten still als nicht vorhanden gegolten; die Karten wären auf die Browserstimme zurückgefallen |
+| `firestore.rules` | aus dem Datenmodell rekonstruiert | deine veröffentlichte Fassung im Repository überschrieben |
+
+Ursache: Der Arbeitsplatz war abgeräumt worden, und beim Wiederaufbau habe
+ich diese drei Dateien neu geschrieben, weil sie zum Bauen und Prüfen
+gebraucht wurden — und sie dann mit eingepackt, statt sie zurückzuhalten. Die
+App hat den ersten Fall selbst abgefangen und im Klartext gemeldet; die
+beiden anderen wären still geblieben.
+
+**Behoben:**
+
+* Das Paket enthält diese drei Dateien nicht mehr. Stattdessen liegen
+  `firebase-config.BEISPIEL.js` und `firestore.rules.BEISPIEL` bei, beide mit
+  einem Warnkopf; `audio/manifest.json` fehlt ganz (die App kommt damit klar).
+* `werkzeuge/packen.sh` baut das Paket und **weigert sich**, wenn eine dieser
+  Dateien darin auftaucht. Gegengeprüft: Eine nachträglich eingeschmuggelte
+  `firebase-config.js` wird erkannt.
+* `werkzeuge/manifest-neu.mjs` baut das Audio-Verzeichnis aus dem Ordner neu
+  auf — ohne etwas zu erzeugen, ohne Netz, ohne Kosten.
+* Die README beginnt jetzt mit einem Abschnitt „Beim Auspacken".
+
+**Die Regel, die daraus folgt**, steht als Kommentarkopf in `packen.sh`:
+*Im Paket darf keine Datei liegen, die beim Auspacken etwas überschreibt, was
+der Nutzer selbst angelegt hat.*
+
+---
+
 ## Prüfstand
 
 Der Prüfstand musste neu aufgebaut werden — der alte `test/`-Ordner ging mit
